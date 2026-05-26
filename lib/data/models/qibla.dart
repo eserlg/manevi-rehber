@@ -30,13 +30,13 @@ class QiblaDirection {
 
     // Calculate Qibla direction
     final double dLon = lon2 - lon1;
-    
+
     final double y = sin(dLon) * cos(lat2);
     final double x = cos(lat1) * sin(lat2) - sin(lat1) * cos(lat2) * cos(dLon);
-    
+
     double qiblaRad = atan2(y, x);
     double qiblaDeg = _toDegrees(qiblaRad);
-    
+
     // Normalize to 0-360
     qiblaDeg = (qiblaDeg + 360) % 360;
 
@@ -59,17 +59,18 @@ class QiblaDirection {
     return radians * 180 / pi;
   }
 
-  static double _calculateDistance(double lat1, double lon1, double lat2, double lon2) {
+  static double _calculateDistance(
+      double lat1, double lon1, double lat2, double lon2) {
     const double earthRadius = 6371; // km
-    
+
     final double dLat = lat2 - lat1;
     final double dLon = lon2 - lon1;
-    
+
     final double a = sin(dLat / 2) * sin(dLat / 2) +
         cos(lat1) * cos(lat2) * sin(dLon / 2) * sin(dLon / 2);
-    
+
     final double c = 2 * atan2(sqrt(a), sqrt(1 - a));
-    
+
     return earthRadius * c;
   }
 
@@ -87,15 +88,24 @@ class QiblaDirection {
 
   String get fullDirectionName {
     switch (compassDirection) {
-      case 'K': return 'Kuzey';
-      case 'KD': return 'Kuzeydoğu';
-      case 'D': return 'Doğu';
-      case 'GD': return 'Güneydoğu';
-      case 'G': return 'Güncy';
-      case 'GB': return 'Güneybatı';
-      case 'B': return 'Batı';
-      case 'KB': return 'Kuzeybatı';
-      default: return 'Bilinmeyen';
+      case 'K':
+        return 'Kuzey';
+      case 'KD':
+        return 'Kuzeydoğu';
+      case 'D':
+        return 'Doğu';
+      case 'GD':
+        return 'Güneydoğu';
+      case 'G':
+        return 'Güney';
+      case 'GB':
+        return 'Güneybatı';
+      case 'B':
+        return 'Batı';
+      case 'KB':
+        return 'Kuzeybatı';
+      default:
+        return 'Bilinmeyen';
     }
   }
 

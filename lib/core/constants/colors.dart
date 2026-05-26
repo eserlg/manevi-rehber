@@ -20,9 +20,9 @@ class AppColors {
   static const Color accentDark = Color(0xFF7C5A18);
 
   // Background Colors
-  static const Color background = Color(0xFFF8FAF6);
+  static const Color background = Color(0xFFF4F7F1);
   static const Color surface = Color(0xFFFFFFFF);
-  static const Color surfaceVariant = Color(0xFFEAF2EC);
+  static const Color surfaceVariant = Color(0xFFE6F0EA);
 
   // Text Colors
   static const Color textPrimary = Color(0xFF24352F);
@@ -37,7 +37,7 @@ class AppColors {
   static const Color info = Color(0xFF4F8FA8);
 
   // Prayer Time Colors
-  static const Color softBlue = Color(0xFFDDECF2);
+  static const Color softBlue = Color(0xFFCFE8EE);
   static const Color softPurple = Color(0xFFE9E0F3);
   static const Color softOrange = Color(0xFFF3E2C3);
   static const Color softPink = Color(0xFFF2D7D2);

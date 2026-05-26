@@ -1,5 +1,17 @@
 import 'package:just_audio/just_audio.dart';
 
+class QuranAudioReference {
+  final int surahId;
+  final int firstAyah;
+  final int lastAyah;
+
+  const QuranAudioReference(
+    this.surahId,
+    this.firstAyah, [
+    int? lastAyah,
+  ]) : lastAyah = lastAyah ?? firstAyah;
+}
+
 class QuranAudioService {
   final AudioPlayer _player = AudioPlayer();
 
@@ -7,6 +19,43 @@ class QuranAudioService {
     try {
       await _player.stop();
       await _player.setUrl(_surahAudioUrl(surahId));
+      await _player.play();
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  Future<bool> playReferences(List<QuranAudioReference> references) async {
+    final ayahNumbers = <int>[];
+
+    for (final reference in references) {
+      if (reference.firstAyah > reference.lastAyah) continue;
+
+      for (var ayah = reference.firstAyah;
+          ayah <= reference.lastAyah;
+          ayah += 1) {
+        final globalAyah = _globalAyahNumber(reference.surahId, ayah);
+        if (globalAyah != null) ayahNumbers.add(globalAyah);
+      }
+    }
+
+    if (ayahNumbers.isEmpty) return false;
+
+    try {
+      await _player.stop();
+      if (ayahNumbers.length == 1) {
+        await _player.setUrl(_ayahAudioUrl(ayahNumbers.first));
+      } else {
+        await _player.setAudioSource(
+          ConcatenatingAudioSource(
+            children: [
+              for (final ayahNumber in ayahNumbers)
+                AudioSource.uri(Uri.parse(_ayahAudioUrl(ayahNumber))),
+            ],
+          ),
+        );
+      }
       await _player.play();
       return true;
     } catch (_) {
@@ -42,9 +91,142 @@ class QuranAudioService {
     return 'https://cdn.islamic.network/quran/audio-surah/128/ar.alafasy/$surahId.mp3';
   }
 
+  String _ayahAudioUrl(int ayahNumber) {
+    return 'https://cdn.islamic.network/quran/audio/128/ar.alafasy/$ayahNumber.mp3';
+  }
+
   String _turkishMealAudioUrl(String fileName) {
     return 'https://archive.org/download/Prof.Dr.Hamdi_DoNDuREN-Turkce_Meal/$fileName';
   }
+
+  int? _globalAyahNumber(int surahId, int ayah) {
+    if (surahId < 1 || surahId > _ayahCounts.length) return null;
+    final surahAyahCount = _ayahCounts[surahId - 1];
+    if (ayah < 1 || ayah > surahAyahCount) return null;
+
+    var previousAyahs = 0;
+    for (var index = 0; index < surahId - 1; index += 1) {
+      previousAyahs += _ayahCounts[index];
+    }
+    return previousAyahs + ayah;
+  }
+
+  static const List<int> _ayahCounts = [
+    7,
+    286,
+    200,
+    176,
+    120,
+    165,
+    206,
+    75,
+    129,
+    109,
+    123,
+    111,
+    43,
+    52,
+    99,
+    128,
+    111,
+    110,
+    98,
+    135,
+    112,
+    78,
+    118,
+    64,
+    77,
+    227,
+    93,
+    88,
+    69,
+    60,
+    34,
+    30,
+    73,
+    54,
+    45,
+    83,
+    182,
+    88,
+    75,
+    85,
+    54,
+    53,
+    89,
+    59,
+    37,
+    35,
+    38,
+    29,
+    18,
+    45,
+    60,
+    49,
+    62,
+    55,
+    78,
+    96,
+    29,
+    22,
+    24,
+    13,
+    14,
+    11,
+    11,
+    18,
+    12,
+    12,
+    30,
+    52,
+    52,
+    44,
+    28,
+    28,
+    20,
+    56,
+    40,
+    31,
+    50,
+    40,
+    46,
+    42,
+    29,
+    19,
+    36,
+    25,
+    22,
+    17,
+    19,
+    26,
+    30,
+    20,
+    15,
+    21,
+    11,
+    8,
+    8,
+    19,
+    5,
+    8,
+    8,
+    11,
+    11,
+    8,
+    3,
+    9,
+    5,
+    4,
+    7,
+    3,
+    6,
+    3,
+    5,
+    4,
+    5,
+    6,
+  ];
 
   static const Map<int, String> _turkishMealAudioFiles = {
     1: '001fatiha_64kb.mp3',

@@ -6,6 +6,7 @@ import '../../core/constants/colors.dart';
 import '../../core/constants/dimensions.dart';
 import '../../data/models/prayer.dart';
 import '../../data/services/app_share_service.dart';
+import '../../data/services/quran_audio_service.dart';
 import '../../data/services/text_to_speech_service.dart';
 import '../providers/providers.dart';
 
@@ -34,6 +35,23 @@ class _PrayersScreenState extends ConsumerState<PrayersScreen> {
   final TextEditingController _searchController = TextEditingController();
   late final TextToSpeechService _speechService;
 
+  static const Map<String, List<QuranAudioReference>> _quranPrayerAudio = {
+    '6': [QuranAudioReference(113, 1, 5)],
+    '7': [QuranAudioReference(114, 1, 6)],
+    '8': [QuranAudioReference(112, 1, 4)],
+    '9': [QuranAudioReference(2, 255)],
+    '10': [QuranAudioReference(1, 1, 7)],
+    '11': [QuranAudioReference(2, 201)],
+    '12': [QuranAudioReference(7, 23)],
+    '13': [QuranAudioReference(20, 25, 28)],
+    '14': [QuranAudioReference(21, 87)],
+    '15': [QuranAudioReference(21, 83)],
+    '21': [QuranAudioReference(43, 13, 14)],
+    '35': [QuranAudioReference(17, 24)],
+    '36': [QuranAudioReference(20, 114)],
+    '42': [QuranAudioReference(25, 74)],
+  };
+
   @override
   void initState() {
     super.initState();
@@ -43,6 +61,7 @@ class _PrayersScreenState extends ConsumerState<PrayersScreen> {
   @override
   void dispose() {
     _speechService.stop();
+    ref.read(quranAudioProvider).stop();
     _searchController.dispose();
     super.dispose();
   }
@@ -407,8 +426,7 @@ class _PrayersScreenState extends ConsumerState<PrayersScreen> {
                         ),
                         IconButton(
                           tooltip: 'Sesi durdur',
-                          onPressed: () =>
-                              ref.read(textToSpeechProvider).stop(),
+                          onPressed: _stopPrayerAudio,
                           icon: const Icon(Icons.stop_circle_outlined),
                         ),
                       ],
@@ -484,10 +502,34 @@ class _PrayersScreenState extends ConsumerState<PrayersScreen> {
   }
 
   Future<void> _speakPrayer(Prayer prayer, bool arabic) async {
-    final started = await ref.read(textToSpeechProvider).speak(
-          arabic ? prayer.arabic : prayer.turkish,
-          arabic ? SpeechLanguage.arabic : SpeechLanguage.turkish,
-        );
+    var started = false;
+
+    if (arabic) {
+      final references = _quranPrayerAudio[prayer.id];
+      if (references != null) {
+        started = await ref.read(quranAudioProvider).playReferences(references);
+      }
+    } else {
+      final wholeSurahId = switch (prayer.id) {
+        '6' => 113,
+        '7' => 114,
+        '8' => 112,
+        '10' => 1,
+        _ => null,
+      };
+      if (wholeSurahId != null) {
+        started =
+            await ref.read(quranAudioProvider).playTurkishMeal(wholeSurahId);
+      }
+    }
+
+    if (!started) {
+      started = await ref.read(textToSpeechProvider).speak(
+            arabic ? prayer.arabic : prayer.turkish,
+            arabic ? SpeechLanguage.arabic : SpeechLanguage.turkish,
+          );
+    }
+
     if (!started && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -499,6 +541,11 @@ class _PrayersScreenState extends ConsumerState<PrayersScreen> {
         ),
       );
     }
+  }
+
+  Future<void> _stopPrayerAudio() async {
+    await ref.read(quranAudioProvider).stop();
+    await ref.read(textToSpeechProvider).stop();
   }
 
   String _categoryLabel(String category) {

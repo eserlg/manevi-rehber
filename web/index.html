@@ -37,6 +37,18 @@
     (function () {
       let compassHandler = null;
       let speechKeepAliveTimer = null;
+      let speechVoices = [];
+
+      const refreshSpeechVoices = function () {
+        if (!('speechSynthesis' in window)) return [];
+        speechVoices = window.speechSynthesis.getVoices() || [];
+        return speechVoices;
+      };
+
+      if ('speechSynthesis' in window) {
+        refreshSpeechVoices();
+        window.speechSynthesis.onvoiceschanged = refreshSpeechVoices;
+      }
 
       window.ruhHuzurStopSpeech = function () {
         if (speechKeepAliveTimer) {
@@ -56,15 +68,65 @@
           }
 
           const synth = window.speechSynthesis;
-          const voices = synth.getVoices();
+          const voices = refreshSpeechVoices();
           const languagePrefix = language.split('-')[0].toLowerCase();
-          const voice = voices.find(function (item) {
-            return item.lang && item.lang.toLowerCase() === language.toLowerCase();
-          }) || voices.find(function (item) {
-            return item.lang && item.lang.toLowerCase().startsWith(languagePrefix);
-          }) || voices.find(function (item) {
-            return item.default;
-          });
+          const normalizedLanguage = language.toLowerCase();
+          const scoreVoice = function (voiceItem) {
+            const voiceLang = String(voiceItem.lang || '').toLowerCase().replace('_', '-');
+            const voiceName = String(voiceItem.name || '').toLowerCase();
+            const searchable = `${voiceName} ${voiceLang}`;
+            let score = 0;
+
+            if (voiceLang === normalizedLanguage) {
+              score += 100;
+            } else if (voiceLang.startsWith(languagePrefix)) {
+              score += 70;
+            } else {
+              return 0;
+            }
+
+            [
+              'natural',
+              'neural',
+              'enhanced',
+              'premium',
+              'online',
+              'google',
+              'microsoft',
+              'apple',
+              'siri'
+            ].forEach(function (word) {
+              if (searchable.includes(word)) score += 10;
+            });
+
+            const preferredNames = languagePrefix === 'tr'
+              ? ['yelda', 'emel', 'filiz', 'ahmet', 'turkish', 'türk']
+              : ['maged', 'majed', 'zeina', 'laila', 'layla', 'hoda', 'naayf', 'tarik', 'salma', 'mariam', 'arabic', 'العربية'];
+
+            preferredNames.forEach(function (word) {
+              if (searchable.includes(word)) score += 12;
+            });
+
+            ['compact', 'espeak', 'pico', 'robot'].forEach(function (word) {
+              if (searchable.includes(word)) score -= 20;
+            });
+
+            if (voiceItem.default) score += 3;
+            return score;
+          };
+
+          const voice = voices
+            .map(function (item) {
+              return { item: item, score: scoreVoice(item) };
+            })
+            .filter(function (item) {
+              return item.score >= 50;
+            })
+            .sort(function (a, b) {
+              return b.score - a.score;
+            })[0]?.item || voices.find(function (item) {
+              return item.default;
+            });
 
           const chunks = String(text || '')
             .replace(/\s+/g, ' ')
@@ -102,8 +164,11 @@
             const utterance = new SpeechSynthesisUtterance(chunks[index]);
             utterance.lang = voice && voice.lang ? voice.lang : language;
             if (voice) utterance.voice = voice;
-            utterance.rate = rate;
-            utterance.pitch = 1;
+            const naturalRate = languagePrefix === 'ar'
+              ? Math.max(0.76, Math.min(0.90, rate * 1.9))
+              : Math.max(0.84, Math.min(0.98, rate * 1.8));
+            utterance.rate = naturalRate;
+            utterance.pitch = languagePrefix === 'ar' ? 0.96 : 1.02;
             utterance.volume = 1;
             utterance.onstart = resolveStarted;
             utterance.onend = function () {
@@ -140,7 +205,18 @@
 
         if (typeof DeviceOrientationEvent.requestPermission === 'function') {
           try {
-            return await DeviceOrientationEvent.requestPermission();
+            const orientationPermission = await DeviceOrientationEvent.requestPermission();
+            if (orientationPermission !== 'granted') return orientationPermission;
+
+            if (
+              typeof DeviceMotionEvent !== 'undefined' &&
+              typeof DeviceMotionEvent.requestPermission === 'function'
+            ) {
+              const motionPermission = await DeviceMotionEvent.requestPermission();
+              if (motionPermission !== 'granted') return motionPermission;
+            }
+
+            return 'granted';
           } catch (error) {
             return 'denied';
           }
@@ -160,12 +236,18 @@
         }
 
         compassHandler = function (event) {
+          const normalize = function (value) {
+            return ((value % 360) + 360) % 360;
+          };
           let heading = null;
 
           if (typeof event.webkitCompassHeading === 'number') {
-            heading = event.webkitCompassHeading;
+            heading = normalize(event.webkitCompassHeading);
           } else if (typeof event.alpha === 'number') {
-            heading = (360 - event.alpha) % 360;
+            const screenAngle = window.screen?.orientation?.angle ??
+              window.orientation ??
+              0;
+            heading = normalize(360 - event.alpha + Number(screenAngle || 0));
           }
 
           if (heading !== null && Number.isFinite(heading)) {

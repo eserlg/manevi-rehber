@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/services.dart';
@@ -104,44 +105,75 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     }
 
     return Scaffold(
-      body: SafeArea(
-        child: RefreshIndicator(
-          onRefresh: () async {
-            ref.invalidate(prayerTimesProvider);
-          },
-          child: SingleChildScrollView(
-            physics: const AlwaysScrollableScrollPhysics(),
-            padding: const EdgeInsets.all(AppDimensions.screenPadding),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Header
-                _buildHeader(city),
-                const SizedBox(height: AppDimensions.spacingLG),
-
-                // Prayer Times Card
-                prayerTimesAsync.when(
-                  data: (prayerTimes) => _buildPrayerTimesCard(prayerTimes),
-                  loading: () => _buildLoadingCard(),
-                  error: (_, __) => _buildErrorCard(),
-                ),
-                const SizedBox(height: AppDimensions.spacingLG),
-
-                // Quick Actions
-                _buildQuickActions(),
-                const SizedBox(height: AppDimensions.spacingLG),
-
-                _buildReligiousDays(),
-                const SizedBox(height: AppDimensions.spacingLG),
-
-                _buildMemorialCard(),
-                const SizedBox(height: AppDimensions.spacingLG),
-
-                // Verse of the Day
-                _buildVerseOfDay(),
-              ],
-            ),
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Color(0xFFF9FAF4),
+              AppColors.background,
+              Color(0xFFEAF3ED),
+            ],
           ),
+        ),
+        child: Stack(
+          children: [
+            const Positioned.fill(
+              child: CustomPaint(painter: _HomePatternPainter()),
+            ),
+            SafeArea(
+              child: RefreshIndicator(
+                onRefresh: () async {
+                  ref.invalidate(prayerTimesProvider);
+                },
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    final wide = constraints.maxWidth >= 720;
+                    final horizontalPadding = wide
+                        ? AppDimensions.spacingLG
+                        : AppDimensions.screenPadding;
+
+                    return SingleChildScrollView(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      padding: EdgeInsets.fromLTRB(
+                        horizontalPadding,
+                        AppDimensions.screenPadding,
+                        horizontalPadding,
+                        AppDimensions.spacingXL,
+                      ),
+                      child: Center(
+                        child: ConstrainedBox(
+                          constraints: const BoxConstraints(maxWidth: 1080),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              _buildHeader(city),
+                              const SizedBox(height: AppDimensions.spacingLG),
+                              prayerTimesAsync.when(
+                                data: (prayerTimes) =>
+                                    _buildPrayerTimesCard(prayerTimes),
+                                loading: () => _buildLoadingCard(),
+                                error: (_, __) => _buildErrorCard(),
+                              ),
+                              const SizedBox(height: AppDimensions.spacingLG),
+                              _buildQuickActions(),
+                              const SizedBox(height: AppDimensions.spacingLG),
+                              _buildReligiousDays(),
+                              const SizedBox(height: AppDimensions.spacingLG),
+                              _buildMemorialCard(),
+                              const SizedBox(height: AppDimensions.spacingLG),
+                              _buildVerseOfDay(),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -342,83 +374,131 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final timeUntil = prayerTimes.getTimeUntilNextPrayer();
 
     return Container(
+      width: double.infinity,
       padding: const EdgeInsets.all(AppDimensions.spacingLG),
       decoration: BoxDecoration(
-        gradient: AppColors.primaryGradient,
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            AppColors.primaryDark,
+            AppColors.primary,
+            AppColors.primaryLight,
+          ],
+        ),
         borderRadius: BorderRadius.circular(AppDimensions.radiusLarge),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primary.withOpacity(0.3),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
+            color: AppColors.primaryDark.withOpacity(0.26),
+            blurRadius: 28,
+            offset: const Offset(0, 16),
           ),
         ],
       ),
-      child: Column(
-        children: [
-          // Next Prayer
-          Text(
-            'Sonraki Namaz',
-            style: GoogleFonts.notoSans(
-              fontSize: 14,
-              color: Colors.white.withOpacity(0.9),
-            ),
-          ),
-          const SizedBox(height: AppDimensions.spacingSM),
-          Text(
-            nextPrayer,
-            style: GoogleFonts.amiri(
-              fontSize: 36,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
-          ),
-          Text(
-            nextPrayerTime,
-            style: GoogleFonts.amiri(
-              fontSize: 28,
-              color: Colors.white.withOpacity(0.9),
-            ),
-          ),
-          const SizedBox(height: AppDimensions.spacingMD),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final wide = constraints.maxWidth >= 520;
 
-          // Countdown
-          Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppDimensions.spacingMD,
-              vertical: AppDimensions.spacingSM,
-            ),
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(AppDimensions.radiusLarge),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(Icons.timer, color: Colors.white, size: 20),
-                const SizedBox(width: AppDimensions.spacingSM),
-                Text(
-                  _formatDuration(timeUntil),
+          final prayerInfo = Column(
+            crossAxisAlignment:
+                wide ? CrossAxisAlignment.start : CrossAxisAlignment.center,
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppDimensions.spacingMD,
+                  vertical: AppDimensions.spacingXS,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.14),
+                  borderRadius:
+                      BorderRadius.circular(AppDimensions.radiusCircle),
+                  border: Border.all(color: Colors.white.withOpacity(0.18)),
+                ),
+                child: Text(
+                  'Sonraki Namaz',
                   style: GoogleFonts.notoSans(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white.withOpacity(0.92),
+                  ),
+                ),
+              ),
+              const SizedBox(height: AppDimensions.spacingSM),
+              Text(
+                nextPrayer,
+                style: GoogleFonts.amiri(
+                  fontSize: wide ? 44 : 36,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+              Text(
+                nextPrayerTime,
+                style: GoogleFonts.amiri(
+                  fontSize: wide ? 32 : 28,
+                  color: Colors.white.withOpacity(0.92),
+                ),
+              ),
+            ],
+          );
+
+          final countdown = Container(
+            padding: const EdgeInsets.all(AppDimensions.spacingMD),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.16),
+              borderRadius: BorderRadius.circular(AppDimensions.radiusLarge),
+              border: Border.all(color: Colors.white.withOpacity(0.16)),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment:
+                  wide ? CrossAxisAlignment.end : CrossAxisAlignment.center,
+              children: [
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.timer, color: Colors.white, size: 20),
+                    const SizedBox(width: AppDimensions.spacingSM),
+                    Text(
+                      _formatDuration(timeUntil),
+                      style: GoogleFonts.notoSans(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: AppDimensions.spacingSM),
+                Text(
+                  prayerTimes.hijriDate,
+                  style: GoogleFonts.notoSans(
+                    fontSize: 12,
+                    color: Colors.white.withOpacity(0.82),
                   ),
                 ),
               ],
             ),
-          ),
-          const SizedBox(height: AppDimensions.spacingMD),
+          );
 
-          // Hijri Date
-          Text(
-            prayerTimes.hijriDate,
-            style: GoogleFonts.notoSans(
-              fontSize: 12,
-              color: Colors.white.withOpacity(0.8),
-            ),
-          ),
-        ],
+          if (wide) {
+            return Row(
+              children: [
+                Expanded(child: prayerInfo),
+                const SizedBox(width: AppDimensions.spacingLG),
+                countdown,
+              ],
+            );
+          }
+
+          return Column(
+            children: [
+              prayerInfo,
+              const SizedBox(height: AppDimensions.spacingMD),
+              countdown,
+            ],
+          );
+        },
       ),
     );
   }
@@ -468,50 +548,97 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Widget _buildQuickActions() {
-    return Column(
-      children: [
-        Row(
-          children: [
-            Expanded(
-              child: _buildQuickActionCard(
-                icon: Icons.auto_awesome,
-                title: 'Zikir',
-                subtitle: 'Tesbihat',
-                color: AppColors.accent,
-                onTap: () => ref.read(selectedTabProvider.notifier).state = 2,
-              ),
+    final actions = [
+      _QuickActionData(
+        icon: Icons.auto_awesome,
+        title: 'Zikir',
+        subtitle: 'Tesbihat',
+        color: AppColors.accent,
+        onTap: () => ref.read(selectedTabProvider.notifier).state = 2,
+      ),
+      _QuickActionData(
+        icon: Icons.menu_book,
+        title: 'Dualar',
+        subtitle: 'Günlük Dua',
+        color: AppColors.info,
+        onTap: () => ref.read(selectedTabProvider.notifier).state = 3,
+      ),
+      _QuickActionData(
+        icon: Icons.celebration_outlined,
+        title: 'Mesajlar',
+        subtitle: 'Bayram, Kandil ve Cuma',
+        color: AppColors.primary,
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const OccasionMessagesScreen(),
             ),
-            const SizedBox(width: AppDimensions.spacingMD),
-            Expanded(
+          );
+        },
+      ),
+    ];
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.maxWidth >= 760) {
+          return Row(
+            children: [
+              for (var index = 0; index < actions.length; index += 1) ...[
+                if (index > 0) const SizedBox(width: AppDimensions.spacingMD),
+                Expanded(
+                  child: _buildQuickActionCard(
+                    icon: actions[index].icon,
+                    title: actions[index].title,
+                    subtitle: actions[index].subtitle,
+                    color: actions[index].color,
+                    onTap: actions[index].onTap,
+                  ),
+                ),
+              ],
+            ],
+          );
+        }
+
+        return Column(
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: _buildQuickActionCard(
+                    icon: actions[0].icon,
+                    title: actions[0].title,
+                    subtitle: actions[0].subtitle,
+                    color: actions[0].color,
+                    onTap: actions[0].onTap,
+                  ),
+                ),
+                const SizedBox(width: AppDimensions.spacingMD),
+                Expanded(
+                  child: _buildQuickActionCard(
+                    icon: actions[1].icon,
+                    title: actions[1].title,
+                    subtitle: actions[1].subtitle,
+                    color: actions[1].color,
+                    onTap: actions[1].onTap,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: AppDimensions.spacingMD),
+            SizedBox(
+              width: double.infinity,
               child: _buildQuickActionCard(
-                icon: Icons.menu_book,
-                title: 'Dualar',
-                subtitle: 'Günlük Duası',
-                color: AppColors.softBlue,
-                onTap: () => ref.read(selectedTabProvider.notifier).state = 3,
+                icon: actions[2].icon,
+                title: actions[2].title,
+                subtitle: actions[2].subtitle,
+                color: actions[2].color,
+                onTap: actions[2].onTap,
               ),
             ),
           ],
-        ),
-        const SizedBox(height: AppDimensions.spacingMD),
-        SizedBox(
-          width: double.infinity,
-          child: _buildQuickActionCard(
-            icon: Icons.celebration_outlined,
-            title: 'Mesajlar',
-            subtitle: 'Bayram, Kandil ve Cuma mesajları',
-            color: AppColors.primary,
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const OccasionMessagesScreen(),
-                ),
-              );
-            },
-          ),
-        ),
-      ],
+        );
+      },
     );
   }
 
@@ -666,44 +793,39 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   title: 'Tesbih',
                   value: tasbihCount,
                   actionLabel: '+33',
+                  compact: compact,
                   onTap: () => _incrementMemorialCount(id, 'tasbihCount', 33),
                 ),
                 _buildMemorialCounter(
                   title: 'Yasin',
                   value: yasinCount,
                   actionLabel: '+1',
+                  compact: compact,
                   onTap: () => _incrementMemorialCount(id, 'yasinCount', 1),
                 ),
                 _buildMemorialCounter(
                   title: 'Hatim',
                   value: hatimCount,
                   actionLabel: '+1',
+                  compact: compact,
                   onTap: () => _incrementMemorialCount(id, 'hatimCount', 1),
                 ),
               ];
 
-              if (compact) {
-                return Column(
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(child: counters[0]),
-                        const SizedBox(width: AppDimensions.spacingSM),
-                        Expanded(child: counters[1]),
-                      ],
-                    ),
-                    const SizedBox(height: AppDimensions.spacingSM),
-                    counters[2],
-                  ],
-                );
-              }
-
               return Row(
                 children: [
                   Expanded(child: counters[0]),
-                  const SizedBox(width: AppDimensions.spacingSM),
+                  SizedBox(
+                    width: compact
+                        ? AppDimensions.spacingXS
+                        : AppDimensions.spacingSM,
+                  ),
                   Expanded(child: counters[1]),
-                  const SizedBox(width: AppDimensions.spacingSM),
+                  SizedBox(
+                    width: compact
+                        ? AppDimensions.spacingXS
+                        : AppDimensions.spacingSM,
+                  ),
                   Expanded(child: counters[2]),
                 ],
               );
@@ -718,10 +840,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     required String title,
     required int value,
     required String actionLabel,
+    bool compact = false,
     required VoidCallback onTap,
   }) {
     return Container(
-      padding: const EdgeInsets.all(AppDimensions.spacingMD),
+      padding: EdgeInsets.symmetric(
+        horizontal: compact ? AppDimensions.spacingXS : AppDimensions.spacingMD,
+        vertical: compact ? AppDimensions.spacingSM : AppDimensions.spacingMD,
+      ),
       decoration: BoxDecoration(
         color: AppColors.primary.withOpacity(0.06),
         borderRadius: BorderRadius.circular(AppDimensions.radiusMedium),
@@ -731,7 +857,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           Text(
             '$value',
             style: GoogleFonts.amiri(
-              fontSize: 28,
+              fontSize: compact ? 22 : 28,
               fontWeight: FontWeight.bold,
               color: AppColors.primaryDark,
             ),
@@ -739,13 +865,26 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           Text(
             title,
             style: GoogleFonts.notoSans(
-              fontSize: 12,
+              fontSize: compact ? 11 : 12,
               color: AppColors.textSecondary,
             ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
-          const SizedBox(height: AppDimensions.spacingSM),
+          SizedBox(
+            height: compact ? AppDimensions.spacingXS : AppDimensions.spacingSM,
+          ),
           TextButton(
             onPressed: onTap,
+            style: TextButton.styleFrom(
+              minimumSize: Size.zero,
+              padding: EdgeInsets.symmetric(
+                horizontal:
+                    compact ? AppDimensions.spacingXS : AppDimensions.spacingSM,
+                vertical: AppDimensions.spacingXS,
+              ),
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
             child: Text(actionLabel),
           ),
         ],
@@ -975,43 +1114,63 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     required Color color,
     required VoidCallback onTap,
   }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(AppDimensions.spacingMD),
-        decoration: BoxDecoration(
-          color: color.withOpacity(0.15),
-          borderRadius: BorderRadius.circular(AppDimensions.radiusMedium),
-          border: Border.all(color: color.withOpacity(0.3)),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(AppDimensions.spacingSM),
-              decoration: BoxDecoration(
-                color: color.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(AppDimensions.radiusSmall),
-              ),
-              child: Icon(icon, color: color, size: 24),
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(AppDimensions.radiusMedium),
+        child: Container(
+          constraints: const BoxConstraints(minHeight: 122),
+          padding: const EdgeInsets.all(AppDimensions.spacingMD),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                color.withOpacity(0.20),
+                AppColors.surface.withOpacity(0.76),
+              ],
             ),
-            const SizedBox(height: AppDimensions.spacingSM),
-            Text(
-              title,
-              style: GoogleFonts.notoSans(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: AppColors.textPrimary,
+            borderRadius: BorderRadius.circular(AppDimensions.radiusMedium),
+            border: Border.all(color: color.withOpacity(0.34)),
+            boxShadow: [
+              BoxShadow(
+                color: color.withOpacity(0.10),
+                blurRadius: 18,
+                offset: const Offset(0, 10),
               ),
-            ),
-            Text(
-              subtitle,
-              style: GoogleFonts.notoSans(
-                fontSize: 12,
-                color: AppColors.textSecondary,
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(AppDimensions.spacingSM),
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.2),
+                  borderRadius:
+                      BorderRadius.circular(AppDimensions.radiusSmall),
+                ),
+                child: Icon(icon, color: color, size: 24),
               ),
-            ),
-          ],
+              const SizedBox(height: AppDimensions.spacingSM),
+              Text(
+                title,
+                style: GoogleFonts.notoSans(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+              Text(
+                subtitle,
+                style: GoogleFonts.notoSans(
+                  fontSize: 12,
+                  color: AppColors.textSecondary,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -1141,4 +1300,63 @@ class _ReligiousDay {
       date: DateTime.parse(json['date']),
     );
   }
+}
+
+class _QuickActionData {
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final Color color;
+  final VoidCallback onTap;
+
+  const _QuickActionData({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.color,
+    required this.onTap,
+  });
+}
+
+class _HomePatternPainter extends CustomPainter {
+  const _HomePatternPainter();
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final linePaint = Paint()
+      ..color = AppColors.primary.withOpacity(0.035)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.2;
+
+    final archPaint = Paint()
+      ..color = AppColors.accent.withOpacity(0.045)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.4;
+
+    for (var x = -size.height; x < size.width; x += 72) {
+      canvas.drawLine(
+        Offset(x.toDouble(), size.height),
+        Offset(x + size.height * 0.55, 0),
+        linePaint,
+      );
+    }
+
+    for (var x = 64.0; x < size.width; x += 220) {
+      final rect = Rect.fromLTWH(x, 72, 160, 160);
+      canvas.drawArc(rect, pi, pi, false, archPaint);
+      canvas.drawLine(
+        Offset(x, 152),
+        Offset(x, 210),
+        archPaint,
+      );
+      canvas.drawLine(
+        Offset(x + 160, 152),
+        Offset(x + 160, 210),
+        archPaint,
+      );
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

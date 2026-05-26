@@ -19,37 +19,21 @@ class QiblaScreen extends ConsumerStatefulWidget {
   ConsumerState<QiblaScreen> createState() => _QiblaScreenState();
 }
 
-class _QiblaScreenState extends ConsumerState<QiblaScreen>
-    with SingleTickerProviderStateMixin {
+class _QiblaScreenState extends ConsumerState<QiblaScreen> {
   StreamSubscription<MagnetometerEvent>? _magnetometerSubscription;
   StreamSubscription<AccelerometerEvent>? _accelerometerSubscription;
   Timer? _sensorFallbackTimer;
   double _currentHeading = 0;
-  double _pitch = 0;
-  double _roll = 0;
+  MagnetometerEvent? _lastMagnetometer;
+  AccelerometerEvent? _lastAccelerometer;
   bool _isLoading = true;
   bool _hasLiveCompass = false;
   String _compassMessage = 'Pusula başlatılıyor...';
-
-  late AnimationController _pulseController;
-  late Animation<double> _pulseAnimation;
 
   @override
   void initState() {
     super.initState();
     _initCompass();
-    _initAnimation();
-  }
-
-  void _initAnimation() {
-    _pulseController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1500),
-    )..repeat(reverse: true);
-
-    _pulseAnimation = Tween<double>(begin: 1.0, end: 1.1).animate(
-      CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
-    );
   }
 
   Future<void> _initCompass() async {
@@ -61,6 +45,8 @@ class _QiblaScreenState extends ConsumerState<QiblaScreen>
       setState(() {
         _isLoading = true;
         _hasLiveCompass = false;
+        _lastMagnetometer = null;
+        _lastAccelerometer = null;
         _compassMessage = 'Pusula başlatılıyor...';
       });
     }
@@ -72,26 +58,16 @@ class _QiblaScreenState extends ConsumerState<QiblaScreen>
       _magnetometerSubscription = magnetometerEventStream().listen(
         (event) {
           _sensorFallbackTimer?.cancel();
-          var heading = atan2(event.y, event.x) * 180 / pi;
-          heading = (heading + 360) % 360;
-
-          if (!mounted) return;
-          setState(() {
-            _currentHeading = heading;
-            _isLoading = false;
-            _hasLiveCompass = true;
-          });
+          _lastMagnetometer = event;
+          _updateHeadingFromNativeSensors();
         },
         onError: (_) => _useStaticCompass(),
       );
 
       _accelerometerSubscription = accelerometerEventStream().listen(
         (event) {
-          if (!mounted) return;
-          setState(() {
-            _pitch = event.x * pi / 180;
-            _roll = event.y * pi / 180;
-          });
+          _lastAccelerometer = event;
+          _updateHeadingFromNativeSensors();
         },
         onError: (_) {},
       );
@@ -103,15 +79,10 @@ class _QiblaScreenState extends ConsumerState<QiblaScreen>
   bool _startBrowserCompass() {
     final started = startBrowserCompass((heading) {
       _sensorFallbackTimer?.cancel();
-      if (!mounted) return;
-
-      setState(() {
-        _currentHeading = heading;
-        _isLoading = false;
-        _hasLiveCompass = true;
-        _compassMessage =
-            'Telefonu yatay tutup ortadaki oku Kıble işaretiyle hizalayın.';
-      });
+      _setLiveHeading(
+        heading,
+        'Telefonu yatay tutup ortadaki oku Kıble işaretiyle hizalayın.',
+      );
     });
 
     if (started && mounted) {
@@ -166,13 +137,64 @@ class _QiblaScreenState extends ConsumerState<QiblaScreen>
     });
   }
 
+  void _updateHeadingFromNativeSensors() {
+    final magnetometer = _lastMagnetometer;
+    if (magnetometer == null) return;
+
+    var heading = atan2(magnetometer.y, magnetometer.x) * 180 / pi;
+    final accelerometer = _lastAccelerometer;
+    if (accelerometer != null) {
+      final tilt = sqrt(
+        accelerometer.x * accelerometer.x +
+            accelerometer.y * accelerometer.y +
+            accelerometer.z * accelerometer.z,
+      );
+      if (tilt > 0) {
+        final flatness =
+            (accelerometer.z.abs() / tilt).clamp(0.0, 1.0).toDouble();
+        heading += accelerometer.y.sign.toDouble() * (1 - flatness) * 6;
+      }
+    }
+
+    _setLiveHeading(
+      _normalize360(heading),
+      'Telefonu yatay tutup ortadaki oku Kıble işaretiyle hizalayın.',
+    );
+  }
+
+  void _setLiveHeading(double heading, String message) {
+    if (!mounted || !heading.isFinite) return;
+
+    final normalized = _normalize360(heading);
+    final nextHeading = _hasLiveCompass
+        ? _normalize360(_currentHeading + _shortestDelta(normalized) * 0.28)
+        : normalized;
+
+    setState(() {
+      _currentHeading = nextHeading;
+      _isLoading = false;
+      _hasLiveCompass = true;
+      _compassMessage = message;
+    });
+  }
+
+  double _shortestDelta(double targetHeading) {
+    var delta = targetHeading - _currentHeading;
+    if (delta > 180) delta -= 360;
+    if (delta < -180) delta += 360;
+    return delta;
+  }
+
+  double _normalize360(double angle) {
+    return ((angle % 360) + 360) % 360;
+  }
+
   @override
   void dispose() {
     _sensorFallbackTimer?.cancel();
     _magnetometerSubscription?.cancel();
     _accelerometerSubscription?.cancel();
     stopBrowserCompass();
-    _pulseController.dispose();
     super.dispose();
   }
 

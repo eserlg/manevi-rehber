@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 import '../../data/models/prayer_times.dart';
 import '../../data/models/prayer.dart';
+import '../../data/models/prayer_tracking.dart';
 import '../../data/models/occasion_message.dart';
 import '../../data/models/quran.dart';
 import '../../data/models/zikr.dart';
@@ -187,6 +188,70 @@ final filteredPrayersProvider = Provider<AsyncValue<List<Prayer>>>((ref) {
     return filtered;
   });
 });
+
+final prayerTrackingProvider =
+    StateNotifierProvider<PrayerTrackingNotifier, PrayerTrackingState>((ref) {
+  final storage = ref.watch(localStorageProvider);
+  return PrayerTrackingNotifier(storage);
+});
+
+class PrayerTrackingNotifier extends StateNotifier<PrayerTrackingState> {
+  final LocalStorageService _storage;
+
+  PrayerTrackingNotifier(this._storage) : super(PrayerTrackingState.empty()) {
+    _load();
+  }
+
+  void _load() {
+    final tracking = _storage.getPrayerTracking().map(
+          (date, prayers) => MapEntry(date, prayers.toSet()),
+        );
+    final qada = {
+      for (final prayer in PrayerTrackingState.trackablePrayers)
+        prayer: _storage.getQadaDebt()[prayer] ?? 0,
+    };
+
+    state = PrayerTrackingState(
+      prayedByDate: tracking,
+      qadaDebt: qada,
+    );
+  }
+
+  Future<void> toggleToday(String prayer) async {
+    final todayKey = PrayerTrackingState.dateKey(DateTime.now());
+    final nextTracking = {
+      for (final entry in state.prayedByDate.entries)
+        entry.key: {...entry.value},
+    };
+    final today = nextTracking[todayKey] ?? <String>{};
+
+    if (today.contains(prayer)) {
+      today.remove(prayer);
+    } else {
+      today.add(prayer);
+    }
+
+    nextTracking[todayKey] = today;
+    state = state.copyWith(prayedByDate: nextTracking);
+    await _persistTracking();
+  }
+
+  Future<void> adjustQada(String prayer, int delta) async {
+    final nextDebt = {...state.qadaDebt};
+    final current = nextDebt[prayer] ?? 0;
+    nextDebt[prayer] = (current + delta).clamp(0, 9999).toInt();
+    state = state.copyWith(qadaDebt: nextDebt);
+    await _storage.saveQadaDebt(nextDebt);
+  }
+
+  Future<void> _persistTracking() async {
+    await _storage.savePrayerTracking(
+      state.prayedByDate.map(
+        (date, prayers) => MapEntry(date, prayers.toList()..sort()),
+      ),
+    );
+  }
+}
 
 final occasionMessagesProvider =
     FutureProvider<List<OccasionMessage>>((ref) async {

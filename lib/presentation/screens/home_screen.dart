@@ -24,6 +24,8 @@ class HomeScreen extends ConsumerStatefulWidget {
 }
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
+  static const _freeAdhanAudioUrl =
+      'https://upload.wikimedia.org/wikipedia/commons/transcoded/b/b0/Beautiful_adhan.ogg/Beautiful_adhan.ogg.mp3';
   Timer? _timer;
   late final Future<List<_ReligiousDay>> _religiousDaysFuture;
   List<Map<String, dynamic>> _memorialRecords = [];
@@ -190,6 +192,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                 error: (_, __) => _buildErrorCard(),
                               ),
                               const SizedBox(height: AppDimensions.spacingLG),
+                              _buildPrayerTrackingSummary(),
+                              const SizedBox(height: AppDimensions.spacingLG),
                               _buildQuickActions(),
                               const SizedBox(height: AppDimensions.spacingLG),
                               _buildReligiousDays(),
@@ -197,6 +201,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                               _buildMemorialCard(),
                               const SizedBox(height: AppDimensions.spacingLG),
                               _buildVerseOfDay(),
+                              const SizedBox(height: AppDimensions.spacingLG),
+                              _buildHadithOfDay(),
                             ],
                           ),
                         ),
@@ -377,6 +383,68 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     width: double.infinity,
                     padding: const EdgeInsets.all(AppDimensions.spacingMD),
                     decoration: BoxDecoration(
+                      color: AppColors.primary.withOpacity(0.06),
+                      borderRadius:
+                          BorderRadius.circular(AppDimensions.radiusMedium),
+                      border: Border.all(
+                        color: AppColors.primary.withOpacity(0.12),
+                      ),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(Icons.volume_up_outlined,
+                                color: AppColors.primary, size: 20),
+                            const SizedBox(width: AppDimensions.spacingSM),
+                            Expanded(
+                              child: Text(
+                                'Ücretsiz ezan sesi',
+                                style: GoogleFonts.notoSans(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w700,
+                                  color: AppColors.textPrimary,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: AppDimensions.spacingXS),
+                        Text(
+                          'CC0 lisanslı Wikimedia kaynağı. PWA’da önizleme olarak çalar; özel bildirim sesi native sürümde bağlanır.',
+                          style: GoogleFonts.notoSans(
+                            fontSize: 12,
+                            height: 1.35,
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
+                        const SizedBox(height: AppDimensions.spacingSM),
+                        Wrap(
+                          spacing: AppDimensions.spacingSM,
+                          runSpacing: AppDimensions.spacingSM,
+                          children: [
+                            OutlinedButton.icon(
+                              onPressed: _playFreeAdhanPreview,
+                              icon: const Icon(Icons.play_arrow),
+                              label: const Text('Dinle'),
+                            ),
+                            TextButton.icon(
+                              onPressed: () =>
+                                  ref.read(quranAudioProvider).stop(),
+                              icon: const Icon(Icons.stop_circle_outlined),
+                              label: const Text('Durdur'),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: AppDimensions.spacingLG),
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(AppDimensions.spacingMD),
+                    decoration: BoxDecoration(
                       color: AppColors.surfaceVariant,
                       borderRadius:
                           BorderRadius.circular(AppDimensions.radiusMedium),
@@ -455,6 +523,23 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     } catch (_) {
       return true;
     }
+  }
+
+  Future<void> _playFreeAdhanPreview() async {
+    final started = await ref.read(quranAudioProvider).playUrl(
+          _freeAdhanAudioUrl,
+        );
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          started
+              ? 'Ezan sesi oynatılıyor.'
+              : 'Ezan sesi başlatılamadı. Bağlantıyı kontrol edin.',
+        ),
+      ),
+    );
   }
 
   Widget _buildPrayerTimesCard(PrayerTimes? prayerTimes) {
@@ -636,6 +721,100 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             child: const Text('Tekrar Dene'),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildPrayerTrackingSummary() {
+    final tracking = ref.watch(prayerTrackingProvider);
+    final completed = tracking.completedForDate(DateTime.now());
+    final weeklyFullDays = tracking.completedDaysInLast(7);
+    final progress = tracking.progressForDate(DateTime.now());
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () => ref.read(selectedTabProvider.notifier).state = 1,
+        borderRadius: BorderRadius.circular(AppDimensions.radiusLarge),
+        child: Container(
+          padding: const EdgeInsets.all(AppDimensions.spacingLG),
+          decoration: BoxDecoration(
+            color: AppColors.surface.withOpacity(0.88),
+            borderRadius: BorderRadius.circular(AppDimensions.radiusLarge),
+            border: Border.all(color: AppColors.primary.withOpacity(0.14)),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.primaryDark.withOpacity(0.06),
+                blurRadius: 22,
+                offset: const Offset(0, 12),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              Stack(
+                alignment: Alignment.center,
+                children: [
+                  SizedBox(
+                    width: 58,
+                    height: 58,
+                    child: CircularProgressIndicator(
+                      value: progress,
+                      strokeWidth: 7,
+                      backgroundColor: AppColors.surfaceVariant,
+                      color: AppColors.primary,
+                    ),
+                  ),
+                  Text(
+                    '$completed/5',
+                    style: GoogleFonts.notoSans(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w800,
+                      color: AppColors.primaryDark,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(width: AppDimensions.spacingMD),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Namaz Takibi',
+                      style: GoogleFonts.notoSans(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                    const SizedBox(height: AppDimensions.spacingXS),
+                    Text(
+                      'Bugün $completed vakit işaretlendi. Son 7 günde $weeklyFullDays gün tam.',
+                      style: GoogleFonts.notoSans(
+                        fontSize: 12,
+                        height: 1.35,
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                    if (tracking.totalQadaDebt > 0) ...[
+                      const SizedBox(height: AppDimensions.spacingXS),
+                      Text(
+                        'Kaza takibi: ${tracking.totalQadaDebt} kayıt',
+                        style: GoogleFonts.notoSans(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.primary,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+              Icon(Icons.chevron_right, color: AppColors.textSecondary),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -1352,6 +1531,65 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
+  Widget _buildHadithOfDay() {
+    final hadith =
+        _dailyHadiths[_dayOfYear(DateTime.now()) % _dailyHadiths.length];
+
+    return Container(
+      padding: const EdgeInsets.all(AppDimensions.spacingLG),
+      decoration: BoxDecoration(
+        color: AppColors.surface.withOpacity(0.92),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusMedium),
+        border: Border.all(color: AppColors.accent.withOpacity(0.20)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.format_quote, color: AppColors.accent, size: 20),
+              const SizedBox(width: AppDimensions.spacingSM),
+              Expanded(
+                child: Text(
+                  'Günün Hadisi',
+                  style: GoogleFonts.notoSans(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+              ),
+              IconButton(
+                tooltip: 'Paylaş',
+                onPressed: () => _shareHadithOfDay(hadith),
+                icon: const Icon(Icons.share_outlined),
+                color: AppColors.primary,
+              ),
+            ],
+          ),
+          const SizedBox(height: AppDimensions.spacingMD),
+          Text(
+            hadith.text,
+            style: GoogleFonts.notoSans(
+              fontSize: 16,
+              height: 1.55,
+              fontWeight: FontWeight.w600,
+              color: AppColors.textPrimary,
+            ),
+          ),
+          const SizedBox(height: AppDimensions.spacingSM),
+          Text(
+            hadith.source,
+            style: GoogleFonts.notoSans(
+              fontSize: 12,
+              color: AppColors.textSecondary,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Future<void> _shareVerseOfDay(Verse verse) async {
     final text = [
       'Günün Ayeti',
@@ -1372,6 +1610,30 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       subject: 'Günün Ayeti',
       fallbackMessage: 'Ayet paylaşım metni panoya kopyalandı.',
     );
+  }
+
+  Future<void> _shareHadithOfDay(_DailyHadith hadith) async {
+    final text = [
+      'Günün Hadisi',
+      '',
+      hadith.text,
+      '',
+      hadith.source,
+      '',
+      'Manevi Rehber',
+      'https://manevi-rehber.vercel.app',
+    ].join('\n');
+
+    await AppShareService.shareText(
+      context: context,
+      text: text,
+      subject: 'Günün Hadisi',
+      fallbackMessage: 'Hadis paylaşım metni panoya kopyalandı.',
+    );
+  }
+
+  int _dayOfYear(DateTime date) {
+    return date.difference(DateTime(date.year)).inDays;
   }
 
   String _formatDuration(Duration duration) {
@@ -1449,6 +1711,48 @@ class _ReligiousDay {
     );
   }
 }
+
+class _DailyHadith {
+  final String text;
+  final String source;
+
+  const _DailyHadith({
+    required this.text,
+    required this.source,
+  });
+}
+
+const _dailyHadiths = [
+  _DailyHadith(
+    text: 'Ameller niyetlere göredir; herkese ancak niyet ettiği vardır.',
+    source: 'Buhârî, Bedü’l-vahy 1; Müslim, İmâre 155',
+  ),
+  _DailyHadith(
+    text: 'Müslüman, insanların elinden ve dilinden güvende olduğu kimsedir.',
+    source: 'Buhârî, Îmân 4; Müslim, Îmân 64',
+  ),
+  _DailyHadith(
+    text: 'Kolaylaştırın, zorlaştırmayın; müjdeleyin, nefret ettirmeyin.',
+    source: 'Buhârî, İlim 11; Müslim, Cihâd 6',
+  ),
+  _DailyHadith(
+    text: 'Sizin en hayırlınız Kur’an’ı öğrenen ve öğretendir.',
+    source: 'Buhârî, Fezâilü’l-Kur’ân 21',
+  ),
+  _DailyHadith(
+    text: 'Temizlik imanın yarısıdır.',
+    source: 'Müslim, Tahâret 1',
+  ),
+  _DailyHadith(
+    text:
+        'Allah sizin suretlerinize ve mallarınıza değil, kalplerinize ve amellerinize bakar.',
+    source: 'Müslim, Birr 34',
+  ),
+  _DailyHadith(
+    text: 'Merhamet etmeyene merhamet olunmaz.',
+    source: 'Buhârî, Edeb 18; Müslim, Fezâil 65',
+  ),
+];
 
 class _QuickActionData {
   final IconData icon;

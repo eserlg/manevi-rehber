@@ -17,6 +17,8 @@ class LocalStorageService {
   static const String _autoLocationKey = 'auto_location_enabled';
   static const String _notificationsKey = 'prayer_notifications_enabled';
   static const String _notificationLeadKey = 'notification_lead_minutes';
+  static const String _prayerTrackingKey = 'prayer_tracking';
+  static const String _qadaDebtKey = 'qada_debt';
   static const String _appRatingKey = 'app_rating';
   static const String _feedbackKey = 'feedback_messages';
 
@@ -246,6 +248,44 @@ class LocalStorageService {
 
   int getNotificationLeadMinutes() {
     return _prefs?.getInt(_scopedKey(_notificationLeadKey)) ?? 10;
+  }
+
+  Future<void> savePrayerTracking(Map<String, List<String>> tracking) async {
+    final prefs = await _ensurePrefs();
+    await prefs.setString(_scopedKey(_prayerTrackingKey), jsonEncode(tracking));
+  }
+
+  Map<String, List<String>> getPrayerTracking() {
+    final data = _prefs?.getString(_scopedKey(_prayerTrackingKey));
+    if (data == null) return {};
+
+    final decoded = jsonDecode(data);
+    if (decoded is! Map) return {};
+
+    return decoded.map((key, value) {
+      final prayers = <String>[];
+      if (value is List) {
+        prayers.addAll(value.map((item) => item.toString()));
+      }
+      return MapEntry(key.toString(), prayers.toList());
+    });
+  }
+
+  Future<void> saveQadaDebt(Map<String, int> debt) async {
+    final prefs = await _ensurePrefs();
+    await prefs.setString(_scopedKey(_qadaDebtKey), jsonEncode(debt));
+  }
+
+  Map<String, int> getQadaDebt() {
+    final data = _prefs?.getString(_scopedKey(_qadaDebtKey));
+    if (data == null) return {};
+
+    final decoded = jsonDecode(data);
+    if (decoded is! Map) return {};
+
+    return decoded.map((key, value) {
+      return MapEntry(key.toString(), _asInt(value));
+    });
   }
 
   Future<void> saveAppRating(int rating) async {

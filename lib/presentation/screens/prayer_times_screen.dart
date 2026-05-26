@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/constants/colors.dart';
 import '../../core/constants/dimensions.dart';
+import '../../data/models/prayer_tracking.dart';
 import '../providers/providers.dart';
 import '../widgets/prayer_card.dart';
 
@@ -202,6 +203,9 @@ class _PrayerTimesScreenState extends ConsumerState<PrayerTimesScreen> {
           ),
           const SizedBox(height: AppDimensions.spacingLG),
 
+          _buildPrayerTrackingCard(),
+          const SizedBox(height: AppDimensions.spacingLG),
+
           // All Prayer Times
           Text(
             'Tüm Vakitler',
@@ -246,6 +250,232 @@ class _PrayerTimesScreenState extends ConsumerState<PrayerTimesScreen> {
         ],
       ),
     );
+  }
+
+  Widget _buildPrayerTrackingCard() {
+    final tracking = ref.watch(prayerTrackingProvider);
+    final prayedToday = tracking.prayedForDate(DateTime.now());
+    final completed = tracking.completedForDate(DateTime.now());
+    final progress = tracking.progressForDate(DateTime.now());
+    final weeklyFullDays = tracking.completedDaysInLast(7);
+
+    return Container(
+      padding: const EdgeInsets.all(AppDimensions.spacingLG),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(AppDimensions.radiusLarge),
+        border: Border.all(color: AppColors.primary.withOpacity(0.14)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 18,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(AppDimensions.spacingSM),
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withOpacity(0.1),
+                  borderRadius:
+                      BorderRadius.circular(AppDimensions.radiusSmall),
+                ),
+                child: Icon(Icons.task_alt, color: AppColors.primary),
+              ),
+              const SizedBox(width: AppDimensions.spacingMD),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Bugünkü Namaz Takibi',
+                      style: GoogleFonts.notoSans(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                    Text(
+                      '$completed/5 tamamlandı • Son 7 günde $weeklyFullDays tam gün',
+                      style: GoogleFonts.notoSans(
+                        fontSize: 12,
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              TextButton.icon(
+                onPressed: _showQadaSheet,
+                icon: const Icon(Icons.history),
+                label: const Text('Kaza'),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppDimensions.spacingMD),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(AppDimensions.radiusCircle),
+            child: LinearProgressIndicator(
+              value: progress,
+              minHeight: 8,
+              backgroundColor: AppColors.surfaceVariant,
+              color: AppColors.primary,
+            ),
+          ),
+          const SizedBox(height: AppDimensions.spacingMD),
+          Wrap(
+            spacing: AppDimensions.spacingSM,
+            runSpacing: AppDimensions.spacingSM,
+            children: PrayerTrackingState.trackablePrayers.map((prayer) {
+              final selected = prayedToday.contains(prayer);
+              return FilterChip(
+                selected: selected,
+                label: Text(_prayerDisplayName(prayer)),
+                avatar: Icon(
+                  selected ? Icons.check_circle : Icons.radio_button_unchecked,
+                  size: 18,
+                ),
+                selectedColor: AppColors.primary.withOpacity(0.16),
+                checkmarkColor: AppColors.primary,
+                onSelected: (_) {
+                  ref.read(prayerTrackingProvider.notifier).toggleToday(prayer);
+                },
+              );
+            }).toList(),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _showQadaSheet() async {
+    await showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: AppColors.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(AppDimensions.radiusLarge),
+        ),
+      ),
+      builder: (context) {
+        return Consumer(
+          builder: (context, ref, _) {
+            final tracking = ref.watch(prayerTrackingProvider);
+
+            return SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.all(AppDimensions.screenPadding),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(Icons.history, color: AppColors.primary),
+                        const SizedBox(width: AppDimensions.spacingSM),
+                        Expanded(
+                          child: Text(
+                            'Kaza Namazı Takibi',
+                            style: GoogleFonts.notoSans(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.textPrimary,
+                            ),
+                          ),
+                        ),
+                        Text(
+                          'Toplam ${tracking.totalQadaDebt}',
+                          style: GoogleFonts.notoSans(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.primary,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: AppDimensions.spacingSM),
+                    Text(
+                      'Kılınan kazaları düşebilir, eksiklerini artırarak kişisel takip tutabilirsin. Veriler sadece cihazda saklanır.',
+                      style: GoogleFonts.notoSans(
+                        fontSize: 12,
+                        height: 1.4,
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                    const SizedBox(height: AppDimensions.spacingMD),
+                    for (final prayer in PrayerTrackingState.trackablePrayers)
+                      _buildQadaRow(ref, tracking, prayer),
+                    const SizedBox(height: AppDimensions.spacingMD),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildQadaRow(
+    WidgetRef ref,
+    PrayerTrackingState tracking,
+    String prayer,
+  ) {
+    final value = tracking.qadaDebt[prayer] ?? 0;
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppDimensions.spacingSM),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              _prayerDisplayName(prayer),
+              style: GoogleFonts.notoSans(
+                fontSize: 15,
+                fontWeight: FontWeight.w600,
+                color: AppColors.textPrimary,
+              ),
+            ),
+          ),
+          IconButton.outlined(
+            tooltip: 'Azalt',
+            onPressed: value == 0
+                ? null
+                : () => ref
+                    .read(prayerTrackingProvider.notifier)
+                    .adjustQada(prayer, -1),
+            icon: const Icon(Icons.remove),
+          ),
+          SizedBox(
+            width: 52,
+            child: Text(
+              '$value',
+              textAlign: TextAlign.center,
+              style: GoogleFonts.amiri(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: AppColors.primaryDark,
+              ),
+            ),
+          ),
+          IconButton.filledTonal(
+            tooltip: 'Artır',
+            onPressed: () =>
+                ref.read(prayerTrackingProvider.notifier).adjustQada(prayer, 1),
+            icon: const Icon(Icons.add),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _prayerDisplayName(String prayer) {
+    return prayer == 'İmsak' ? 'Sabah' : prayer;
   }
 
   Widget _buildErrorState() {

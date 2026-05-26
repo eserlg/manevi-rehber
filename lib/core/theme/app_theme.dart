@@ -62,6 +62,38 @@ class AppTheme {
           ),
         ),
       ),
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          foregroundColor: AppColors.primary,
+          side: const BorderSide(color: AppColors.primary),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppDimensions.buttonRadius),
+          ),
+          textStyle: GoogleFonts.notoSans(
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
+      chipTheme: ChipThemeData(
+        backgroundColor: AppColors.surfaceVariant,
+        selectedColor: AppColors.primary.withOpacity(0.16),
+        checkmarkColor: AppColors.primary,
+        labelStyle: GoogleFonts.notoSans(
+          fontSize: 13,
+          fontWeight: FontWeight.w600,
+          color: AppColors.textPrimary,
+        ),
+        secondaryLabelStyle: GoogleFonts.notoSans(
+          fontSize: 13,
+          fontWeight: FontWeight.w700,
+          color: AppColors.primaryDark,
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppDimensions.radiusCircle),
+          side: BorderSide(color: AppColors.primary.withOpacity(0.10)),
+        ),
+      ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: AppColors.surfaceVariant,
@@ -89,6 +121,18 @@ class AppTheme {
       dividerTheme: const DividerThemeData(
         color: AppColors.surfaceVariant,
         thickness: 1,
+      ),
+      bottomSheetTheme: const BottomSheetThemeData(
+        backgroundColor: AppColors.surface,
+        modalBackgroundColor: AppColors.surface,
+        surfaceTintColor: Colors.transparent,
+      ),
+      dialogTheme: DialogThemeData(
+        backgroundColor: AppColors.surface,
+        surfaceTintColor: Colors.transparent,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppDimensions.radiusLarge),
+        ),
       ),
     );
   }

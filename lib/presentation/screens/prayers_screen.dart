@@ -523,18 +523,11 @@ class _PrayersScreenState extends ConsumerState<PrayersScreen> {
       }
     }
 
-    if (!started) {
-      started = await ref.read(textToSpeechProvider).speak(
-            arabic ? prayer.arabic : prayer.turkish,
-            arabic ? SpeechLanguage.arabic : SpeechLanguage.turkish,
-          );
-    }
-
     if (!started && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: const Text(
-            'Ses başlatılamadı. Telefonun sesini açıp tekrar deneyin.',
+            'Bu dua için insan sesi kaydı henüz yok.',
           ),
           backgroundColor: AppColors.error,
           behavior: SnackBarBehavior.floating,

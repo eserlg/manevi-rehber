@@ -26,6 +26,7 @@ class _PrayerGuideScreenState extends State<PrayerGuideScreen> {
     ('ozel', 'Özel'),
     ('cenaze', 'Cenaze'),
     ('nafile', 'Nafile'),
+    ('okunanlar', 'Sure/Dua'),
   ];
 
   @override
@@ -83,7 +84,10 @@ class _PrayerGuideScreenState extends State<PrayerGuideScreen> {
               const SizedBox(height: AppDimensions.spacingMD),
               _buildCategoryChips(),
               const SizedBox(height: AppDimensions.spacingMD),
-              for (final guide in filteredGuides) _buildGuideCard(guide),
+              if (_selectedCategory == 'okunanlar')
+                _buildPrayerTextsSection()
+              else
+                for (final guide in filteredGuides) _buildGuideCard(guide),
             ],
           );
         },
@@ -149,32 +153,28 @@ class _PrayerGuideScreenState extends State<PrayerGuideScreen> {
   }
 
   Widget _buildCategoryChips() {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        children: [
-          for (final category in _categories)
-            Padding(
-              padding: const EdgeInsets.only(right: AppDimensions.spacingSM),
-              child: ChoiceChip(
-                label: Text(category.$2),
-                selected: _selectedCategory == category.$1,
-                selectedColor: AppColors.primary,
-                labelStyle: GoogleFonts.notoSans(
-                  color: _selectedCategory == category.$1
-                      ? Colors.white
-                      : AppColors.textPrimary,
-                  fontWeight: FontWeight.w600,
-                ),
-                backgroundColor: AppColors.surfaceVariant,
-                side: const BorderSide(color: Colors.transparent),
-                onSelected: (_) {
-                  setState(() => _selectedCategory = category.$1);
-                },
-              ),
+    return Wrap(
+      spacing: AppDimensions.spacingSM,
+      runSpacing: AppDimensions.spacingSM,
+      children: [
+        for (final category in _categories)
+          ChoiceChip(
+            label: Text(category.$2),
+            selected: _selectedCategory == category.$1,
+            selectedColor: AppColors.primary,
+            labelStyle: GoogleFonts.notoSans(
+              color: _selectedCategory == category.$1
+                  ? Colors.white
+                  : AppColors.textPrimary,
+              fontWeight: FontWeight.w600,
             ),
-        ],
-      ),
+            backgroundColor: AppColors.surfaceVariant,
+            side: const BorderSide(color: Colors.transparent),
+            onSelected: (_) {
+              setState(() => _selectedCategory = category.$1);
+            },
+          ),
+      ],
     );
   }
 
@@ -224,6 +224,120 @@ class _PrayerGuideScreenState extends State<PrayerGuideScreen> {
           _buildSummary(guide),
           const SizedBox(height: AppDimensions.spacingMD),
           for (final section in guide.sections) _buildSection(section),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPrayerTextsSection() {
+    return Column(
+      children: [
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(AppDimensions.spacingMD),
+          margin: const EdgeInsets.only(bottom: AppDimensions.spacingMD),
+          decoration: BoxDecoration(
+            color: AppColors.primary.withValues(alpha: 0.06),
+            borderRadius: BorderRadius.circular(AppDimensions.radiusMedium),
+            border:
+                Border.all(color: AppColors.primary.withValues(alpha: 0.14)),
+          ),
+          child: Text(
+            'Namazda sık okunan sure ve dualar Arapça metin, okunuş ve Türkçe anlamıyla burada. Ezber için kısa surelerden başlayabilirsin.',
+            style: GoogleFonts.notoSans(
+              fontSize: 13,
+              height: 1.5,
+              color: AppColors.textPrimary,
+            ),
+          ),
+        ),
+        for (final item in _prayerTexts) _buildPrayerTextCard(item),
+      ],
+    );
+  }
+
+  Widget _buildPrayerTextCard(_PrayerText item) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: AppDimensions.spacingMD),
+      child: ExpansionTile(
+        tilePadding: const EdgeInsets.symmetric(
+          horizontal: AppDimensions.spacingMD,
+          vertical: AppDimensions.spacingSM,
+        ),
+        leading: CircleAvatar(
+          backgroundColor: AppColors.primary.withValues(alpha: 0.1),
+          child: Icon(item.icon, color: AppColors.primary, size: 20),
+        ),
+        title: Text(
+          item.title,
+          maxLines: 2,
+          overflow: TextOverflow.visible,
+          style: GoogleFonts.notoSans(
+            fontSize: 15,
+            fontWeight: FontWeight.w800,
+            color: AppColors.textPrimary,
+          ),
+        ),
+        subtitle: Text(
+          item.usage,
+          style: GoogleFonts.notoSans(
+            fontSize: 12,
+            color: AppColors.textSecondary,
+          ),
+        ),
+        childrenPadding: const EdgeInsets.fromLTRB(
+          AppDimensions.spacingMD,
+          0,
+          AppDimensions.spacingMD,
+          AppDimensions.spacingMD,
+        ),
+        children: [
+          Text(
+            item.arabic,
+            textAlign: TextAlign.right,
+            style: GoogleFonts.amiri(
+              fontSize: 26,
+              height: 1.8,
+              color: AppColors.textPrimary,
+            ),
+          ),
+          const SizedBox(height: AppDimensions.spacingMD),
+          _labelBlock('Okunuş', item.transliteration),
+          const SizedBox(height: AppDimensions.spacingSM),
+          _labelBlock('Türkçe anlamı', item.meaning),
+        ],
+      ),
+    );
+  }
+
+  Widget _labelBlock(String label, String text) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(AppDimensions.spacingMD),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceVariant.withValues(alpha: 0.72),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusMedium),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: GoogleFonts.notoSans(
+              fontSize: 12,
+              fontWeight: FontWeight.w800,
+              color: AppColors.primary,
+            ),
+          ),
+          const SizedBox(height: AppDimensions.spacingXS),
+          Text(
+            text,
+            style: GoogleFonts.notoSans(
+              fontSize: 13,
+              height: 1.5,
+              color: AppColors.textPrimary,
+            ),
+          ),
         ],
       ),
     );
@@ -389,3 +503,101 @@ class _PrayerGuideScreenState extends State<PrayerGuideScreen> {
     }
   }
 }
+
+class _PrayerText {
+  final String title;
+  final String usage;
+  final String arabic;
+  final String transliteration;
+  final String meaning;
+  final IconData icon;
+
+  const _PrayerText({
+    required this.title,
+    required this.usage,
+    required this.arabic,
+    required this.transliteration,
+    required this.meaning,
+    required this.icon,
+  });
+}
+
+const _prayerTexts = [
+  _PrayerText(
+    title: 'Sübhaneke',
+    usage: 'Namaza başlarken okunur',
+    arabic:
+        'سُبْحَانَكَ اللّٰهُمَّ وَبِحَمْدِكَ وَتَبَارَكَ اسْمُكَ وَتَعَالٰى جَدُّكَ وَلَا إِلٰهَ غَيْرُكَ',
+    transliteration:
+        'Sübhânekellâhümme ve bihamdik. Ve tebârekesmük. Ve teâlâ ceddük. Ve lâ ilâhe ğayruk.',
+    meaning:
+        'Allahım! Seni eksik sıfatlardan tenzih ederim. Sana hamd ederim. İsmin mübarektir, şanın yücedir. Senden başka ilah yoktur.',
+    icon: Icons.front_hand_outlined,
+  ),
+  _PrayerText(
+    title: 'Fâtiha Suresi',
+    usage: 'Her rekatta okunur',
+    arabic:
+        'بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيمِ\nاَلْحَمْدُ لِلّٰهِ رَبِّ الْعَالَمِينَ\nاَلرَّحْمٰنِ الرَّحِيمِ\nمَالِكِ يَوْمِ الدِّينِ\nاِيَّاكَ نَعْبُدُ وَاِيَّاكَ نَسْتَعِينُ\nاِهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ\nصِرَاطَ الَّذِينَ اَنْعَمْتَ عَلَيْهِمْ غَيْرِ الْمَغْضُوبِ عَلَيْهِمْ وَلَا الضَّالِّينَ',
+    transliteration:
+        'Bismillahirrahmanirrahim. Elhamdülillahi rabbil alemin. Errahmanirrahim. Maliki yevmiddin. İyyake na’budü ve iyyake nestein. İhdinessıratal müstakim. Sıratallezine en’amte aleyhim ğayril mağdubi aleyhim veleddallin.',
+    meaning:
+        'Rahman ve Rahim olan Allah’ın adıyla. Hamd alemlerin Rabbi Allah’a mahsustur. O Rahman ve Rahim’dir. Din gününün sahibidir. Yalnız Sana kulluk eder, yalnız Senden yardım dileriz. Bizi dosdoğru yola ilet.',
+    icon: Icons.menu_book_outlined,
+  ),
+  _PrayerText(
+    title: 'Ettehiyyatü',
+    usage: 'Oturuluşlarda okunur',
+    arabic:
+        'اَلتَّحِيَّاتُ لِلّٰهِ وَالصَّلَوَاتُ وَالطَّيِّبَاتُ، اَلسَّلَامُ عَلَيْكَ اَيُّهَا النَّبِيُّ وَرَحْمَةُ اللّٰهِ وَبَرَكَاتُهُ، اَلسَّلَامُ عَلَيْنَا وَعَلٰى عِبَادِ اللّٰهِ الصَّالِحِينَ، اَشْهَدُ اَنْ لَا اِلٰهَ اِلَّا اللّٰهُ وَاَشْهَدُ اَنَّ مُحَمَّدًا عَبْدُهُ وَرَسُولُهُ',
+    transliteration:
+        'Ettehiyyâtü lillâhi vessalavâtü vettayyibât. Esselâmü aleyke eyyühennebiyyü ve rahmetullahi ve berekâtüh. Esselâmü aleynâ ve alâ ibâdillâhis-sâlihîn. Eşhedü en lâ ilâhe illallah ve eşhedü enne Muhammeden abdühû ve rasûlüh.',
+    meaning:
+        'Bütün hürmetler, dualar ve güzel sözler Allah içindir. Ey Peygamber! Allah’ın selamı, rahmeti ve bereketi üzerine olsun. Selam bizim ve Allah’ın salih kulları üzerine olsun. Allah’tan başka ilah olmadığına, Muhammed’in O’nun kulu ve elçisi olduğuna şahitlik ederim.',
+    icon: Icons.airline_seat_recline_normal,
+  ),
+  _PrayerText(
+    title: 'Salli ve Barik',
+    usage: 'Son oturuşta okunur',
+    arabic:
+        'اَللّٰهُمَّ صَلِّ عَلٰى مُحَمَّدٍ وَعَلٰى اٰلِ مُحَمَّدٍ كَمَا صَلَّيْتَ عَلٰى اِبْرَاهِيمَ وَعَلٰى اٰلِ اِبْرَاهِيمَ اِنَّكَ حَمِيدٌ مَجِيدٌ\nاَللّٰهُمَّ بَارِكْ عَلٰى مُحَمَّدٍ وَعَلٰى اٰلِ مُحَمَّدٍ كَمَا بَارَكْتَ عَلٰى اِبْرَاهِيمَ وَعَلٰى اٰلِ اِبْرَاهِيمَ اِنَّكَ حَمِيدٌ مَجِيدٌ',
+    transliteration:
+        'Allahümme salli alâ Muhammedin ve alâ âli Muhammed... Allahümme bârik alâ Muhammedin ve alâ âli Muhammed...',
+    meaning:
+        'Allahım! Hz. Muhammed’e ve ailesine rahmet ve bereket eyle; Hz. İbrahim’e ve ailesine rahmet ve bereket ettiğin gibi. Şüphesiz Sen hamde layık ve yücesin.',
+    icon: Icons.volunteer_activism_outlined,
+  ),
+  _PrayerText(
+    title: 'Rabbena Duaları',
+    usage: 'Son oturuşta okunur',
+    arabic:
+        'رَبَّنَا اٰتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْاٰخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ\nرَبَّنَا اغْفِرْ لِي وَلِوَالِدَيَّ وَلِلْمُؤْمِنِينَ يَوْمَ يَقُومُ الْحِسَابُ',
+    transliteration:
+        'Rabbenâ âtinâ fiddünyâ haseneten ve fil âhireti haseneten ve kınâ azâbennâr. Rabbenağfirlî ve li-vâlideyye ve lil-mü’minîne yevme yekûmül hisâb.',
+    meaning:
+        'Rabbimiz! Bize dünyada da ahirette de iyilik ver ve bizi ateş azabından koru. Rabbimiz! Hesap görüleceği gün beni, anne babamı ve müminleri bağışla.',
+    icon: Icons.favorite_border,
+  ),
+  _PrayerText(
+    title: 'Kunut Duaları',
+    usage: 'Vitir namazının üçüncü rekatında okunur',
+    arabic:
+        'اَللّٰهُمَّ اِنَّا نَسْتَعِينُكَ وَنَسْتَغْفِرُكَ وَنَسْتَهْدِيكَ وَنُؤْمِنُ بِكَ وَنَتُوبُ اِلَيْكَ وَنَتَوَكَّلُ عَلَيْكَ وَنُثْنِي عَلَيْكَ الْخَيْرَ كُلَّهُ نَشْكُرُكَ وَلَا نَكْفُرُكَ',
+    transliteration:
+        'Allahümme innâ nesteînüke ve nestağfirüke ve nestehdîk. Ve nü’minü bike ve netûbü ileyk. Ve netevekkelü aleyk...',
+    meaning:
+        'Allahım! Senden yardım, bağışlanma ve hidayet dileriz. Sana iman eder, Sana tövbe eder, Sana güveniriz. Seni hayırla överiz; Sana şükreder, nankörlük etmeyiz.',
+    icon: Icons.nights_stay_outlined,
+  ),
+  _PrayerText(
+    title: 'İhlas, Felak ve Nas',
+    usage: 'Kısa sure olarak namazda ve korunma niyetiyle okunur',
+    arabic:
+        'قُلْ هُوَ اللّٰهُ اَحَدٌ...\nقُلْ اَعُوذُ بِرَبِّ الْفَلَقِ...\nقُلْ اَعُوذُ بِرَبِّ النَّاسِ...',
+    transliteration:
+        'Kul hüvallâhü ehad... Kul eûzü bi-rabbil felak... Kul eûzü bi-rabbin nâs...',
+    meaning:
+        'İhlas Allah’ın birliğini bildirir. Felak ve Nas sureleri Allah’a sığınmayı öğretir.',
+    icon: Icons.shield_outlined,
+  ),
+];

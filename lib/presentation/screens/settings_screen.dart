@@ -247,6 +247,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
     setState(() => _notificationsEnabled = enabled);
     await ref.read(localStorageProvider).setPrayerNotificationsEnabled(enabled);
+    ref.invalidate(prayerTimesProvider);
     _showSnack(enabled
         ? 'Namaz bildirimleri açıldı.'
         : 'Namaz bildirimleri kapatıldı.');
@@ -254,6 +255,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
   Future<bool> _requestNotificationPermission() async {
     try {
+      final webGranted =
+          await ref.read(prayerNotificationServiceProvider).requestPermission();
+      if (webGranted) return true;
+
       final status = await Permission.notification.request();
       return status.isGranted;
     } catch (_) {
@@ -393,6 +398,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
     await ref.read(localStorageProvider).setNotificationLeadMinutes(selected);
     setState(() => _notificationLeadMinutes = selected);
+    ref.invalidate(prayerTimesProvider);
     _showSnack('Bildirim süresi güncellendi.');
   }
 

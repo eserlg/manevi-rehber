@@ -267,6 +267,16 @@ class _QiblaScreenState extends ConsumerState<QiblaScreen> {
             child: Column(
               children: [
                 _buildLocationCard(qiblaDir),
+                if (!_hasLiveCompass) ...[
+                  ElevatedButton.icon(
+                    onPressed: _requestAndStartBrowserCompass,
+                    icon: const Icon(Icons.explore),
+                    label: const Text('Pusulayı Başlat'),
+                  ),
+                  const SizedBox(height: AppDimensions.spacingSM),
+                  _buildManualHeadingPanel(),
+                  const SizedBox(height: AppDimensions.spacingMD),
+                ],
                 Padding(
                   padding: const EdgeInsets.symmetric(
                     horizontal: AppDimensions.screenPadding,
@@ -278,17 +288,6 @@ class _QiblaScreenState extends ConsumerState<QiblaScreen> {
                     isLiveCompass: _hasLiveCompass,
                   ),
                 ),
-                if (!_hasLiveCompass) ...[
-                  const SizedBox(height: AppDimensions.spacingMD),
-                  ElevatedButton.icon(
-                    onPressed: _requestAndStartBrowserCompass,
-                    icon: const Icon(Icons.explore),
-                    label: const Text('Pusulayı Başlat'),
-                  ),
-                  const SizedBox(height: AppDimensions.spacingMD),
-                  _buildManualHeadingPanel(),
-                  const SizedBox(height: AppDimensions.spacingMD),
-                ],
                 const SizedBox(height: AppDimensions.spacingLG),
                 _buildInfoPanel(qiblaDir),
               ],

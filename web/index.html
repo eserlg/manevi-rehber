@@ -38,6 +38,7 @@
       let compassHandler = null;
       let speechKeepAliveTimer = null;
       let speechVoices = [];
+      let prayerNotificationTimers = [];
 
       const refreshSpeechVoices = function () {
         if (!('speechSynthesis' in window)) return [];
@@ -58,6 +59,75 @@
         if ('speechSynthesis' in window) {
           window.speechSynthesis.cancel();
         }
+      };
+
+      window.ruhHuzurRequestNotificationPermission = async function () {
+        if (!('Notification' in window)) return 'unsupported';
+        if (Notification.permission === 'granted') return 'granted';
+        if (Notification.permission === 'denied') return 'denied';
+
+        try {
+          return await Notification.requestPermission();
+        } catch (error) {
+          return 'denied';
+        }
+      };
+
+      window.ruhHuzurClearPrayerNotifications = function () {
+        prayerNotificationTimers.forEach(function (timerId) {
+          clearTimeout(timerId);
+        });
+        prayerNotificationTimers = [];
+      };
+
+      window.ruhHuzurSchedulePrayerNotifications = function (payloadJson) {
+        if (!('Notification' in window) || Notification.permission !== 'granted') {
+          return false;
+        }
+
+        window.ruhHuzurClearPrayerNotifications();
+
+        let notifications = [];
+        try {
+          notifications = JSON.parse(payloadJson || '[]');
+        } catch (error) {
+          return false;
+        }
+
+        const maxDelay = 2147483647;
+        const showNotification = function (item) {
+          const options = {
+            body: item.body || '',
+            icon: 'icons/Icon-192.png',
+            badge: 'icons/Icon-192.png',
+            tag: item.tag || 'prayer-time',
+            renotify: true,
+          };
+
+          if (navigator.serviceWorker?.ready) {
+            navigator.serviceWorker.ready
+              .then(function (registration) {
+                registration.showNotification(item.title || 'Namaz vakti', options);
+              })
+              .catch(function () {
+                new Notification(item.title || 'Namaz vakti', options);
+              });
+            return;
+          }
+
+          new Notification(item.title || 'Namaz vakti', options);
+        };
+
+        notifications.forEach(function (item) {
+          const notifyAt = new Date(item.notifyAt).getTime();
+          const delay = notifyAt - Date.now();
+          if (!Number.isFinite(delay) || delay < 0 || delay > maxDelay) return;
+          prayerNotificationTimers.push(setTimeout(function () {
+            showNotification(item);
+          }, delay));
+        });
+
+        return prayerNotificationTimers.length > 0;
       };
 
       window.ruhHuzurSpeak = function (text, language, rate) {

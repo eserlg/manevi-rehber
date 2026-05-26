@@ -10,6 +10,8 @@ import 'package:permission_handler/permission_handler.dart';
 import '../../core/constants/colors.dart';
 import '../../core/constants/dimensions.dart';
 import '../../data/models/prayer_times.dart';
+import '../../data/models/quran.dart';
+import '../../data/services/app_share_service.dart';
 import '../providers/providers.dart';
 import '../widgets/memorial_donation_sheet.dart';
 import 'occasion_messages_screen.dart';
@@ -336,6 +338,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           }
 
                           await storage.setPrayerNotificationsEnabled(value);
+                          ref.invalidate(prayerTimesProvider);
                           setModalState(() => notificationsEnabled = value);
                           if (mounted) setState(() {});
                         },
@@ -363,6 +366,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         selectedColor: AppColors.primary.withOpacity(0.18),
                         onSelected: (_) async {
                           await storage.setNotificationLeadMinutes(minutes);
+                          ref.invalidate(prayerTimesProvider);
                           setModalState(() => leadMinutes = minutes);
                         },
                       );
@@ -388,6 +392,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   Future<bool> _requestNotificationPermission() async {
     try {
+      final webGranted =
+          await ref.read(prayerNotificationServiceProvider).requestPermission();
+      if (webGranted) return true;
+
       final status = await Permission.notification.request();
       return status.isGranted;
     } catch (_) {
@@ -1223,13 +1231,27 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             children: [
               Icon(Icons.format_quote, color: AppColors.primary, size: 20),
               const SizedBox(width: AppDimensions.spacingSM),
-              Text(
-                'Günün Ayeti',
-                style: GoogleFonts.notoSans(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.textSecondary,
+              Expanded(
+                child: Text(
+                  'Günün Ayeti',
+                  style: GoogleFonts.notoSans(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textSecondary,
+                  ),
                 ),
+              ),
+              verseAsync.maybeWhen(
+                data: (verse) {
+                  if (verse == null) return const SizedBox.shrink();
+                  return IconButton(
+                    tooltip: 'Paylaş',
+                    onPressed: () => _shareVerseOfDay(verse),
+                    icon: const Icon(Icons.share_outlined),
+                    color: AppColors.primary,
+                  );
+                },
+                orElse: () => const SizedBox.shrink(),
               ),
             ],
           ),
@@ -1274,6 +1296,28 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
         ],
       ),
+    );
+  }
+
+  Future<void> _shareVerseOfDay(Verse verse) async {
+    final text = [
+      'Günün Ayeti',
+      '',
+      verse.text,
+      if (verse.translation != null && verse.translation!.isNotEmpty) ...[
+        '',
+        verse.translation!,
+      ],
+      '',
+      'Manevi Rehber',
+      'https://manevi-rehber.vercel.app',
+    ].join('\n');
+
+    await AppShareService.shareText(
+      context: context,
+      text: text,
+      subject: 'Günün Ayeti',
+      fallbackMessage: 'Ayet paylaşım metni panoya kopyalandı.',
     );
   }
 

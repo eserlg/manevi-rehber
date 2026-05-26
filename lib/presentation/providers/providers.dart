@@ -9,6 +9,7 @@ import '../../data/repositories/prayer_repository.dart';
 import '../../data/services/location_service.dart';
 import '../../data/services/local_storage_service.dart';
 import '../../data/services/quran_audio_service.dart';
+import '../../data/services/prayer_notification_service.dart';
 import '../../data/services/text_to_speech_service.dart';
 import '../../data/services/widget_service.dart';
 
@@ -17,6 +18,8 @@ final locationServiceProvider = Provider((ref) => LocationService());
 final prayerRepositoryProvider = Provider((ref) => PrayerRepository());
 final localStorageProvider = Provider((ref) => LocalStorageService());
 final prayerWidgetServiceProvider = Provider((ref) => PrayerWidgetService());
+final prayerNotificationServiceProvider =
+    Provider((ref) => PrayerNotificationService());
 final textToSpeechProvider = Provider((ref) => TextToSpeechService());
 final quranAudioProvider = Provider((ref) {
   final service = QuranAudioService();
@@ -46,6 +49,14 @@ final prayerTimesProvider =
 
   if (prayerTimes != null) {
     await ref.read(prayerWidgetServiceProvider).updatePrayerTimes(prayerTimes);
+    final storage = ref.read(localStorageProvider);
+    await ref
+        .read(prayerNotificationServiceProvider)
+        .schedulePrayerNotifications(
+          prayerTimes: prayerTimes,
+          leadMinutes: storage.getNotificationLeadMinutes(),
+          enabled: storage.arePrayerNotificationsEnabled(),
+        );
   }
 
   return prayerTimes;

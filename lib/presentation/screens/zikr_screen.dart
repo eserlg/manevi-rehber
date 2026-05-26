@@ -237,13 +237,6 @@ class ZikrScreen extends ConsumerWidget {
       }
     }
 
-    if (!started) {
-      started = await ref.read(textToSpeechProvider).speak(
-            language == SpeechLanguage.arabic ? zikr.arabic : zikr.meaning,
-            language,
-          );
-    }
-
     if (!started && context.mounted) {
       _showSpeechError(context);
     }
@@ -376,7 +369,7 @@ class ZikrScreen extends ConsumerWidget {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: const Text(
-          'Ses başlatılamadı. Telefonun sesini açıp tekrar deneyin.',
+          'Bu içerik için insan sesi kaydı henüz yok.',
         ),
         backgroundColor: AppColors.error,
         behavior: SnackBarBehavior.floating,

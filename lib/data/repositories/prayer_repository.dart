@@ -7,10 +7,11 @@ import '../models/quran.dart';
 class PrayerRepository {
   final Dio _dio;
 
-  PrayerRepository() : _dio = Dio(BaseOptions(
-    connectTimeout: const Duration(seconds: 10),
-    receiveTimeout: const Duration(seconds: 10),
-  ));
+  PrayerRepository()
+      : _dio = Dio(BaseOptions(
+          connectTimeout: const Duration(seconds: 10),
+          receiveTimeout: const Duration(seconds: 10),
+        ));
 
   /// Get prayer times from Aladhan API
   Future<PrayerTimes?> getPrayerTimes({
@@ -23,7 +24,7 @@ class PrayerRepository {
       final queryParams = {
         'latitude': latitude.toString(),
         'longitude': longitude.toString(),
-        'method': '3', // Turkey calculation method
+        'method': '13', // Diyanet İşleri Başkanlığı, Turkey
         'school': '0', // Standard calculation
       };
 
@@ -93,9 +94,7 @@ class PrayerRepository {
 
       if (surah != null) {
         final List<dynamic> verses = surah['verses'] ?? [];
-        return verses
-            .map((json) => Verse.fromJson(json, surahId))
-            .toList();
+        return verses.map((json) => Verse.fromJson(json, surahId)).toList();
       }
     }
 
@@ -115,7 +114,9 @@ class PrayerRepository {
 
       if (response.statusCode == 200) {
         final List<dynamic> verses = response.data['verses'] ?? [];
-        return verses.map((json) => Verse.fromJson(json['verse'], surahId)).toList();
+        return verses
+            .map((json) => Verse.fromJson(json['verse'], surahId))
+            .toList();
       }
       return [];
     } catch (e) {
@@ -129,7 +130,7 @@ class PrayerRepository {
       // Get a random surah (1-114) and verse
       final randomSurah = DateTime.now().millisecondsSinceEpoch % 114 + 1;
       final verses = await getVerses(randomSurah);
-      
+
       if (verses.isNotEmpty) {
         final randomVerseIndex = DateTime.now().second % verses.length;
         return verses[randomVerseIndex];
@@ -142,7 +143,8 @@ class PrayerRepository {
 
   Future<Map<String, dynamic>?> _loadLocalQuran() async {
     try {
-      final jsonString = await rootBundle.loadString('assets/data/quran_tr.json');
+      final jsonString =
+          await rootBundle.loadString('assets/data/quran_tr.json');
       return jsonDecode(jsonString) as Map<String, dynamic>;
     } catch (_) {
       return null;

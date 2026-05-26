@@ -167,7 +167,7 @@ class _PrayerGuideScreenState extends State<PrayerGuideScreen> {
                   fontWeight: FontWeight.w600,
                 ),
                 backgroundColor: AppColors.surfaceVariant,
-                side: const BorderSide(),
+                side: const BorderSide(color: Colors.transparent),
                 onSelected: (_) {
                   setState(() => _selectedCategory = category.$1);
                 },

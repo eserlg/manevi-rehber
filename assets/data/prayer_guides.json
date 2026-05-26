@@ -1,0 +1,354 @@
+[
+  {
+    "id": "sabah",
+    "category": "gunluk",
+    "title": "Sabah Namazı",
+    "subtitle": "Günün ilk farz namazı",
+    "totalRakat": "4 rekat",
+    "shortDescription": "2 rekat sünnet, ardından 2 rekat farz olarak kılınır.",
+    "highlights": ["2 sünnet", "2 farz", "Farzda sesli kıraat olabilir"],
+    "sections": [
+      {
+        "title": "Rekat düzeni",
+        "body": "Sabah namazı önce sünnet, sonra farz olarak kılınır.",
+        "items": [
+          "2 rekat sabah sünneti",
+          "2 rekat sabah farzı",
+          "Farz cemaatle kılınıyorsa imam kıraati sesli yapar"
+        ]
+      },
+      {
+        "title": "Okunacak sure ve dualar",
+        "body": "Her rekatta Fatiha okunur. Fatiha'dan sonra kısa bir sure veya ayet okunabilir.",
+        "items": [
+          "Namaza başlarken iftitah tekbiri alınır ve Sübhaneke okunur",
+          "Her rekatta Fatiha; ardından İhlas, Kevser, Asr, Felak, Nas gibi kısa surelerden biri okunabilir",
+          "Oturuluşta Ettehiyyatü; son oturuşta Salli-Barik ve Rabbena duaları okunur"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ogle",
+    "category": "gunluk",
+    "title": "Öğle Namazı",
+    "subtitle": "Günün ortasındaki farz namaz",
+    "totalRakat": "10 rekat",
+    "shortDescription": "4 rekat ilk sünnet, 4 rekat farz ve 2 rekat son sünnet olarak kılınır.",
+    "highlights": ["4 ilk sünnet", "4 farz", "2 son sünnet"],
+    "sections": [
+      {
+        "title": "Rekat düzeni",
+        "body": "Öğle namazı genellikle on rekat olarak kılınır.",
+        "items": [
+          "4 rekat öğle ilk sünneti",
+          "4 rekat öğle farzı",
+          "2 rekat öğle son sünneti"
+        ]
+      },
+      {
+        "title": "Okunacak sure ve dualar",
+        "body": "Farzın ilk iki rekatında Fatiha'dan sonra sure okunur; son iki rekatta yalnız Fatiha okunması yaygındır.",
+        "items": [
+          "İlk rekatta Sübhaneke ile başlanır",
+          "Fatiha'dan sonra kısa sure veya ayet okunabilir",
+          "İkinci rekat sonunda Ettehiyyatü için oturulur; son oturuşta Salli-Barik ve Rabbena duaları okunur"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ikindi",
+    "category": "gunluk",
+    "title": "İkindi Namazı",
+    "subtitle": "Günün ikinci yarısındaki farz namaz",
+    "totalRakat": "8 rekat",
+    "shortDescription": "4 rekat sünnet, ardından 4 rekat farz olarak kılınır.",
+    "highlights": ["4 sünnet", "4 farz", "Sessiz kıraat"],
+    "sections": [
+      {
+        "title": "Rekat düzeni",
+        "body": "İkindi namazı sünnet ve farzdan oluşur.",
+        "items": [
+          "4 rekat ikindi sünneti",
+          "4 rekat ikindi farzı",
+          "Cemaatle kılınsa da kıraat sessiz yapılır"
+        ]
+      },
+      {
+        "title": "Okunacak sure ve dualar",
+        "body": "Dört rekatlı namaz düzeni öğle namazına benzer.",
+        "items": [
+          "Sünnetin her rekatında Fatiha'dan sonra sure okunur",
+          "Farzın ilk iki rekatında Fatiha'dan sonra sure okunur",
+          "Son oturuşta Ettehiyyatü, Salli-Barik ve Rabbena duaları okunur"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "aksam",
+    "category": "gunluk",
+    "title": "Akşam Namazı",
+    "subtitle": "Güneş battıktan sonra kılınır",
+    "totalRakat": "5 rekat",
+    "shortDescription": "3 rekat farz, ardından 2 rekat sünnet olarak kılınır.",
+    "highlights": ["3 farz", "2 sünnet", "İlk iki rekat sesli olabilir"],
+    "sections": [
+      {
+        "title": "Rekat düzeni",
+        "body": "Akşam namazında önce farz, sonra sünnet kılınır.",
+        "items": [
+          "3 rekat akşam farzı",
+          "2 rekat akşam sünneti",
+          "Farz cemaatle kılınıyorsa imam ilk iki rekatı sesli okur"
+        ]
+      },
+      {
+        "title": "Okunacak sure ve dualar",
+        "body": "Üç rekatlı farzda ikinci ve üçüncü rekatlardan sonra oturuş vardır.",
+        "items": [
+          "İlk iki rekatta Fatiha'dan sonra kısa sure okunur",
+          "İkinci rekat sonunda Ettehiyyatü okunur",
+          "Üçüncü rekatta Fatiha okunur; son oturuşta Ettehiyyatü, Salli-Barik ve Rabbena duaları okunur"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "yatsi_vitir",
+    "category": "gunluk",
+    "title": "Yatsı ve Vitir Namazı",
+    "subtitle": "Günün son farz namazı ve vitir",
+    "totalRakat": "13 rekat",
+    "shortDescription": "4 ilk sünnet, 4 farz, 2 son sünnet ve 3 rekat vitir olarak kılınır.",
+    "highlights": ["4 ilk sünnet", "4 farz", "2 son sünnet", "3 vitir"],
+    "sections": [
+      {
+        "title": "Rekat düzeni",
+        "body": "Yatsı namazının ardından vitir namazı kılınır.",
+        "items": [
+          "4 rekat yatsı ilk sünneti",
+          "4 rekat yatsı farzı",
+          "2 rekat yatsı son sünneti",
+          "3 rekat vitir namazı"
+        ]
+      },
+      {
+        "title": "Vitir namazında okunanlar",
+        "body": "Vitir namazının üçüncü rekatında Fatiha ve sureden sonra tekbir alınarak Kunut duaları okunur.",
+        "items": [
+          "Üçüncü rekatta Fatiha ve kısa sure okunur",
+          "Eller kaldırılarak tekbir alınır",
+          "Kunut duaları okunur; bilmeyenler kısa dua ile Allah'a niyaz edebilir"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "cuma",
+    "category": "cuma",
+    "title": "Cuma Namazı",
+    "subtitle": "Cuma günü cemaatle kılınan farz",
+    "totalRakat": "10 rekat",
+    "shortDescription": "4 rekat ilk sünnet, hutbeden sonra 2 rekat farz ve 4 rekat son sünnet olarak kılınır.",
+    "highlights": ["Hutbe", "2 farz", "Cemaatle kılınır"],
+    "sections": [
+      {
+        "title": "Rekat düzeni",
+        "body": "Cuma namazı hutbe ve cemaatle kılınan farzıyla diğer namazlardan ayrılır.",
+        "items": [
+          "4 rekat cuma ilk sünneti",
+          "Hutbe dinlenir",
+          "2 rekat cuma farzı cemaatle kılınır",
+          "4 rekat cuma son sünneti"
+        ]
+      },
+      {
+        "title": "Okunacak sure ve dualar",
+        "body": "Farzı imam kıldırır; cemaat imamı takip eder.",
+        "items": [
+          "Farzda cemaat kıraat yapmaz, imamı dinler",
+          "Sünnetlerde Fatiha'dan sonra kısa sure okunur",
+          "Yerel uygulamalarda ek namazlar bulunabilir; camideki görevlinin yönlendirmesine uyulmalıdır"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "bayram",
+    "category": "ozel",
+    "title": "Bayram Namazı",
+    "subtitle": "Ramazan ve Kurban bayramlarında kılınır",
+    "totalRakat": "2 rekat",
+    "shortDescription": "Cemaatle kılınan iki rekatlık özel namazdır; fazladan tekbirleri vardır.",
+    "highlights": ["2 rekat", "Cemaatle", "Zaid tekbirler"],
+    "sections": [
+      {
+        "title": "Genel düzen",
+        "body": "Bayram namazı vakti güneş doğduktan sonra başlar ve cemaatle kılınır.",
+        "items": [
+          "2 rekat olarak kılınır",
+          "Her iki rekatta fazladan tekbirler alınır",
+          "Namazdan sonra hutbe okunur"
+        ]
+      },
+      {
+        "title": "Okunacak sure ve dualar",
+        "body": "İmamın yönlendirmesiyle kılınır; cemaat tekbirlerde imamı takip eder.",
+        "items": [
+          "Birinci rekatta Sübhaneke'den sonra fazladan tekbirler alınır",
+          "Fatiha ve sure imam tarafından okunur",
+          "İkinci rekatta Fatiha ve sureden sonra fazladan tekbirler alınır, ardından rükûya gidilir"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "teravih",
+    "category": "ozel",
+    "title": "Teravih Namazı",
+    "subtitle": "Ramazan gecelerinde kılınan namaz",
+    "totalRakat": "Genelde 20 rekat",
+    "shortDescription": "Ramazan ayında yatsıdan sonra, vitirden önce veya sonra cemaatle ya da tek başına kılınabilir.",
+    "highlights": ["Ramazan", "20 rekat yaygın", "2'şer rekat"],
+    "sections": [
+      {
+        "title": "Rekat düzeni",
+        "body": "Türkiye'deki yaygın uygulamada teravih 20 rekat olarak kılınır.",
+        "items": [
+          "2'şer rekat halinde kılınabilir",
+          "Bazı yerlerde 4'er rekatta selam verilebilir",
+          "Teravih sonrası vitir namazı cemaatle kılınabilir"
+        ]
+      },
+      {
+        "title": "Okunacak sure ve dualar",
+        "body": "Her rekatta Fatiha ve ardından Kur'an'dan bir bölüm okunur.",
+        "items": [
+          "Kısa sureler veya hatimle uzun kıraat tercih edilebilir",
+          "Oturuluşlarda Ettehiyyatü, son oturuşlarda Salli-Barik ve Rabbena duaları okunur",
+          "Cemaatle kılınırken imamın kıraati takip edilir"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "cenaze",
+    "category": "cenaze",
+    "title": "Cenaze Namazı",
+    "subtitle": "Vefat eden Müslüman için dua",
+    "totalRakat": "Rekat yok",
+    "shortDescription": "Rükû ve secde yapılmadan, ayakta dört tekbirle kılınır.",
+    "highlights": ["4 tekbir", "Rükû yok", "Secde yok"],
+    "sections": [
+      {
+        "title": "Genel düzen",
+        "body": "Cenaze namazı bir dua namazıdır; ayakta kılınır.",
+        "items": [
+          "Niyet edilir ve ilk tekbir alınır",
+          "Dört tekbir vardır",
+          "Rükû ve secde yapılmaz",
+          "Dördüncü tekbirden sonra selam verilir"
+        ]
+      },
+      {
+        "title": "Okunacak dualar",
+        "body": "Yaygın Hanefi uygulamasında tekbirler arasında şu dualar okunur.",
+        "items": [
+          "Birinci tekbirden sonra Sübhaneke duası, 've celle senaük' ilavesiyle okunur",
+          "İkinci tekbirden sonra Salli-Barik duaları okunur",
+          "Üçüncü tekbirden sonra cenaze duası okunur; bilmeyenler ölü için rahmet ve bağışlanma duası edebilir",
+          "Dördüncü tekbirden sonra sağa ve sola selam verilir"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "teheccud",
+    "category": "nafile",
+    "title": "Teheccüd Namazı",
+    "subtitle": "Gece uyanıp kılınan nafile namaz",
+    "totalRakat": "2 rekat ve üzeri",
+    "shortDescription": "Yatsıdan sonra uyuyup kalkınca, imsak vaktinden önce kılınır.",
+    "highlights": ["Gece ibadeti", "2'şer rekat", "Dua vakti"],
+    "sections": [
+      {
+        "title": "Rekat düzeni",
+        "body": "Teheccüd iki rekatta bir selam verilerek kılınabilir.",
+        "items": [
+          "En az 2 rekat kılınabilir",
+          "2'şer rekat halinde devam edilebilir",
+          "İmsak vaktinden önce tamamlanmalıdır"
+        ]
+      },
+      {
+        "title": "Okunacak sure ve dualar",
+        "body": "Her rekatta Fatiha ve ardından Kur'an'dan bir bölüm okunur.",
+        "items": [
+          "Kısa surelerle kılınabilir",
+          "Namazdan sonra istiğfar, salavat ve dua ile devam edilebilir",
+          "Uzun kıraat okumak isteyenler ezberindeki sureleri tercih edebilir"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "kusluk",
+    "category": "nafile",
+    "title": "Kuşluk Namazı",
+    "subtitle": "Gündüz kılınan nafile namaz",
+    "totalRakat": "2-12 rekat",
+    "shortDescription": "Güneş yükseldikten sonra öğle vaktine yakın zamana kadar kılınır.",
+    "highlights": ["Duha", "2 rekat ve üzeri", "Nafile"],
+    "sections": [
+      {
+        "title": "Rekat düzeni",
+        "body": "Kuşluk namazı iki rekatta bir selam verilerek kılınabilir.",
+        "items": [
+          "En az 2 rekat kılınabilir",
+          "4, 8 veya daha fazla rekat olarak kılınması da yaygındır",
+          "Güneş doğar doğmaz değil, yükseldikten sonra kılınır"
+        ]
+      },
+      {
+        "title": "Okunacak sure ve dualar",
+        "body": "Standart nafile namaz düzeniyle kılınır.",
+        "items": [
+          "Her rekatta Fatiha ve kısa sure okunur",
+          "Oturuluşta Ettehiyyatü, son oturuşta Salli-Barik ve Rabbena duaları okunur",
+          "Namazdan sonra şükür ve bereket duası edilebilir"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "hacet_istihare",
+    "category": "nafile",
+    "title": "Hacet ve İstihare Namazı",
+    "subtitle": "Dua ve hayırlı karar niyetiyle kılınan nafileler",
+    "totalRakat": "Genelde 2 rekat",
+    "shortDescription": "Bir dilek, ihtiyaç veya hayırlı karar için iki rekat nafile namaz kılınıp dua edilir.",
+    "highlights": ["2 rekat", "Dua", "Nafile"],
+    "sections": [
+      {
+        "title": "Rekat düzeni",
+        "body": "Hacet ve istihare namazları iki rekat nafile olarak kılınabilir.",
+        "items": [
+          "Niyet edilir ve iki rekat namaz kılınır",
+          "Her rekatta Fatiha ve kısa sure okunur",
+          "Namazdan sonra samimi bir dua edilir"
+        ]
+      },
+      {
+        "title": "Kısa not",
+        "body": "İstihare, hayırlı olanı Allah'tan istemek ve kalbin yönelişini gözlemlemek için yapılır.",
+        "items": [
+          "Karar vermeden önce istişare etmek de önemlidir",
+          "Dua ederken hayırlı olanın nasip edilmesi istenir",
+          "Rüya görme şartı aranmaz; kalbin huzuru ve şartların açılması da dikkate alınır"
+        ]
+      }
+    ]
+  }
+]

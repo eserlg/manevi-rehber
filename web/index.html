@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <!--
+    If you are serving your web app in a path other than the root, change the
+    href value below to reflect the base path you are serving from.
+
+    The path provided below has to start and end with a slash "/" in order for
+    it to work correctly.
+
+    For more details:
+    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
+
+    This is a placeholder for base href that will be replaced by the value of
+    the `--base-href` argument provided to `flutter build`.
+  -->
+  <base href="$FLUTTER_BASE_HREF">
+
+  <meta charset="UTF-8">
+  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <meta name="description" content="Manevi Rehber - Namaz, Kur'an, dua, zikir ve kıble uygulaması.">
+
+  <!-- iOS meta tags & icons -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="Manevi Rehber">
+  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="favicon.png"/>
+
+  <title>Manevi Rehber</title>
+  <link rel="manifest" href="manifest.json">
+</head>
+<body>
+  <script>
+    (function () {
+      let compassHandler = null;
+      let speechKeepAliveTimer = null;
+
+      window.ruhHuzurStopSpeech = function () {
+        if (speechKeepAliveTimer) {
+          clearInterval(speechKeepAliveTimer);
+          speechKeepAliveTimer = null;
+        }
+        if ('speechSynthesis' in window) {
+          window.speechSynthesis.cancel();
+        }
+      };
+
+      window.ruhHuzurSpeak = function (text, language, rate) {
+        return new Promise(function (resolve, reject) {
+          if (!('speechSynthesis' in window)) {
+            reject(new Error('speechSynthesis is not supported'));
+            return;
+          }
+
+          const synth = window.speechSynthesis;
+          const voices = synth.getVoices();
+          const languagePrefix = language.split('-')[0].toLowerCase();
+          const voice = voices.find(function (item) {
+            return item.lang && item.lang.toLowerCase() === language.toLowerCase();
+          }) || voices.find(function (item) {
+            return item.lang && item.lang.toLowerCase().startsWith(languagePrefix);
+          }) || voices.find(function (item) {
+            return item.default;
+          });
+
+          const chunks = String(text || '')
+            .replace(/\s+/g, ' ')
+            .match(/.{1,180}(\s|$)|.{1,180}/g)
+            ?.map(function (item) { return item.trim(); })
+            .filter(Boolean) || [];
+
+          if (chunks.length === 0) {
+            resolve(true);
+            return;
+          }
+
+          synth.cancel();
+
+          let index = 0;
+          let resolved = false;
+          const resolveStarted = function () {
+            if (resolved) return;
+            resolved = true;
+            resolve(true);
+          };
+          const stopKeepAlive = function () {
+            if (speechKeepAliveTimer) {
+              clearInterval(speechKeepAliveTimer);
+              speechKeepAliveTimer = null;
+            }
+          };
+          const speakNext = function () {
+            if (index >= chunks.length) {
+              stopKeepAlive();
+              resolveStarted();
+              return;
+            }
+
+            const utterance = new SpeechSynthesisUtterance(chunks[index]);
+            utterance.lang = voice && voice.lang ? voice.lang : language;
+            if (voice) utterance.voice = voice;
+            utterance.rate = rate;
+            utterance.pitch = 1;
+            utterance.volume = 1;
+            utterance.onstart = resolveStarted;
+            utterance.onend = function () {
+              index += 1;
+              setTimeout(speakNext, 20);
+            };
+            utterance.onerror = function (event) {
+              stopKeepAlive();
+              if (resolved) {
+                console.warn('Speech synthesis error', event.error);
+              } else {
+                reject(new Error(event.error || 'Speech synthesis error'));
+              }
+            };
+
+            synth.speak(utterance);
+            setTimeout(resolveStarted, 80);
+          };
+
+          // iOS Safari needs speech to begin inside the tap handler. Do not wait
+          // for voiceschanged here; a default voice is better than a blocked one.
+          stopKeepAlive();
+          speechKeepAliveTimer = setInterval(function () {
+            if (synth.speaking || synth.pending) synth.resume();
+          }, 1000);
+          speakNext();
+        });
+      };
+
+      window.ruhHuzurRequestOrientationPermission = async function () {
+        if (typeof DeviceOrientationEvent === 'undefined') {
+          return 'unsupported';
+        }
+
+        if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+          try {
+            return await DeviceOrientationEvent.requestPermission();
+          } catch (error) {
+            return 'denied';
+          }
+        }
+
+        return 'granted';
+      };
+
+      window.ruhHuzurStartCompass = function (callback) {
+        if (typeof DeviceOrientationEvent === 'undefined') {
+          return false;
+        }
+
+        if (compassHandler) {
+          window.removeEventListener('deviceorientationabsolute', compassHandler, true);
+          window.removeEventListener('deviceorientation', compassHandler, true);
+        }
+
+        compassHandler = function (event) {
+          let heading = null;
+
+          if (typeof event.webkitCompassHeading === 'number') {
+            heading = event.webkitCompassHeading;
+          } else if (typeof event.alpha === 'number') {
+            heading = (360 - event.alpha) % 360;
+          }
+
+          if (heading !== null && Number.isFinite(heading)) {
+            callback(heading);
+          }
+        };
+
+        window.addEventListener('deviceorientationabsolute', compassHandler, true);
+        window.addEventListener('deviceorientation', compassHandler, true);
+        return true;
+      };
+
+      window.ruhHuzurStopCompass = function () {
+        if (!compassHandler) return;
+        window.removeEventListener('deviceorientationabsolute', compassHandler, true);
+        window.removeEventListener('deviceorientation', compassHandler, true);
+        compassHandler = null;
+      };
+    })();
+  </script>
+  <!--
+    You can customize the "flutter_bootstrap.js" script.
+    This is useful to provide a custom configuration to the Flutter loader
+    or to give the user feedback during the initialization process.
+
+    For more details:
+    * https://docs.flutter.dev/platform-integration/web/initialization
+  -->
+  <script src="flutter_bootstrap.js" async></script>
+</body>
+</html>

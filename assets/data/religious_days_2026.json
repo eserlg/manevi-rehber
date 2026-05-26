@@ -1,0 +1,20 @@
+[
+  {"name": "Miraç Kandili", "date": "2026-01-15", "type": "kandil"},
+  {"name": "Berat Kandili", "date": "2026-02-02", "type": "kandil"},
+  {"name": "Ramazan Başlangıcı", "date": "2026-02-19", "type": "ay"},
+  {"name": "Kadir Gecesi", "date": "2026-03-16", "type": "gece"},
+  {"name": "Ramazan Bayramı Arefesi", "date": "2026-03-19", "type": "arefe"},
+  {"name": "Ramazan Bayramı 1. Gün", "date": "2026-03-20", "type": "bayram"},
+  {"name": "Ramazan Bayramı 2. Gün", "date": "2026-03-21", "type": "bayram"},
+  {"name": "Ramazan Bayramı 3. Gün", "date": "2026-03-22", "type": "bayram"},
+  {"name": "Kurban Bayramı Arefesi", "date": "2026-05-26", "type": "arefe"},
+  {"name": "Kurban Bayramı 1. Gün", "date": "2026-05-27", "type": "bayram"},
+  {"name": "Kurban Bayramı 2. Gün", "date": "2026-05-28", "type": "bayram"},
+  {"name": "Kurban Bayramı 3. Gün", "date": "2026-05-29", "type": "bayram"},
+  {"name": "Kurban Bayramı 4. Gün", "date": "2026-05-30", "type": "bayram"},
+  {"name": "Hicri Yılbaşı", "date": "2026-06-16", "type": "gun"},
+  {"name": "Aşure Günü", "date": "2026-06-25", "type": "gun"},
+  {"name": "Mevlid Kandili", "date": "2026-08-24", "type": "kandil"},
+  {"name": "Üç Ayların Başlangıcı", "date": "2026-12-10", "type": "ay"},
+  {"name": "Regaib Kandili", "date": "2026-12-10", "type": "kandil"}
+]

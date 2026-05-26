@@ -1,0 +1,42 @@
+name: ruh_huzur
+description: Namaz vakitleri, Kur'an, zikir, dua, kıble, dini günler ve manevi takipler için mobil rehber.
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.6
+  flutter_riverpod: ^2.4.9
+  dio: ^5.4.0
+  geolocator: ^10.1.0
+  shared_preferences: ^2.2.2
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+  flutter_local_notifications: 18.0.1
+  home_widget: ^0.4.1
+  google_fonts: ^6.1.0
+  intl: ^0.18.1
+  just_audio: ^0.9.36
+  permission_handler: ^11.2.0
+  sensors_plus: 7.0.0
+  flutter_tts: ^4.2.5
+  share_plus: ^13.1.0
+  url_launcher: ^6.3.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.1
+  hive_generator: ^2.0.1
+  build_runner: ^2.4.8
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/data/
+    - assets/images/

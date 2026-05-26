@@ -1,0 +1,18 @@
+Manevi Rehber, günlük ibadet ve manevi takiplerini sade bir arayüzde toplamak için tasarlanmıştır.
+
+Öne çıkan özellikler:
+- Şehre veya konuma göre namaz vakitleri
+- Sonraki namaza kalan süre
+- Kıble yönü rehberi
+- Kur'an-ı Kerim ve Türkçe meal okuma
+- Kaldığın yerden devam etme
+- Zikir ve tesbih takibi
+- Günlük dualar, favoriler ve paylaşım
+- Bayram, Kandil ve Cuma mesajları
+- Dini günler ve yaklaşan özel günler
+- Vefat hatırası, Yasin, hatim ve tesbih bağışı takibi
+- Peygamberlerin hayatından kısa bilgiler
+
+Veriler cihazda yerel olarak tutulur. Kullanıcı adıyla girildiğinde kişisel ayarlar ve takipler ayrı saklanır.
+
+Not: Namaz vakitleri, kıble yönü ve konum bazlı hesaplamalar cihaz izinleri, şehir seçimi ve kullanılan servis yanıtlarına göre değişebilir.

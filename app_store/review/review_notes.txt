@@ -1,0 +1,15 @@
+Uygulama kullanıcı adıyla yerel profil oluşturur; harici hesap veya sunucu girişi gerektirmez.
+
+Test için örnek kullanıcı adı:
+test
+
+Kontrol edilecek ana akışlar:
+- Ana sayfa > namaz vakitleri ve dini günler
+- Vakitler > tüm vakit kartları
+- Dualar > favoriye ekleme ve paylaşım
+- Kur'an > sure listesi, meal ve kaldığın yerden devam
+- Kıble > konum ve sensör izni verilerek yön kontrolü
+- Siyer > peygamber bilgileri
+- Ana sayfa > vefat hatırası kişi ekleme ve bağış takibi
+
+Konum izni namaz vakitleri ve kıble hesaplaması için kullanılır. Hareket sensörü izni kıble pusulasında telefon yönünü algılamak için kullanılır.

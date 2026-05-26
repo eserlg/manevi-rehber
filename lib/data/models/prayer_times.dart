@@ -26,12 +26,17 @@ class PrayerTimes {
     required this.longitude,
   });
 
-  factory PrayerTimes.fromJson(Map<String, dynamic> json, String city, double lat, double lng) {
+  factory PrayerTimes.fromJson(
+    Map<String, dynamic> json,
+    String city,
+    double lat,
+    double lng,
+  ) {
     final timings = json['data']['timings'];
     final dateInfo = json['data']['date'];
     final hijriMonthNumber = dateInfo['hijri']['month']['number'] ?? 1;
     final hijriMonthName = _hijriMonthName(hijriMonthNumber);
-    
+
     return PrayerTimes(
       imsak: timings['Imsak'] ?? '00:00',
       gunes: timings['Sunrise'] ?? '00:00',
@@ -40,7 +45,33 @@ class PrayerTimes {
       aksam: timings['Maghrib'] ?? '00:00',
       yatsi: timings['Isha'] ?? '00:00',
       date: dateInfo['readable'] ?? '',
-      hijriDate: '${dateInfo['hijri']['day']} $hijriMonthName ${dateInfo['hijri']['year']}',
+      hijriDate:
+          '${dateInfo['hijri']['day']} $hijriMonthName ${dateInfo['hijri']['year']}',
+      city: city,
+      latitude: lat,
+      longitude: lng,
+    );
+  }
+
+  factory PrayerTimes.fromDiyanet(
+    Map<String, dynamic> json,
+    String city,
+    double lat,
+    double lng,
+  ) {
+    final times = json['times'] as Map<String, dynamic>? ?? const {};
+    final hijriDate = json['hijri_date'] as Map<String, dynamic>? ?? const {};
+    final parsedDate = DateTime.tryParse(json['date']?.toString() ?? '');
+
+    return PrayerTimes(
+      imsak: times['imsak']?.toString() ?? '00:00',
+      gunes: times['gunes']?.toString() ?? '00:00',
+      ogle: times['ogle']?.toString() ?? '00:00',
+      ikindi: times['ikindi']?.toString() ?? '00:00',
+      aksam: times['aksam']?.toString() ?? '00:00',
+      yatsi: times['yatsi']?.toString() ?? '00:00',
+      date: parsedDate == null ? '' : _formatGregorianDate(parsedDate),
+      hijriDate: hijriDate['full_date']?.toString() ?? '',
       city: city,
       latitude: lat,
       longitude: lng,
@@ -66,19 +97,43 @@ class PrayerTimes {
     return months[month - 1];
   }
 
+  static String _formatGregorianDate(DateTime date) {
+    return '${date.day} ${_gregorianMonthName(date.month)} ${date.year}';
+  }
+
+  static String _gregorianMonthName(int month) {
+    const months = [
+      'Ocak',
+      'Şubat',
+      'Mart',
+      'Nisan',
+      'Mayıs',
+      'Haziran',
+      'Temmuz',
+      'Ağustos',
+      'Eylül',
+      'Ekim',
+      'Kasım',
+      'Aralık',
+    ];
+    if (month < 1 || month > months.length) return '';
+    return months[month - 1];
+  }
+
   Map<String, String> get allPrayers => {
-    'İmsak': imsak,
-    'Güneş': gunes,
-    'Öğle': ogle,
-    'İkindi': ikindi,
-    'Akşam': aksam,
-    'Yatsı': yatsi,
-  };
+        'İmsak': imsak,
+        'Güneş': gunes,
+        'Öğle': ogle,
+        'İkindi': ikindi,
+        'Akşam': aksam,
+        'Yatsı': yatsi,
+      };
 
   String getNextPrayer() {
     final now = DateTime.now();
-    final currentTime = '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}';
-    
+    final currentTime =
+        '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}';
+
     final prayers = [
       ('İmsak', imsak),
       ('Güneş', gunes),
@@ -93,20 +148,27 @@ class PrayerTimes {
         return prayer.$1;
       }
     }
-    
+
     return 'İmsak'; // Next day
   }
 
   String getNextPrayerTime() {
     final nextPrayer = getNextPrayer();
     switch (nextPrayer) {
-      case 'İmsak': return imsak;
-      case 'Güneş': return gunes;
-      case 'Öğle': return ogle;
-      case 'İkindi': return ikindi;
-      case 'Akşam': return aksam;
-      case 'Yatsı': return yatsi;
-      default: return imsak;
+      case 'İmsak':
+        return imsak;
+      case 'Güneş':
+        return gunes;
+      case 'Öğle':
+        return ogle;
+      case 'İkindi':
+        return ikindi;
+      case 'Akşam':
+        return aksam;
+      case 'Yatsı':
+        return yatsi;
+      default:
+        return imsak;
     }
   }
 
@@ -124,12 +186,18 @@ class PrayerTimes {
     final now = DateTime.now();
     final nextTime = getNextPrayerTime();
     final parts = nextTime.split(':');
-    var nextDateTime = DateTime(now.year, now.month, now.day, int.parse(parts[0]), int.parse(parts[1]));
-    
+    var nextDateTime = DateTime(
+      now.year,
+      now.month,
+      now.day,
+      int.parse(parts[0]),
+      int.parse(parts[1]),
+    );
+
     if (nextDateTime.isBefore(now)) {
       nextDateTime = nextDateTime.add(const Duration(days: 1));
     }
-    
+
     return nextDateTime.difference(now);
   }
 }

@@ -15,6 +15,7 @@ import '../../data/services/app_share_service.dart';
 import '../providers/providers.dart';
 import '../widgets/memorial_donation_sheet.dart';
 import 'occasion_messages_screen.dart';
+import 'widgets_screen.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -849,6 +850,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           );
         },
       ),
+      _QuickActionData(
+        icon: Icons.widgets_outlined,
+        title: 'Widgetler',
+        subtitle: 'Ayet ve vakit ekranları',
+        color: AppColors.primaryLight,
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const WidgetsScreen(),
+            ),
+          );
+        },
+      ),
     ];
 
     return LayoutBuilder(
@@ -872,43 +887,26 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           );
         }
 
-        return Column(
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  child: _buildQuickActionCard(
-                    icon: actions[0].icon,
-                    title: actions[0].title,
-                    subtitle: actions[0].subtitle,
-                    color: actions[0].color,
-                    onTap: actions[0].onTap,
-                  ),
-                ),
-                const SizedBox(width: AppDimensions.spacingMD),
-                Expanded(
-                  child: _buildQuickActionCard(
-                    icon: actions[1].icon,
-                    title: actions[1].title,
-                    subtitle: actions[1].subtitle,
-                    color: actions[1].color,
-                    onTap: actions[1].onTap,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: AppDimensions.spacingMD),
-            SizedBox(
-              width: double.infinity,
-              child: _buildQuickActionCard(
-                icon: actions[2].icon,
-                title: actions[2].title,
-                subtitle: actions[2].subtitle,
-                color: actions[2].color,
-                onTap: actions[2].onTap,
-              ),
-            ),
-          ],
+        return GridView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: actions.length,
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            crossAxisSpacing: AppDimensions.spacingMD,
+            mainAxisSpacing: AppDimensions.spacingMD,
+            childAspectRatio: 1.35,
+          ),
+          itemBuilder: (context, index) {
+            final action = actions[index];
+            return _buildQuickActionCard(
+              icon: action.icon,
+              title: action.title,
+              subtitle: action.subtitle,
+              color: action.color,
+              onTap: action.onTap,
+            );
+          },
         );
       },
     );

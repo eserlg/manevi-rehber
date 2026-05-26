@@ -16,14 +16,21 @@ class PrayerHomeWidgetProvider : HomeWidgetProvider() {
     ) {
         for (widgetId in appWidgetIds) {
             val views = RemoteViews(context.packageName, R.layout.prayer_home_widget)
-            val nextPrayer = widgetData.getString("next_prayer", "Sıradaki vakit")
+            val nextPrayer = widgetData.getString("next_prayer", "Siradaki vakit")
             val nextPrayerTime = widgetData.getString("next_prayer_time", "")
-            val timeUntil = widgetData.getString("time_until_next", "Vakitler güncelleniyor")
-            val city = widgetData.getString("city", "İstanbul")
+            val timeUntil = widgetData.getString("time_until_next", "Vakitler guncelleniyor")
+            val city = widgetData.getString("city", "Istanbul")
+            val verseReference = widgetData.getString("verse_reference", "Gunun Ayeti")
+            val verseText = widgetData.getString(
+                "verse_text",
+                "Allah'i anmak kalplere huzur verir."
+            )
 
             views.setTextViewText(R.id.widget_next_prayer, "$nextPrayer $nextPrayerTime")
             views.setTextViewText(R.id.widget_countdown, timeUntil)
             views.setTextViewText(R.id.widget_city, city)
+            views.setTextViewText(R.id.widget_verse_reference, verseReference)
+            views.setTextViewText(R.id.widget_verse_text, verseText)
 
             context.packageManager.getLaunchIntentForPackage(context.packageName)?.let { intent ->
                 val pendingIntent = PendingIntent.getActivity(

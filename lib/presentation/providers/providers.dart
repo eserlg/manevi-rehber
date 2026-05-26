@@ -49,7 +49,17 @@ final prayerTimesProvider =
   );
 
   if (prayerTimes != null) {
-    await ref.read(prayerWidgetServiceProvider).updatePrayerTimes(prayerTimes);
+    Verse? verse;
+    try {
+      verse = await repository.getVerseOfDay();
+    } catch (_) {}
+
+    await ref.read(prayerWidgetServiceProvider).updatePrayerTimes(
+          prayerTimes,
+          verseReference:
+              verse == null ? null : '${verse.surahId}:${verse.verseKey}',
+          verseText: verse?.translation,
+        );
     final storage = ref.read(localStorageProvider);
     await ref
         .read(prayerNotificationServiceProvider)

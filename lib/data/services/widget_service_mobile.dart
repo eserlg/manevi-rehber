@@ -4,12 +4,25 @@ import '../models/prayer_times.dart';
 class PrayerWidgetService {
   static const _channel = MethodChannel('home_widget');
 
-  Future<void> updatePrayerTimes(PrayerTimes prayerTimes) async {
+  Future<void> updatePrayerTimes(
+    PrayerTimes prayerTimes, {
+    String? verseReference,
+    String? verseText,
+  }) async {
     try {
       final nextPrayer = prayerTimes.getNextPrayer();
       await _saveWidgetData('city', prayerTimes.city);
       await _saveWidgetData('next_prayer', nextPrayer);
-      await _saveWidgetData('next_prayer_time', prayerTimes.getNextPrayerTime());
+      await _saveWidgetData(
+          'next_prayer_time', prayerTimes.getNextPrayerTime());
+      await _saveWidgetData('verse_reference', verseReference ?? 'Günün Ayeti');
+      await _saveWidgetData(
+        'verse_text',
+        _shorten(
+          verseText ?? 'Allah’ı anmak kalplere huzur verir.',
+          92,
+        ),
+      );
       await _saveWidgetData(
         'time_until_next',
         _formatDuration(prayerTimes.getTimeUntilNextPrayer()),
@@ -27,6 +40,12 @@ class PrayerWidgetService {
       'id': id,
       'data': data,
     });
+  }
+
+  String _shorten(String value, int maxLength) {
+    final normalized = value.replaceAll(RegExp(r'\s+'), ' ').trim();
+    if (normalized.length <= maxLength) return normalized;
+    return '${normalized.substring(0, maxLength - 1)}…';
   }
 
   String _formatDuration(Duration duration) {

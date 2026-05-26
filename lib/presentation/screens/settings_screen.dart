@@ -208,6 +208,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
       await ref.read(localStorageProvider).setAutoLocationEnabled(true);
       await ref.read(localStorageProvider).saveCity(displayCity);
+      await ref.read(localStorageProvider).saveLastLocation(
+            latitude: position.latitude,
+            longitude: position.longitude,
+          );
 
       setState(() {
         _autoLocationEnabled = true;

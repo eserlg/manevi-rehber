@@ -12,6 +12,7 @@ class LocalStorageService {
   static const String _lastReadKey = 'last_read_surah';
   static const String _memorialKey = 'memorial_record';
   static const String _cityKey = 'selected_city';
+  static const String _lastLocationKey = 'last_location';
   static const String _onboardingKey = 'onboarding_completed';
   static const String _autoLocationKey = 'auto_location_enabled';
   static const String _notificationsKey = 'prayer_notifications_enabled';
@@ -186,6 +187,37 @@ class LocalStorageService {
 
   String? getCity() {
     return _prefs?.getString(_scopedKey(_cityKey));
+  }
+
+  Future<void> saveLastLocation({
+    required double latitude,
+    required double longitude,
+  }) async {
+    final prefs = await _ensurePrefs();
+    await prefs.setString(
+      _scopedKey(_lastLocationKey),
+      jsonEncode({
+        'latitude': latitude,
+        'longitude': longitude,
+      }),
+    );
+  }
+
+  Map<String, double>? getLastLocation() {
+    final data = _prefs?.getString(_scopedKey(_lastLocationKey));
+    if (data == null) return null;
+
+    final decoded = jsonDecode(data);
+    if (decoded is! Map) return null;
+
+    final latitude = decoded['latitude'];
+    final longitude = decoded['longitude'];
+    if (latitude is! num || longitude is! num) return null;
+
+    return {
+      'latitude': latitude.toDouble(),
+      'longitude': longitude.toDouble(),
+    };
   }
 
   // Settings

@@ -63,6 +63,17 @@ class QuranAudioService {
     }
   }
 
+  Future<bool> playUrl(String url) async {
+    try {
+      await _player.stop();
+      await _player.setUrl(url);
+      await _player.play();
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
   Future<bool> playTurkishMeal(int surahId) async {
     final fileName = _turkishMealAudioFiles[surahId];
     if (fileName == null) return false;

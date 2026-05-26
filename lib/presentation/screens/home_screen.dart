@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/services.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:permission_handler/permission_handler.dart';
 import '../../core/constants/colors.dart';
@@ -49,6 +50,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Future<void> _initLocation() async {
     final storage = ref.read(localStorageProvider);
     final savedCity = storage.getCity();
+    final savedLocation = storage.getLastLocation();
 
     if (!storage.isAutoLocationEnabled()) {
       if (savedCity != null && savedCity.isNotEmpty) {
@@ -65,10 +67,39 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       ref.read(currentPositionProvider.notifier).state = position;
       ref.read(currentCityProvider.notifier).state =
           city == 'Bilinmeyen' ? savedCity ?? 'Mevcut Konum' : city;
+      await storage.saveLastLocation(
+        latitude: position.latitude,
+        longitude: position.longitude,
+      );
+      if (city != 'Bilinmeyen') await storage.saveCity(city);
     } else {
-      // Default to Istanbul
+      if (savedLocation != null) {
+        ref.read(currentPositionProvider.notifier).state = _positionFromCoords(
+          savedLocation['latitude']!,
+          savedLocation['longitude']!,
+        );
+        ref.read(currentCityProvider.notifier).state =
+            savedCity ?? 'Mevcut Konum';
+        return;
+      }
+
       ref.read(currentCityProvider.notifier).state = savedCity ?? 'İstanbul';
     }
+  }
+
+  Position _positionFromCoords(double latitude, double longitude) {
+    return Position(
+      latitude: latitude,
+      longitude: longitude,
+      timestamp: DateTime.now(),
+      accuracy: 0,
+      altitude: 0,
+      altitudeAccuracy: 0,
+      heading: 0,
+      headingAccuracy: 0,
+      speed: 0,
+      speedAccuracy: 0,
+    );
   }
 
   Future<void> _loadMemorialRecord() async {

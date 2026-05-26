@@ -1,15 +1,18 @@
+import 'dart:math';
+
 import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
+import '../../core/constants/city_coordinates.dart';
 
 class LocationService {
   /// Check and request location permission
   Future<bool> requestPermission() async {
-    var status = await Permission.location.status;
-    
+    var status = await Permission.locationWhenInUse.status;
+
     if (status.isDenied) {
-      status = await Permission.location.request();
+      status = await Permission.locationWhenInUse.request();
     }
-    
+
     return status.isGranted;
   }
 
@@ -44,7 +47,25 @@ class LocationService {
 
   /// Get city name from coordinates (reverse geocoding)
   Future<String> getCityName(Position position) async {
-    return 'Bilinmeyen';
+    CityCoordinate? nearest;
+    var nearestDistance = double.infinity;
+
+    for (final city in cityCoordinates) {
+      final distance = _distanceKm(
+        position.latitude,
+        position.longitude,
+        city.latitude,
+        city.longitude,
+      );
+      if (distance < nearestDistance) {
+        nearestDistance = distance;
+        nearest = city;
+      }
+    }
+
+    return nearestDistance <= 60
+        ? nearest?.name ?? 'Bilinmeyen'
+        : 'Mevcut Konum';
   }
 
   /// Check if location services are enabled
@@ -52,3 +73,17 @@ class LocationService {
     return await Geolocator.isLocationServiceEnabled();
   }
 }
+
+double _distanceKm(double lat1, double lon1, double lat2, double lon2) {
+  const earthRadius = 6371.0;
+  final dLat = _toRadians(lat2 - lat1);
+  final dLon = _toRadians(lon2 - lon1);
+  final a = sin(dLat / 2) * sin(dLat / 2) +
+      cos(_toRadians(lat1)) *
+          cos(_toRadians(lat2)) *
+          sin(dLon / 2) *
+          sin(dLon / 2);
+  return earthRadius * 2 * atan2(sqrt(a), sqrt(1 - a));
+}
+
+double _toRadians(double degree) => degree * pi / 180;

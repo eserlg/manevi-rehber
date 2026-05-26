@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../core/constants/colors.dart';
 import '../../core/constants/dimensions.dart';
 import '../../data/models/zikr.dart';
+import '../../data/services/quran_audio_service.dart';
 import '../../data/services/text_to_speech_service.dart';
 import '../providers/providers.dart';
 import '../widgets/memorial_donation_sheet.dart';
@@ -11,6 +12,18 @@ import '../widgets/zikr_counter.dart';
 
 class ZikrScreen extends ConsumerWidget {
   const ZikrScreen({super.key});
+
+  static const Map<String, String> _wikimediaArabicAudio = {
+    'elhamdulillah':
+        'https://upload.wikimedia.org/wikipedia/commons/transcoded/7/73/Ar-%D8%A7%D9%84%D8%AD%D9%85%D8%AF_%D9%84%D9%84%D9%87.ogg/Ar-%D8%A7%D9%84%D8%AD%D9%85%D8%AF_%D9%84%D9%84%D9%87.ogg.mp3',
+    'allahu_ekber':
+        'https://upload.wikimedia.org/wikipedia/commons/transcoded/6/69/Ar-eg-%D8%A7%D9%84%D9%84%D9%87_%D8%A3%D9%83%D8%A8%D8%B1.oga/Ar-eg-%D8%A7%D9%84%D9%84%D9%87_%D8%A3%D9%83%D8%A8%D8%B1.oga.mp3',
+  };
+
+  static const Map<String, List<QuranAudioReference>> _quranArabicAudio = {
+    'subhanallah': [QuranAudioReference(37, 159)],
+    'la_ilahe_illallah': [QuranAudioReference(37, 35)],
+  };
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -170,20 +183,20 @@ class ZikrScreen extends ConsumerWidget {
       alignment: WrapAlignment.center,
       children: [
         OutlinedButton.icon(
-          onPressed: () => _speakZikr(
+          onPressed: () => _playZikrAudio(
             context,
             ref,
-            zikr.arabic,
+            zikr,
             SpeechLanguage.arabic,
           ),
           icon: const Icon(Icons.volume_up),
           label: const Text('Arapça Dinle'),
         ),
         OutlinedButton.icon(
-          onPressed: () => _speakZikr(
+          onPressed: () => _playZikrAudio(
             context,
             ref,
-            zikr.meaning,
+            zikr,
             SpeechLanguage.turkish,
           ),
           icon: const Icon(Icons.record_voice_over),
@@ -191,20 +204,46 @@ class ZikrScreen extends ConsumerWidget {
         ),
         IconButton(
           tooltip: 'Sesi durdur',
-          onPressed: () => ref.read(textToSpeechProvider).stop(),
+          onPressed: () async {
+            await ref.read(quranAudioProvider).stop();
+            await ref.read(textToSpeechProvider).stop();
+          },
           icon: const Icon(Icons.stop_circle_outlined),
         ),
       ],
     );
   }
 
-  Future<void> _speakZikr(
+  Future<void> _playZikrAudio(
     BuildContext context,
     WidgetRef ref,
-    String text,
+    Zikr zikr,
     SpeechLanguage language,
   ) async {
-    final started = await ref.read(textToSpeechProvider).speak(text, language);
+    var started = false;
+
+    if (language == SpeechLanguage.arabic) {
+      final url = _wikimediaArabicAudio[zikr.id];
+      if (url != null) {
+        started = await ref.read(quranAudioProvider).playUrl(url);
+      }
+
+      if (!started) {
+        final references = _quranArabicAudio[zikr.id];
+        if (references != null) {
+          started =
+              await ref.read(quranAudioProvider).playReferences(references);
+        }
+      }
+    }
+
+    if (!started) {
+      started = await ref.read(textToSpeechProvider).speak(
+            language == SpeechLanguage.arabic ? zikr.arabic : zikr.meaning,
+            language,
+          );
+    }
+
     if (!started && context.mounted) {
       _showSpeechError(context);
     }

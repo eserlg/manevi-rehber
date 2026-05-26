@@ -278,15 +278,18 @@ class _QiblaScreenState extends ConsumerState<QiblaScreen> {
                     isLiveCompass: _hasLiveCompass,
                   ),
                 ),
-                const SizedBox(height: AppDimensions.spacingLG),
                 if (!_hasLiveCompass) ...[
+                  const SizedBox(height: AppDimensions.spacingMD),
                   ElevatedButton.icon(
                     onPressed: _requestAndStartBrowserCompass,
                     icon: const Icon(Icons.explore),
                     label: const Text('Pusulayı Başlat'),
                   ),
                   const SizedBox(height: AppDimensions.spacingMD),
+                  _buildManualHeadingPanel(),
+                  const SizedBox(height: AppDimensions.spacingMD),
                 ],
+                const SizedBox(height: AppDimensions.spacingLG),
                 _buildInfoPanel(qiblaDir),
               ],
             ),
@@ -294,6 +297,99 @@ class _QiblaScreenState extends ConsumerState<QiblaScreen> {
         );
       },
     );
+  }
+
+  Widget _buildManualHeadingPanel() {
+    return Container(
+      margin:
+          const EdgeInsets.symmetric(horizontal: AppDimensions.screenPadding),
+      padding: const EdgeInsets.all(AppDimensions.spacingMD),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(AppDimensions.radiusLarge),
+        border: Border.all(color: AppColors.primary.withOpacity(0.16)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.tune, color: AppColors.primary, size: 20),
+              const SizedBox(width: AppDimensions.spacingSM),
+              Expanded(
+                child: Text(
+                  'Sensör yoksa elle hizala',
+                  style: GoogleFonts.notoSans(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+              ),
+              Text(
+                '${_currentHeading.round()}°',
+                style: GoogleFonts.notoSans(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.primary,
+                ),
+              ),
+            ],
+          ),
+          Slider(
+            value: _currentHeading.clamp(0, 359).toDouble(),
+            min: 0,
+            max: 359,
+            divisions: 359,
+            activeColor: AppColors.primary,
+            label: '${_currentHeading.round()}°',
+            onChanged: (value) {
+              setState(() {
+                _currentHeading = value;
+                _compassMessage =
+                    'Pusula sensörü yoksa telefonu çevirdiğin yönü buradan elle ayarlayabilirsin.';
+              });
+            },
+          ),
+          Wrap(
+            spacing: AppDimensions.spacingSM,
+            runSpacing: AppDimensions.spacingSM,
+            children: [
+              _headingChip('K', 0),
+              _headingChip('D', 90),
+              _headingChip('G', 180),
+              _headingChip('B', 270),
+              OutlinedButton.icon(
+                onPressed: () => _nudgeHeading(-10),
+                icon: const Icon(Icons.rotate_left),
+                label: const Text('-10°'),
+              ),
+              OutlinedButton.icon(
+                onPressed: () => _nudgeHeading(10),
+                icon: const Icon(Icons.rotate_right),
+                label: const Text('+10°'),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _headingChip(String label, double heading) {
+    return ActionChip(
+      label: Text(label),
+      avatar: const Icon(Icons.explore, size: 16),
+      onPressed: () {
+        setState(() => _currentHeading = heading);
+      },
+    );
+  }
+
+  void _nudgeHeading(double delta) {
+    setState(() {
+      _currentHeading = _normalize360(_currentHeading + delta);
+    });
   }
 
   Widget _buildLocationCard(QiblaDirection qiblaDir) {

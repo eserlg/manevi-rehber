@@ -57,7 +57,7 @@ class Zikr {
       name: 'La İlahe İllallah',
       arabic: 'لَا إِلٰهَ إِلَّا اللّٰهُ',
       meaning: 'Allah\'tan başka ilah yoktur',
-      targetCount: 1,
+      targetCount: 33,
       category: 'kelime',
     );
   }

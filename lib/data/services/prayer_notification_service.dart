@@ -10,6 +10,12 @@ class PrayerNotificationService {
     return permission == 'granted';
   }
 
+  Future<bool> showTestNotification() async {
+    final permission = await requestBrowserNotificationPermission();
+    if (permission != 'granted') return false;
+    return showBrowserTestNotification();
+  }
+
   Future<bool> schedulePrayerNotifications({
     required PrayerTimes prayerTimes,
     required int leadMinutes,
@@ -55,8 +61,11 @@ class PrayerNotificationService {
         prayerDate = prayerDate.add(const Duration(days: 1));
       }
 
-      final notifyAt = prayerDate.subtract(Duration(minutes: leadMinutes));
-      if (!notifyAt.isAfter(now)) continue;
+      var notifyAt = prayerDate.subtract(Duration(minutes: leadMinutes));
+      if (!notifyAt.isAfter(now)) {
+        if (!prayerDate.isAfter(now)) continue;
+        notifyAt = now.add(const Duration(seconds: 3));
+      }
 
       notifications.add({
         'title': '${entry.key} namazı yaklaşıyor',

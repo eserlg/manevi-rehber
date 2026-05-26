@@ -373,6 +373,60 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     }).toList(),
                   ),
                   const SizedBox(height: AppDimensions.spacingLG),
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(AppDimensions.spacingMD),
+                    decoration: BoxDecoration(
+                      color: AppColors.surfaceVariant,
+                      borderRadius:
+                          BorderRadius.circular(AppDimensions.radiusMedium),
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Icon(
+                          Icons.info_outline,
+                          color: AppColors.primary,
+                          size: 20,
+                        ),
+                        const SizedBox(width: AppDimensions.spacingSM),
+                        Expanded(
+                          child: Text(
+                            'PWA bildirimleri uygulama açıkken veya arka planda canlı kaldığında çalışır. Telefon uygulamayı uykuya alırsa kesin alarm için native Android/iOS sürümü gerekir.',
+                            style: GoogleFonts.notoSans(
+                              fontSize: 12,
+                              height: 1.35,
+                              color: AppColors.textSecondary,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: AppDimensions.spacingMD),
+                  SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton.icon(
+                      onPressed: () async {
+                        final shown = await ref
+                            .read(prayerNotificationServiceProvider)
+                            .showTestNotification();
+                        if (!context.mounted) return;
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              shown
+                                  ? 'Test bildirimi gönderildi.'
+                                  : 'Bildirim gönderilemedi. PWA bildirimi veya tarayıcı izni kapalı olabilir.',
+                            ),
+                          ),
+                        );
+                      },
+                      icon: const Icon(Icons.notifications_active_outlined),
+                      label: const Text('Test bildirimi gönder'),
+                    ),
+                  ),
+                  const SizedBox(height: AppDimensions.spacingMD),
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton.icon(
@@ -1075,8 +1129,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         final days = snapshot.data ?? [];
         final today = DateTime.now();
         final todayDate = DateTime(today.year, today.month, today.day);
-        final upcoming =
-            days.where((day) => !day.date.isBefore(todayDate)).take(3).toList();
+        final upcoming = _visibleReligiousDays(days, todayDate);
 
         if (upcoming.isEmpty) return const SizedBox.shrink();
 
@@ -1337,6 +1390,26 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         await rootBundle.loadString('assets/data/religious_days_2026.json');
     final List<dynamic> jsonList = jsonDecode(jsonString);
     return jsonList.map((json) => _ReligiousDay.fromJson(json)).toList();
+  }
+
+  List<_ReligiousDay> _visibleReligiousDays(
+    List<_ReligiousDay> days,
+    DateTime todayDate,
+  ) {
+    final upcoming =
+        days.where((day) => !day.date.isBefore(todayDate)).toList();
+    if (upcoming.isEmpty) return [];
+
+    final family = _bayramFamily(upcoming.first.name);
+    if (family == null) return upcoming.take(3).toList();
+
+    return upcoming.where((day) => day.name.startsWith(family)).toList();
+  }
+
+  String? _bayramFamily(String name) {
+    if (name.startsWith('Ramazan Bayramı')) return 'Ramazan Bayramı';
+    if (name.startsWith('Kurban Bayramı')) return 'Kurban Bayramı';
+    return null;
   }
 
   String _formatDaysLeft(int days) {

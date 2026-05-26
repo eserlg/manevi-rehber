@@ -67,21 +67,21 @@ class CompassWidget extends StatelessWidget {
                       isPointingQibla ? AppColors.primary : AppColors.textHint,
                 ),
               ),
-              Transform.rotate(
-                angle: relativeAngle * pi / 180,
-                child: SizedBox(
-                  width: compassSize,
-                  height: compassSize,
-                  child: Align(
-                    alignment: Alignment.topCenter,
-                    child: Padding(
-                      padding: const EdgeInsets.only(top: 18),
-                      child: _QiblaMarker(isAligned: isPointingQibla),
-                    ),
+              SizedBox(
+                width: compassSize,
+                height: compassSize,
+                child: Align(
+                  alignment: Alignment.topCenter,
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 18),
+                    child: _QiblaMarker(isAligned: isPointingQibla),
                   ),
                 ),
               ),
-              _CenterDirectionPointer(isAligned: isPointingQibla),
+              _CenterDirectionPointer(
+                isAligned: isPointingQibla,
+                angle: relativeAngle,
+              ),
             ],
           ),
         ),
@@ -235,39 +235,54 @@ class _QiblaMarker extends StatelessWidget {
 
 class _CenterDirectionPointer extends StatelessWidget {
   final bool isAligned;
+  final double angle;
 
-  const _CenterDirectionPointer({required this.isAligned});
+  const _CenterDirectionPointer({
+    required this.isAligned,
+    required this.angle,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 74,
-      height: 74,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: isAligned ? AppColors.primary : AppColors.secondaryDark,
-      ),
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          Transform.translate(
-            offset: const Offset(0, -8),
-            child: Icon(
-              Icons.navigation,
-              color: Colors.white,
-              size: 34,
+    return Transform.rotate(
+      angle: angle * pi / 180,
+      child: Container(
+        width: 74,
+        height: 74,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: isAligned ? AppColors.primary : AppColors.secondaryDark,
+          boxShadow: [
+            BoxShadow(
+              color: (isAligned ? AppColors.primary : AppColors.secondaryDark)
+                  .withOpacity(0.24),
+              blurRadius: 16,
+              offset: const Offset(0, 6),
             ),
-          ),
-          Container(
-            width: 14,
-            height: 14,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: AppColors.textPrimary,
-              border: Border.all(color: Colors.white, width: 2),
+          ],
+        ),
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            Transform.translate(
+              offset: const Offset(0, -8),
+              child: Icon(
+                Icons.navigation,
+                color: Colors.white,
+                size: 34,
+              ),
             ),
-          ),
-        ],
+            Container(
+              width: 14,
+              height: 14,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: AppColors.textPrimary,
+                border: Border.all(color: Colors.white, width: 2),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

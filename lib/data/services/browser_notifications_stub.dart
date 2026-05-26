@@ -7,3 +7,7 @@ Future<bool> scheduleBrowserPrayerNotifications(String payloadJson) async {
 }
 
 void clearBrowserPrayerNotifications() {}
+
+Future<bool> showBrowserTestNotification() async {
+  return false;
+}

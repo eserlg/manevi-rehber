@@ -36,6 +36,7 @@
   <script>
     (function () {
       let compassHandler = null;
+      let absoluteCompassSensor = null;
       let speechKeepAliveTimer = null;
       let speechVoices = [];
       let prayerNotificationTimers = [];
@@ -80,6 +81,34 @@
         prayerNotificationTimers = [];
       };
 
+      window.ruhHuzurShowLocalNotification = function (title, body, tag) {
+        if (!('Notification' in window) || Notification.permission !== 'granted') {
+          return false;
+        }
+
+        const options = {
+          body: body || '',
+          icon: 'icons/Icon-192.png',
+          badge: 'icons/Icon-192.png',
+          tag: tag || 'manevi-rehber',
+          renotify: true,
+        };
+
+        if (navigator.serviceWorker?.ready) {
+          navigator.serviceWorker.ready
+            .then(function (registration) {
+              registration.showNotification(title || 'Manevi Rehber', options);
+            })
+            .catch(function () {
+              new Notification(title || 'Manevi Rehber', options);
+            });
+          return true;
+        }
+
+        new Notification(title || 'Manevi Rehber', options);
+        return true;
+      };
+
       window.ruhHuzurSchedulePrayerNotifications = function (payloadJson) {
         if (!('Notification' in window) || Notification.permission !== 'granted') {
           return false;
@@ -95,35 +124,16 @@
         }
 
         const maxDelay = 2147483647;
-        const showNotification = function (item) {
-          const options = {
-            body: item.body || '',
-            icon: 'icons/Icon-192.png',
-            badge: 'icons/Icon-192.png',
-            tag: item.tag || 'prayer-time',
-            renotify: true,
-          };
-
-          if (navigator.serviceWorker?.ready) {
-            navigator.serviceWorker.ready
-              .then(function (registration) {
-                registration.showNotification(item.title || 'Namaz vakti', options);
-              })
-              .catch(function () {
-                new Notification(item.title || 'Namaz vakti', options);
-              });
-            return;
-          }
-
-          new Notification(item.title || 'Namaz vakti', options);
-        };
-
         notifications.forEach(function (item) {
           const notifyAt = new Date(item.notifyAt).getTime();
           const delay = notifyAt - Date.now();
           if (!Number.isFinite(delay) || delay < 0 || delay > maxDelay) return;
           prayerNotificationTimers.push(setTimeout(function () {
-            showNotification(item);
+            window.ruhHuzurShowLocalNotification(
+              item.title || 'Namaz vakti',
+              item.body || '',
+              item.tag || 'prayer-time'
+            );
           }, delay));
         });
 
@@ -269,13 +279,26 @@
       };
 
       window.ruhHuzurRequestOrientationPermission = async function () {
-        if (typeof DeviceOrientationEvent === 'undefined') {
+        const isLocal = ['localhost', '127.0.0.1', '::1'].includes(window.location.hostname);
+        if (!window.isSecureContext && !isLocal) {
+          return 'insecure';
+        }
+
+        if (
+          typeof DeviceOrientationEvent === 'undefined' &&
+          typeof window.AbsoluteOrientationSensor === 'undefined'
+        ) {
           return 'unsupported';
         }
 
         if (typeof DeviceOrientationEvent.requestPermission === 'function') {
           try {
-            const orientationPermission = await DeviceOrientationEvent.requestPermission();
+            let orientationPermission = 'granted';
+            try {
+              orientationPermission = await DeviceOrientationEvent.requestPermission(true);
+            } catch (absoluteError) {
+              orientationPermission = await DeviceOrientationEvent.requestPermission();
+            }
             if (orientationPermission !== 'granted') return orientationPermission;
 
             if (
@@ -296,45 +319,84 @@
       };
 
       window.ruhHuzurStartCompass = function (callback) {
-        if (typeof DeviceOrientationEvent === 'undefined') {
+        const isLocal = ['localhost', '127.0.0.1', '::1'].includes(window.location.hostname);
+        if (!window.isSecureContext && !isLocal) {
           return false;
         }
 
-        if (compassHandler) {
-          window.removeEventListener('deviceorientationabsolute', compassHandler, true);
-          window.removeEventListener('deviceorientation', compassHandler, true);
-        }
+        window.ruhHuzurStopCompass();
+
+        const normalize = function (value) {
+          return ((value % 360) + 360) % 360;
+        };
+
+        const emitHeading = function (heading) {
+          if (heading !== null && Number.isFinite(heading)) {
+            callback(normalize(heading));
+          }
+        };
 
         compassHandler = function (event) {
-          const normalize = function (value) {
-            return ((value % 360) + 360) % 360;
-          };
           let heading = null;
 
           if (typeof event.webkitCompassHeading === 'number') {
-            heading = normalize(event.webkitCompassHeading);
+            heading = event.webkitCompassHeading;
           } else if (typeof event.alpha === 'number') {
             const screenAngle = window.screen?.orientation?.angle ??
               window.orientation ??
               0;
-            heading = normalize(360 - event.alpha + Number(screenAngle || 0));
+            heading = 360 - event.alpha + Number(screenAngle || 0);
           }
 
-          if (heading !== null && Number.isFinite(heading)) {
-            callback(heading);
-          }
+          emitHeading(heading);
         };
 
         window.addEventListener('deviceorientationabsolute', compassHandler, true);
         window.addEventListener('deviceorientation', compassHandler, true);
+
+        if (typeof window.AbsoluteOrientationSensor === 'function') {
+          try {
+            absoluteCompassSensor = new window.AbsoluteOrientationSensor({
+              frequency: 12,
+              referenceFrame: 'device',
+            });
+            absoluteCompassSensor.addEventListener('reading', function () {
+              const q = absoluteCompassSensor.quaternion;
+              if (!q || q.length < 4) return;
+
+              const x = q[0];
+              const y = q[1];
+              const z = q[2];
+              const w = q[3];
+              const yaw = Math.atan2(
+                2 * (w * z + x * y),
+                1 - 2 * (y * y + z * z)
+              ) * 180 / Math.PI;
+              emitHeading(360 - yaw);
+            });
+            absoluteCompassSensor.addEventListener('error', function () {});
+            absoluteCompassSensor.start();
+          } catch (error) {
+            absoluteCompassSensor = null;
+          }
+        }
+
         return true;
       };
 
       window.ruhHuzurStopCompass = function () {
-        if (!compassHandler) return;
-        window.removeEventListener('deviceorientationabsolute', compassHandler, true);
-        window.removeEventListener('deviceorientation', compassHandler, true);
-        compassHandler = null;
+        if (compassHandler) {
+          window.removeEventListener('deviceorientationabsolute', compassHandler, true);
+          window.removeEventListener('deviceorientation', compassHandler, true);
+          compassHandler = null;
+        }
+
+        if (absoluteCompassSensor) {
+          try {
+            absoluteCompassSensor.stop();
+          } catch (error) {}
+          absoluteCompassSensor = null;
+        }
       };
     })();
   </script>

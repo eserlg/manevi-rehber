@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:math';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -51,6 +52,16 @@ class _QiblaScreenState extends ConsumerState<QiblaScreen> {
       });
     }
 
+    if (kIsWeb) {
+      if (!mounted) return;
+      setState(() {
+        _isLoading = false;
+        _compassMessage =
+            'PWA\'da canlÄ± pusula iÃ§in PusulayÄ± BaÅŸlat butonuna dokunun.';
+      });
+      return;
+    }
+
     _startBrowserCompass();
     _sensorFallbackTimer = Timer(const Duration(seconds: 3), _useStaticCompass);
 
@@ -95,8 +106,14 @@ class _QiblaScreenState extends ConsumerState<QiblaScreen> {
   }
 
   Future<void> _requestAndStartBrowserCompass() async {
+    _sensorFallbackTimer?.cancel();
+    await _magnetometerSubscription?.cancel();
+    await _accelerometerSubscription?.cancel();
+    stopBrowserCompass();
+
     if (mounted) {
       setState(() {
+        _hasLiveCompass = false;
         _compassMessage = 'Pusula izni isteniyor...';
       });
     }
@@ -109,8 +126,27 @@ class _QiblaScreenState extends ConsumerState<QiblaScreen> {
       setState(() {
         _isLoading = false;
         _compassMessage = started
-            ? 'Pusula verisi bekleniyor...'
+            ? 'Pusula verisi bekleniyor; telefonu hafifçe sağa sola çevirin.'
             : 'Bu cihazda pusula sensörü desteklenmiyor.';
+      });
+      if (started) {
+        _sensorFallbackTimer = Timer(const Duration(seconds: 6), () {
+          if (!mounted || _hasLiveCompass) return;
+          setState(() {
+            _compassMessage =
+                'Sensör izni alındı ama tarayıcı yön verisi göndermedi. HTTPS/PWA iznini kontrol edin veya elle hizalayın.';
+          });
+        });
+      }
+      return;
+    }
+
+    if (permission == 'insecure') {
+      setState(() {
+        _isLoading = false;
+        _hasLiveCompass = false;
+        _compassMessage =
+            'Pusula için HTTPS gerekir. Vercel linkinden veya ana ekrana eklenen PWA\'dan açın.';
       });
       return;
     }

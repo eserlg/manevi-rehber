@@ -3,13 +3,18 @@ import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sensors_plus/sensors_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
+import '../../core/constants/city_coordinates.dart';
 import '../../core/constants/colors.dart';
 import '../../core/constants/dimensions.dart';
+import '../../data/models/mosque_place.dart';
 import '../../data/models/qibla.dart';
 import '../../data/services/browser_compass_stub.dart'
     if (dart.library.js_interop) '../../data/services/browser_compass_web.dart';
+import '../../data/services/nearby_mosque_service.dart';
 import '../providers/providers.dart';
 import '../widgets/compass_widget.dart';
 
@@ -21,13 +26,17 @@ class QiblaScreen extends ConsumerStatefulWidget {
 }
 
 class _QiblaScreenState extends ConsumerState<QiblaScreen> {
+  final NearbyMosqueService _nearbyMosqueService = NearbyMosqueService();
   StreamSubscription<MagnetometerEvent>? _magnetometerSubscription;
   StreamSubscription<AccelerometerEvent>? _accelerometerSubscription;
   Timer? _sensorFallbackTimer;
   double _currentHeading = 0;
   MagnetometerEvent? _lastMagnetometer;
   AccelerometerEvent? _lastAccelerometer;
+  Future<List<MosquePlace>>? _nearbyMosquesFuture;
+  Position? _mosqueQueryPosition;
   bool _isLoading = true;
+  bool _isLocatingMosques = false;
   bool _hasLiveCompass = false;
   String _compassMessage = 'Pusula başlatılıyor...';
 
@@ -35,6 +44,9 @@ class _QiblaScreenState extends ConsumerState<QiblaScreen> {
   void initState() {
     super.initState();
     _initCompass();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _loadNearbyMosques();
+    });
   }
 
   Future<void> _initCompass() async {
@@ -57,16 +69,17 @@ class _QiblaScreenState extends ConsumerState<QiblaScreen> {
       setState(() {
         _isLoading = false;
         _compassMessage =
-            'PWA\'da canlÄ± pusula iÃ§in PusulayÄ± BaÅŸlat butonuna dokunun.';
+            'PWA\'da canlı pusula için Pusulayı Başlat butonuna dokunun.';
       });
       return;
     }
 
-    _startBrowserCompass();
-    _sensorFallbackTimer = Timer(const Duration(seconds: 3), _useStaticCompass);
+    _sensorFallbackTimer = Timer(const Duration(seconds: 8), _useStaticCompass);
 
     try {
-      _magnetometerSubscription = magnetometerEventStream().listen(
+      _magnetometerSubscription = magnetometerEventStream(
+        samplingPeriod: SensorInterval.uiInterval,
+      ).listen(
         (event) {
           _sensorFallbackTimer?.cancel();
           _lastMagnetometer = event;
@@ -75,7 +88,9 @@ class _QiblaScreenState extends ConsumerState<QiblaScreen> {
         onError: (_) => _useStaticCompass(),
       );
 
-      _accelerometerSubscription = accelerometerEventStream().listen(
+      _accelerometerSubscription = accelerometerEventStream(
+        samplingPeriod: SensorInterval.uiInterval,
+      ).listen(
         (event) {
           _lastAccelerometer = event;
           _updateHeadingFromNativeSensors();
@@ -175,27 +190,40 @@ class _QiblaScreenState extends ConsumerState<QiblaScreen> {
 
   void _updateHeadingFromNativeSensors() {
     final magnetometer = _lastMagnetometer;
+    final accelerometer = _lastAccelerometer;
     if (magnetometer == null) return;
 
-    var heading = atan2(magnetometer.y, magnetometer.x) * 180 / pi;
-    final accelerometer = _lastAccelerometer;
-    if (accelerometer != null) {
-      final tilt = sqrt(
-        accelerometer.x * accelerometer.x +
-            accelerometer.y * accelerometer.y +
-            accelerometer.z * accelerometer.z,
-      );
-      if (tilt > 0) {
-        final flatness =
-            (accelerometer.z.abs() / tilt).clamp(0.0, 1.0).toDouble();
-        heading += accelerometer.y.sign.toDouble() * (1 - flatness) * 6;
-      }
-    }
+    final heading = accelerometer == null
+        ? _normalize360(atan2(magnetometer.y, magnetometer.x) * 180 / pi)
+        : _calculateTiltCompensatedHeading(accelerometer, magnetometer);
 
     _setLiveHeading(
-      _normalize360(heading),
+      heading,
       'Telefonu yatay tutup ortadaki oku Kıble işaretiyle hizalayın.',
     );
+  }
+
+  double _calculateTiltCompensatedHeading(
+    AccelerometerEvent accelerometer,
+    MagnetometerEvent magnetometer,
+  ) {
+    final ax = accelerometer.x;
+    final ay = accelerometer.y;
+    final az = accelerometer.z;
+    final mx = magnetometer.x;
+    final my = magnetometer.y;
+    final mz = magnetometer.z;
+
+    final roll = atan2(ay, az);
+    final pitch = atan2(-ax, ay * sin(roll) + az * cos(roll));
+
+    final compensatedY = mz * sin(roll) - my * cos(roll);
+    final compensatedX = mx * cos(pitch) +
+        my * sin(pitch) * sin(roll) +
+        mz * sin(pitch) * cos(roll);
+
+    final heading = atan2(compensatedY, compensatedX) * 180 / pi;
+    return _normalize360(heading);
   }
 
   void _setLiveHeading(double heading, String message) {
@@ -234,18 +262,70 @@ class _QiblaScreenState extends ConsumerState<QiblaScreen> {
     super.dispose();
   }
 
+  Future<void> _loadNearbyMosques({bool requestFreshLocation = false}) async {
+    if (_isLocatingMosques) return;
+
+    setState(() => _isLocatingMosques = requestFreshLocation);
+
+    Position? position;
+    if (requestFreshLocation) {
+      position = await ref.read(locationServiceProvider).getCurrentLocation();
+      if (position != null) {
+        final cityName =
+            await ref.read(locationServiceProvider).getCityName(position);
+        if (!mounted) return;
+        ref.read(currentPositionProvider.notifier).state = position;
+        ref.read(currentCityProvider.notifier).state =
+            cityName == 'Bilinmeyen' ? 'Mevcut Konum' : cityName;
+      }
+    }
+
+    position ??= ref.read(currentPositionProvider) ??
+        _positionForSelectedCity(ref.read(currentCityProvider)) ??
+        _positionFromCoords(defaultLatitude, defaultLongitude);
+
+    if (!mounted) return;
+    setState(() {
+      _isLocatingMosques = false;
+      _mosqueQueryPosition = position;
+      _nearbyMosquesFuture = _nearbyMosqueService.findNearbyMosques(
+        latitude: position!.latitude,
+        longitude: position.longitude,
+      );
+    });
+  }
+
+  Position? _positionForSelectedCity(String cityName) {
+    final city = findCityCoordinate(cityName);
+    if (city == null) return null;
+    return _positionFromCoords(city.latitude, city.longitude);
+  }
+
+  Position _positionFromCoords(double latitude, double longitude) {
+    return Position(
+      latitude: latitude,
+      longitude: longitude,
+      timestamp: DateTime.now(),
+      accuracy: 0,
+      altitude: 0,
+      altitudeAccuracy: 0,
+      heading: 0,
+      headingAccuracy: 0,
+      speed: 0,
+      speedAccuracy: 0,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final position = ref.watch(currentPositionProvider);
-    final qiblaDirection = position != null
-        ? QiblaDirection.calculate(
-            latitude: position.latitude,
-            longitude: position.longitude,
-          )
-        : QiblaDirection.calculate(
-            latitude: defaultLatitude,
-            longitude: defaultLongitude,
-          );
+    final currentCity = ref.watch(currentCityProvider);
+    final position = ref.watch(currentPositionProvider) ??
+        _positionForSelectedCity(currentCity) ??
+        _positionFromCoords(defaultLatitude, defaultLongitude);
+    final qiblaDirection = QiblaDirection.calculate(
+      latitude: position.latitude,
+      longitude: position.longitude,
+    );
 
     return Scaffold(
       appBar: AppBar(
@@ -326,6 +406,8 @@ class _QiblaScreenState extends ConsumerState<QiblaScreen> {
                 ),
                 const SizedBox(height: AppDimensions.spacingLG),
                 _buildInfoPanel(qiblaDir),
+                const SizedBox(height: AppDimensions.spacingLG),
+                _buildNearbyMosquesPanel(),
               ],
             ),
           ),
@@ -464,6 +546,215 @@ class _QiblaScreenState extends ConsumerState<QiblaScreen> {
         ],
       ),
     );
+  }
+
+  Widget _buildNearbyMosquesPanel() {
+    return Container(
+      margin:
+          const EdgeInsets.symmetric(horizontal: AppDimensions.screenPadding),
+      padding: const EdgeInsets.all(AppDimensions.screenPadding),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(AppDimensions.radiusLarge),
+        border: Border.all(color: AppColors.primary.withOpacity(0.12)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(AppDimensions.spacingSM),
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withOpacity(0.1),
+                  borderRadius:
+                      BorderRadius.circular(AppDimensions.radiusSmall),
+                ),
+                child: Icon(
+                  Icons.mosque,
+                  color: AppColors.primary,
+                  size: 20,
+                ),
+              ),
+              const SizedBox(width: AppDimensions.spacingSM),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Yakındaki Camiler',
+                      style: GoogleFonts.notoSans(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                    Text(
+                      _mosqueQueryPosition == null
+                          ? 'Konuma göre en yakın camiler'
+                          : 'Seçili konuma göre sıralandı',
+                      style: GoogleFonts.notoSans(
+                        fontSize: 12,
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              IconButton(
+                tooltip: 'Konumla yenile',
+                onPressed: _isLocatingMosques
+                    ? null
+                    : () => _loadNearbyMosques(requestFreshLocation: true),
+                icon: _isLocatingMosques
+                    ? const SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Icon(Icons.my_location),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppDimensions.spacingMD),
+          FutureBuilder<List<MosquePlace>>(
+            future: _nearbyMosquesFuture,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 18),
+                  child: Center(child: CircularProgressIndicator()),
+                );
+              }
+
+              if (snapshot.hasError) {
+                return _buildMosqueEmptyState(
+                  'Camiler yüklenemedi. Konumu yenileyip tekrar deneyin.',
+                );
+              }
+
+              final mosques = snapshot.data ?? const <MosquePlace>[];
+              if (mosques.isEmpty) {
+                return _buildMosqueEmptyState(
+                  'Yakında kayıtlı cami bulunamadı. Veriler OpenStreetMap kayıtlarına bağlıdır.',
+                );
+              }
+
+              return Column(
+                children: [
+                  for (final mosque in mosques.take(5))
+                    _buildMosqueTile(mosque),
+                ],
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMosqueEmptyState(String message) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(
+          message,
+          style: GoogleFonts.notoSans(
+            fontSize: 13,
+            height: 1.35,
+            color: AppColors.textSecondary,
+          ),
+        ),
+        const SizedBox(height: AppDimensions.spacingSM),
+        OutlinedButton.icon(
+          onPressed: _isLocatingMosques
+              ? null
+              : () => _loadNearbyMosques(requestFreshLocation: true),
+          icon: const Icon(Icons.my_location),
+          label: const Text('Konumumu Kullan'),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildMosqueTile(MosquePlace mosque) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppDimensions.spacingSM),
+      child: Container(
+        padding: const EdgeInsets.all(AppDimensions.spacingMD),
+        decoration: BoxDecoration(
+          color: AppColors.surfaceVariant.withOpacity(0.55),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusMedium),
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    mosque.name,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.notoSans(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w800,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: AppDimensions.spacingXS),
+                  Text(
+                    mosque.address ?? 'Adres bilgisi yok',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.notoSans(
+                      fontSize: 12,
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: AppDimensions.spacingSM),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(
+                  mosque.formattedDistance,
+                  style: GoogleFonts.notoSans(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.primary,
+                  ),
+                ),
+                TextButton.icon(
+                  onPressed: () => _openMosqueInMaps(mosque),
+                  icon: const Icon(Icons.map_outlined, size: 16),
+                  label: const Text('Harita'),
+                  style: TextButton.styleFrom(
+                    visualDensity: VisualDensity.compact,
+                    foregroundColor: AppColors.primary,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _openMosqueInMaps(MosquePlace mosque) async {
+    final uri = Uri.https(
+      'www.google.com',
+      '/maps/search/',
+      {
+        'api': '1',
+        'query': '${mosque.latitude},${mosque.longitude}',
+      },
+    );
+
+    await launchUrl(uri, mode: LaunchMode.externalApplication);
   }
 
   Widget _buildInfoPanel(QiblaDirection qiblaDir) {

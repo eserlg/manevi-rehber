@@ -14,6 +14,7 @@ import '../../data/models/quran.dart';
 import '../../data/services/app_share_service.dart';
 import '../providers/providers.dart';
 import '../widgets/memorial_donation_sheet.dart';
+import 'live_stream_screen.dart';
 import 'occasion_messages_screen.dart';
 import 'widgets_screen.dart';
 
@@ -846,6 +847,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             context,
             MaterialPageRoute(
               builder: (context) => const OccasionMessagesScreen(),
+            ),
+          );
+        },
+      ),
+      _QuickActionData(
+        icon: Icons.live_tv_outlined,
+        title: 'Canlı Yayın',
+        subtitle: 'Mekke, Medine ve kıraat',
+        color: AppColors.primaryDark,
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const LiveStreamScreen(),
             ),
           );
         },

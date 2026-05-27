@@ -6,12 +6,12 @@ import '../../core/constants/colors.dart';
 import '../../core/constants/dimensions.dart';
 
 class YoutubeLivePlayer extends StatefulWidget {
-  final String channelId;
+  final String videoId;
   final String title;
 
   const YoutubeLivePlayer({
     super.key,
-    required this.channelId,
+    required this.videoId,
     required this.title,
   });
 
@@ -26,25 +26,26 @@ class _YoutubeLivePlayerState extends State<YoutubeLivePlayer> {
   void initState() {
     super.initState();
     _viewType =
-        'youtube-live-${widget.channelId}-${DateTime.now().microsecondsSinceEpoch}';
+        'youtube-live-${widget.videoId}-${DateTime.now().microsecondsSinceEpoch}';
 
     ui_web.platformViewRegistry.registerViewFactory(_viewType, (int viewId) {
       return html.IFrameElement()
         ..src = Uri.https(
           'www.youtube.com',
-          '/embed/live_stream',
+          '/embed/${widget.videoId}',
           {
-            'channel': widget.channelId,
             'autoplay': '0',
             'playsinline': '1',
             'rel': '0',
             'modestbranding': '1',
+            'iv_load_policy': '3',
           },
         ).toString()
         ..title = widget.title
         ..allow =
             'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share'
         ..allowFullscreen = true
+        ..referrerPolicy = 'strict-origin-when-cross-origin'
         ..style.border = '0'
         ..style.width = '100%'
         ..style.height = '100%';

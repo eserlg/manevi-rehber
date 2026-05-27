@@ -18,10 +18,7 @@ class PrayerWidgetService {
       await _saveWidgetData('verse_reference', verseReference ?? 'Günün Ayeti');
       await _saveWidgetData(
         'verse_text',
-        _shorten(
-          verseText ?? 'Allah’ı anmak kalplere huzur verir.',
-          92,
-        ),
+        _normalizeVerseText(verseText ?? 'Allah’ı anmak kalplere huzur verir.'),
       );
       await _saveWidgetData(
         'time_until_next',
@@ -42,11 +39,8 @@ class PrayerWidgetService {
     });
   }
 
-  String _shorten(String value, int maxLength) {
-    final normalized = value.replaceAll(RegExp(r'\s+'), ' ').trim();
-    if (normalized.length <= maxLength) return normalized;
-    return '${normalized.substring(0, maxLength - 1)}…';
-  }
+  String _normalizeVerseText(String value) =>
+      value.replaceAll(RegExp(r'\s+'), ' ').trim();
 
   String _formatDuration(Duration duration) {
     final hours = duration.inHours;

@@ -239,7 +239,7 @@ class _LockScreenPreview extends StatelessWidget {
                           child: Text(
                             '${_verseReference(verse)}\n${_shortVerse(verse)}',
                             style: GoogleFonts.notoSans(
-                              fontSize: 14,
+                              fontSize: 13,
                               height: 1.25,
                               fontWeight: FontWeight.w800,
                               color: Colors.white,
@@ -337,10 +337,8 @@ class _NotificationPreview extends StatelessWidget {
                     ),
                     Text(
                       '${_shortVerse(verse)}\n-${_verseReference(verse)}',
-                      maxLines: 3,
-                      overflow: TextOverflow.ellipsis,
                       style: GoogleFonts.notoSans(
-                        fontSize: 13,
+                        fontSize: 12,
                         height: 1.25,
                         color: AppColors.textPrimary,
                       ),
@@ -428,8 +426,6 @@ class _HomeWidgetPreview extends StatelessWidget {
                   const SizedBox(height: AppDimensions.spacingSM),
                   Text(
                     '${_verseReference(verse)} • ${_shortVerse(verse)}',
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
                     style: GoogleFonts.notoSans(
                       fontSize: 12,
                       height: 1.3,
@@ -652,8 +648,7 @@ String _verseReference(Verse? verse) {
 String _shortVerse(Verse? verse) {
   final text = verse?.translation?.trim();
   if (text == null || text.isEmpty) {
-    return 'Öyleyse yalnız beni anın ki ben de sizi anayım.';
+    return 'Öyleyse yalnız beni anın ki ben de sizi anayım. Bana şükredin, sakın nankörlük etmeyin.';
   }
-  if (text.length <= 92) return text;
-  return '${text.substring(0, 91)}…';
+  return text.replaceAll(RegExp(r'\s+'), ' ');
 }

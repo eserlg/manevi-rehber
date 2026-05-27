@@ -4,12 +4,12 @@ import '../../core/constants/colors.dart';
 import '../../core/constants/dimensions.dart';
 
 class YoutubeLivePlayer extends StatelessWidget {
-  final String channelId;
+  final String videoId;
   final String title;
 
   const YoutubeLivePlayer({
     super.key,
-    required this.channelId,
+    required this.videoId,
     required this.title,
   });
 

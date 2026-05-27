@@ -9,9 +9,9 @@ import '../widgets/youtube_live_player.dart';
 class LiveStreamScreen extends StatelessWidget {
   const LiveStreamScreen({super.key});
 
-  static const _makkahChannelId = 'UCos52azQNBgW63_9uDJoPDA';
+  static const _makkahVideoId = 'ueIOUTyRS84';
   static final _makkahLiveUrl =
-      Uri.parse('https://www.youtube.com/@SaudiQuranTv/live');
+      Uri.parse('https://www.youtube.com/watch?v=$_makkahVideoId');
   static final _madinahLiveUrl =
       Uri.parse('https://www.youtube.com/@SaudiSunnahTv/live');
   static final _mp3QuranUrl = Uri.parse('https://www.mp3quran.net/tr');
@@ -120,7 +120,7 @@ class LiveStreamScreen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const YoutubeLivePlayer(
-            channelId: _makkahChannelId,
+            videoId: _makkahVideoId,
             title: 'Mekke Canlı Yayın',
           ),
           const SizedBox(height: AppDimensions.spacingMD),

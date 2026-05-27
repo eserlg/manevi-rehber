@@ -288,17 +288,67 @@ class _QiblaScreenState extends ConsumerState<QiblaScreen> {
     setState(() {
       _isLocatingMosques = false;
       _mosqueQueryPosition = position;
-      _nearbyMosquesFuture = _nearbyMosqueService.findNearbyMosques(
-        latitude: position!.latitude,
-        longitude: position.longitude,
-      );
+      _nearbyMosquesFuture = _findNearbyMosquesWithFallback(position!);
     });
+  }
+
+  Future<List<MosquePlace>> _findNearbyMosquesWithFallback(
+    Position position,
+  ) async {
+    final primary = await _nearbyMosqueService.findNearbyMosques(
+      latitude: position.latitude,
+      longitude: position.longitude,
+    );
+    if (primary.isNotEmpty) return primary;
+
+    final fallback = _positionForSelectedCity(ref.read(currentCityProvider)) ??
+        _nearestCityPosition(position);
+    if (_distanceKm(
+          position.latitude,
+          position.longitude,
+          fallback.latitude,
+          fallback.longitude,
+        ) <
+        2) {
+      return primary;
+    }
+
+    final fallbackPlaces = await _nearbyMosqueService.findNearbyMosques(
+      latitude: fallback.latitude,
+      longitude: fallback.longitude,
+      radiusMeters: 30000,
+    );
+
+    if (fallbackPlaces.isNotEmpty && mounted) {
+      setState(() => _mosqueQueryPosition = fallback);
+    }
+    return fallbackPlaces;
   }
 
   Position? _positionForSelectedCity(String cityName) {
     final city = findCityCoordinate(cityName);
     if (city == null) return null;
     return _positionFromCoords(city.latitude, city.longitude);
+  }
+
+  Position _nearestCityPosition(Position position) {
+    var nearest = cityCoordinates.first;
+    var nearestDistance = double.infinity;
+
+    for (final city in cityCoordinates) {
+      final distance = _distanceKm(
+        position.latitude,
+        position.longitude,
+        city.latitude,
+        city.longitude,
+      );
+      if (distance < nearestDistance) {
+        nearestDistance = distance;
+        nearest = city;
+      }
+    }
+
+    return _positionFromCoords(nearest.latitude, nearest.longitude);
   }
 
   Position _positionFromCoords(double latitude, double longitude) {
@@ -834,5 +884,17 @@ class _QiblaScreenState extends ConsumerState<QiblaScreen> {
     var normalized = (angle + 360) % 360;
     if (normalized > 180) normalized -= 360;
     return normalized;
+  }
+
+  double _distanceKm(double lat1, double lon1, double lat2, double lon2) {
+    const earthRadius = 6371.0;
+    final dLat = (lat2 - lat1) * pi / 180;
+    final dLon = (lon2 - lon1) * pi / 180;
+    final a = sin(dLat / 2) * sin(dLat / 2) +
+        cos(lat1 * pi / 180) *
+            cos(lat2 * pi / 180) *
+            sin(dLon / 2) *
+            sin(dLon / 2);
+    return earthRadius * 2 * atan2(sqrt(a), sqrt(1 - a));
   }
 }

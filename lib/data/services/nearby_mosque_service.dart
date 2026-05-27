@@ -25,6 +25,31 @@ class NearbyMosqueService {
     int radiusMeters = 5000,
     int limit = 8,
   }) async {
+    final radii = <int>{
+      radiusMeters,
+      15000,
+      30000,
+    };
+
+    for (final radius in radii) {
+      final places = await _queryNearbyMosques(
+        latitude: latitude,
+        longitude: longitude,
+        radiusMeters: radius,
+        limit: limit,
+      );
+      if (places.isNotEmpty) return places;
+    }
+
+    return const [];
+  }
+
+  Future<List<MosquePlace>> _queryNearbyMosques({
+    required double latitude,
+    required double longitude,
+    required int radiusMeters,
+    required int limit,
+  }) async {
     final query = '''
 [out:json][timeout:15];
 (
@@ -34,8 +59,11 @@ class NearbyMosqueService {
   node["building"="mosque"](around:$radiusMeters,$latitude,$longitude);
   way["building"="mosque"](around:$radiusMeters,$latitude,$longitude);
   relation["building"="mosque"](around:$radiusMeters,$latitude,$longitude);
+  node["name"~"cami|camii|mescit|mescid|mosque",i](around:$radiusMeters,$latitude,$longitude);
+  way["name"~"cami|camii|mescit|mescid|mosque",i](around:$radiusMeters,$latitude,$longitude);
+  relation["name"~"cami|camii|mescit|mescid|mosque",i](around:$radiusMeters,$latitude,$longitude);
 );
-out center tags $limit;
+out center tags 120;
 ''';
 
     final response = await _dio.get(

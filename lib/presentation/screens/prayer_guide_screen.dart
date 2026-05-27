@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../core/constants/colors.dart';
 import '../../core/constants/dimensions.dart';
@@ -16,8 +17,10 @@ class PrayerGuideScreen extends StatefulWidget {
 }
 
 class _PrayerGuideScreenState extends State<PrayerGuideScreen> {
+  static const _learningProgressKey = 'quran_learning_step_index';
   late final Future<List<PrayerGuide>> _guidesFuture;
   String _selectedCategory = 'tum';
+  int _learningStepIndex = 0;
 
   static const _categories = [
     ('tum', 'Tümü'),
@@ -27,12 +30,34 @@ class _PrayerGuideScreenState extends State<PrayerGuideScreen> {
     ('cenaze', 'Cenaze'),
     ('nafile', 'Nafile'),
     ('okunanlar', 'Sure/Dua'),
+    ('ogreniyorum', 'Kur’an Öğreniyorum'),
   ];
 
   @override
   void initState() {
     super.initState();
     _guidesFuture = _loadGuides();
+    _loadLearningProgress();
+  }
+
+  Future<void> _loadLearningProgress() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (!mounted) return;
+    setState(() {
+      _learningStepIndex = prefs
+              .getInt(_learningProgressKey)
+              ?.clamp(0, _quranLearningSteps.length - 1)
+              .toInt() ??
+          0;
+    });
+  }
+
+  Future<void> _saveLearningProgress(int index) async {
+    final safeIndex = index.clamp(0, _quranLearningSteps.length - 1).toInt();
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt(_learningProgressKey, safeIndex);
+    if (!mounted) return;
+    setState(() => _learningStepIndex = safeIndex);
   }
 
   Future<List<PrayerGuide>> _loadGuides() async {
@@ -86,6 +111,8 @@ class _PrayerGuideScreenState extends State<PrayerGuideScreen> {
               const SizedBox(height: AppDimensions.spacingMD),
               if (_selectedCategory == 'okunanlar')
                 _buildPrayerTextsSection()
+              else if (_selectedCategory == 'ogreniyorum')
+                _buildQuranLearningSection()
               else
                 for (final guide in filteredGuides) _buildGuideCard(guide),
             ],
@@ -310,6 +337,148 @@ class _PrayerGuideScreenState extends State<PrayerGuideScreen> {
     );
   }
 
+  Widget _buildQuranLearningSection() {
+    final currentStep = _quranLearningSteps[_learningStepIndex];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Container(
+          padding: const EdgeInsets.all(AppDimensions.spacingMD),
+          margin: const EdgeInsets.only(bottom: AppDimensions.spacingMD),
+          decoration: BoxDecoration(
+            color: AppColors.primary.withValues(alpha: 0.07),
+            borderRadius: BorderRadius.circular(AppDimensions.radiusMedium),
+            border:
+                Border.all(color: AppColors.primary.withValues(alpha: 0.14)),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Icon(Icons.school_outlined, color: AppColors.primary),
+                  const SizedBox(width: AppDimensions.spacingSM),
+                  Expanded(
+                    child: Text(
+                      'Kaldığın yer: ${currentStep.title}',
+                      style: GoogleFonts.notoSans(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: AppDimensions.spacingSM),
+              LinearProgressIndicator(
+                value: (_learningStepIndex + 1) / _quranLearningSteps.length,
+                minHeight: 8,
+                color: AppColors.primary,
+                backgroundColor: AppColors.primary.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(99),
+              ),
+              const SizedBox(height: AppDimensions.spacingSM),
+              Text(
+                'Önce Elif-Ba cüzü gibi harf, hareke ve okunuş temelinden başlar; sonra kısa surelerle Kur’an okuma pratiğine geçirir.',
+                style: GoogleFonts.notoSans(
+                  fontSize: 13,
+                  height: 1.45,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+            ],
+          ),
+        ),
+        for (var index = 0; index < _quranLearningSteps.length; index += 1)
+          _buildQuranLearningCard(_quranLearningSteps[index], index),
+      ],
+    );
+  }
+
+  Widget _buildQuranLearningCard(_QuranLearningStep step, int index) {
+    final isCurrent = index == _learningStepIndex;
+    final isCompleted = index < _learningStepIndex;
+
+    return Card(
+      margin: const EdgeInsets.only(bottom: AppDimensions.spacingMD),
+      child: ExpansionTile(
+        initiallyExpanded: isCurrent,
+        tilePadding: const EdgeInsets.symmetric(
+          horizontal: AppDimensions.spacingMD,
+          vertical: AppDimensions.spacingSM,
+        ),
+        leading: CircleAvatar(
+          backgroundColor: isCurrent
+              ? AppColors.primary
+              : AppColors.primary.withValues(alpha: 0.1),
+          child: Icon(
+            isCompleted ? Icons.check : step.icon,
+            color: isCurrent ? Colors.white : AppColors.primary,
+            size: 20,
+          ),
+        ),
+        title: Text(
+          step.title,
+          style: GoogleFonts.notoSans(
+            fontSize: 15,
+            fontWeight: FontWeight.w800,
+            color: AppColors.textPrimary,
+          ),
+        ),
+        subtitle: Text(
+          step.subtitle,
+          style: GoogleFonts.notoSans(
+            fontSize: 12,
+            color: AppColors.textSecondary,
+          ),
+        ),
+        childrenPadding: const EdgeInsets.fromLTRB(
+          AppDimensions.spacingMD,
+          0,
+          AppDimensions.spacingMD,
+          AppDimensions.spacingMD,
+        ),
+        children: [
+          Text(
+            step.arabic,
+            textAlign: TextAlign.right,
+            style: GoogleFonts.amiri(
+              fontSize: 30,
+              height: 1.8,
+              color: AppColors.textPrimary,
+            ),
+          ),
+          const SizedBox(height: AppDimensions.spacingMD),
+          _labelBlock('Okunuş', step.transliteration),
+          const SizedBox(height: AppDimensions.spacingSM),
+          _labelBlock('Türkçe anlatım', step.explanation),
+          const SizedBox(height: AppDimensions.spacingMD),
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: () => _saveLearningProgress(index),
+                  icon: const Icon(Icons.bookmark_border),
+                  label: const Text('Kaldığım Yer'),
+                ),
+              ),
+              const SizedBox(width: AppDimensions.spacingSM),
+              Expanded(
+                child: ElevatedButton.icon(
+                  onPressed: () => _saveLearningProgress(index + 1),
+                  icon: const Icon(Icons.arrow_forward),
+                  label: const Text('Sonraki'),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _labelBlock(String label, String text) {
     return Container(
       width: double.infinity,
@@ -521,6 +690,91 @@ class _PrayerText {
     required this.icon,
   });
 }
+
+class _QuranLearningStep {
+  final String title;
+  final String subtitle;
+  final String arabic;
+  final String transliteration;
+  final String explanation;
+  final IconData icon;
+
+  const _QuranLearningStep({
+    required this.title,
+    required this.subtitle,
+    required this.arabic,
+    required this.transliteration,
+    required this.explanation,
+    required this.icon,
+  });
+}
+
+const _quranLearningSteps = [
+  _QuranLearningStep(
+    title: '1. Harflerle Başlangıç',
+    subtitle: 'Elif-Ba cüzü mantığıyla ilk harfler',
+    arabic: 'ا ب ت ث\nج ح خ',
+    transliteration: 'Elif, Be, Te, Se. Cim, Ha, Hı.',
+    explanation:
+        'Önce harfin şeklini tanı. Harfler tek başına ve kelime içinde farklı görünebilir. Bu bölümde amaç ezberden çok göz alışkanlığı kazanmaktır.',
+    icon: Icons.abc,
+  ),
+  _QuranLearningStep(
+    title: '2. Harekeler',
+    subtitle: 'Üstün, esre ve ötre',
+    arabic: 'بَ بِ بُ\nتَ تِ تُ',
+    transliteration: 'Be, bi, bu. Te, ti, tu.',
+    explanation:
+        'Üstün kısa “e/a”, esre kısa “i”, ötre kısa “u” sesi verir. Harfi hızlıca değil, tane tane okuyarak ilerle.',
+    icon: Icons.tune,
+  ),
+  _QuranLearningStep(
+    title: '3. Cezm ve Sükun',
+    subtitle: 'Harfi durdurarak okuma',
+    arabic: 'اَبْ اَتْ اَحْ\nمِنْ عَنْ قُلْ',
+    transliteration: 'Eb, et, eh. Min, an, kul.',
+    explanation:
+        'Cezmli harf kendinden önceki sesle birleşir ve durdurularak okunur. Bu ders kelimeleri akıcı okumaya geçiştir.',
+    icon: Icons.stop_circle_outlined,
+  ),
+  _QuranLearningStep(
+    title: '4. Şedde',
+    subtitle: 'Harf iki kere okunur gibi tutulur',
+    arabic: 'رَبَّنَا\nاِيَّاكَ\nاَللّٰهُ',
+    transliteration: 'Rabbena, iyyake, Allah.',
+    explanation:
+        'Şedde harfi güçlendirir. Önce harfi kısa tut, sonra devamındaki harekeyi oku. “Rab-be-na” gibi parçalara ayırmak öğrenmeyi kolaylaştırır.',
+    icon: Icons.compress,
+  ),
+  _QuranLearningStep(
+    title: '5. Uzatma Harfleri',
+    subtitle: 'Elif, vav ve ye ile med',
+    arabic: 'قَالَ\nنُورٌ\nفِيهِ',
+    transliteration: 'Kaa-le, nuur, fii-hi.',
+    explanation:
+        'Med harfleri sesi uzatır. Elif “aa”, vav “uu”, ye “ii” uzatması verir. Kısa sesle uzun sesi ayırmak kıraat için önemlidir.',
+    icon: Icons.keyboard_double_arrow_right,
+  ),
+  _QuranLearningStep(
+    title: '6. Kısa Sureye Geçiş',
+    subtitle: 'İhlas suresiyle okuma pratiği',
+    arabic: 'قُلْ هُوَ اللّٰهُ اَحَدٌ\nاَللّٰهُ الصَّمَدُ',
+    transliteration: 'Kul hüvellahu ehad. Allahus-samed.',
+    explanation:
+        'Artık harfleri kelime içinde takip ederek kısa sureye geç. Önce Arapça metne bak, sonra okunuş desteğiyle kontrol et.',
+    icon: Icons.menu_book_outlined,
+  ),
+  _QuranLearningStep(
+    title: '7. Kur’an Okuma Pratiği',
+    subtitle: 'Fatiha ile düzenli tekrar',
+    arabic:
+        'بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيمِ\nاَلْحَمْدُ لِلّٰهِ رَبِّ الْعَالَمِينَ',
+    transliteration: 'Bismillahirrahmanirrahim. Elhamdülillahi rabbil alemin.',
+    explanation:
+        'Bu bölümden sonra Kur’an sekmesinde sureleri ayet ayet takip edebilirsin. Uygulama Kur’an tarafında son okuduğun yeri ayrıca saklar.',
+    icon: Icons.auto_stories_outlined,
+  ),
+];
 
 const _prayerTexts = [
   _PrayerText(

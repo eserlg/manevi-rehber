@@ -1,5 +1,3 @@
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -205,8 +203,21 @@ class _LockScreenPreview extends StatelessWidget {
           child: Stack(
             fit: StackFit.expand,
             children: [
-              const _SkyMosqueBackground(),
-              Container(color: Colors.black.withOpacity(0.10)),
+              const _PhotoMosqueBackground(),
+              Container(color: Colors.black.withOpacity(0.18)),
+              const DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Color(0x66112D3B),
+                      Color(0x11112D3B),
+                      Color(0xAA102D3B),
+                    ],
+                  ),
+                ),
+              ),
               Padding(
                 padding: const EdgeInsets.all(24),
                 child: Column(
@@ -317,10 +328,19 @@ class _NotificationPreview extends StatelessWidget {
                 width: 58,
                 height: 58,
                 decoration: BoxDecoration(
-                  color: AppColors.primaryDark,
                   borderRadius: BorderRadius.circular(14),
                 ),
-                child: const Icon(Icons.mosque, color: Colors.white),
+                clipBehavior: Clip.antiAlias,
+                child: const Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    _PhotoMosqueBackground(),
+                    DecoratedBox(
+                      decoration: BoxDecoration(color: Color(0x77126C55)),
+                    ),
+                    Icon(Icons.mosque, color: Colors.white),
+                  ],
+                ),
               ),
               const SizedBox(width: AppDimensions.spacingMD),
               Expanded(
@@ -380,65 +400,75 @@ class _HomeWidgetPreview extends StatelessWidget {
 
     return _PreviewFrame(
       title: 'Ana Ekran Widgetı',
-      child: Container(
-        padding: const EdgeInsets.all(AppDimensions.spacingLG),
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              AppColors.primaryDark,
-              AppColors.primary,
-              AppColors.accent,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(28),
+        child: SizedBox(
+          height: 168,
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              const _PhotoMosqueBackground(),
+              Container(color: Colors.black.withOpacity(0.30)),
+              const DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                    colors: [
+                      Color(0xDD0A4537),
+                      Color(0x99126C55),
+                      Color(0x66B98B2E),
+                    ],
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(AppDimensions.spacingLG),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '$nextPrayer $nextTime',
+                            style: GoogleFonts.notoSans(
+                              fontSize: 24,
+                              fontWeight: FontWeight.w900,
+                              color: Colors.white,
+                            ),
+                          ),
+                          Text(
+                            countdown,
+                            style: GoogleFonts.notoSans(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.white.withOpacity(0.88),
+                            ),
+                          ),
+                          const SizedBox(height: AppDimensions.spacingSM),
+                          Text(
+                            '${_verseReference(verse)} • ${_shortVerse(verse)}',
+                            maxLines: 3,
+                            overflow: TextOverflow.ellipsis,
+                            style: GoogleFonts.notoSans(
+                              fontSize: 12,
+                              height: 1.3,
+                              color: Colors.white.withOpacity(0.90),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: AppDimensions.spacingMD),
+                    Icon(Icons.wb_twilight,
+                        color: Colors.white.withOpacity(0.88), size: 42),
+                  ],
+                ),
+              ),
             ],
           ),
-          borderRadius: BorderRadius.circular(28),
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.primaryDark.withOpacity(0.18),
-              blurRadius: 24,
-              offset: const Offset(0, 14),
-            ),
-          ],
-        ),
-        child: Row(
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    '$nextPrayer $nextTime',
-                    style: GoogleFonts.notoSans(
-                      fontSize: 24,
-                      fontWeight: FontWeight.w900,
-                      color: Colors.white,
-                    ),
-                  ),
-                  Text(
-                    countdown,
-                    style: GoogleFonts.notoSans(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.white.withOpacity(0.88),
-                    ),
-                  ),
-                  const SizedBox(height: AppDimensions.spacingSM),
-                  Text(
-                    '${_verseReference(verse)} • ${_shortVerse(verse)}',
-                    style: GoogleFonts.notoSans(
-                      fontSize: 12,
-                      height: 1.3,
-                      color: Colors.white.withOpacity(0.90),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(width: AppDimensions.spacingMD),
-            Icon(Icons.wb_twilight,
-                color: Colors.white.withOpacity(0.88), size: 42),
-          ],
         ),
       ),
     );
@@ -519,90 +549,17 @@ class _StatusLine extends StatelessWidget {
   }
 }
 
-class _SkyMosqueBackground extends StatelessWidget {
-  const _SkyMosqueBackground();
+class _PhotoMosqueBackground extends StatelessWidget {
+  const _PhotoMosqueBackground();
 
   @override
   Widget build(BuildContext context) {
-    return CustomPaint(
-      painter: _SkyMosquePainter(),
-      child: const SizedBox.expand(),
+    return Image.asset(
+      'assets/images/mosque_widget_background.jpg',
+      fit: BoxFit.cover,
+      alignment: Alignment.center,
     );
   }
-}
-
-class _SkyMosquePainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final sky = Paint()
-      ..shader = const LinearGradient(
-        begin: Alignment.topCenter,
-        end: Alignment.bottomCenter,
-        colors: [
-          Color(0xFF0F4C91),
-          Color(0xFF6FA8DC),
-          Color(0xFFF0C36A),
-          Color(0xFF27405D),
-        ],
-      ).createShader(Offset.zero & size);
-    canvas.drawRect(Offset.zero & size, sky);
-
-    final cloud = Paint()..color = Colors.white.withOpacity(0.28);
-    for (var index = 0; index < 12; index += 1) {
-      final x = (index * 58.0) % size.width;
-      final y = size.height * (0.42 + (index % 4) * 0.07);
-      canvas.drawOval(
-        Rect.fromCenter(
-          center: Offset(x, y),
-          width: 128,
-          height: 42,
-        ),
-        cloud,
-      );
-    }
-
-    final mosque = Paint()..color = const Color(0xFF102D3B).withOpacity(0.72);
-    final baseTop = size.height * 0.68;
-    final baseRect = Rect.fromLTWH(
-      size.width * 0.20,
-      baseTop,
-      size.width * 0.60,
-      size.height * 0.18,
-    );
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(baseRect, const Radius.circular(18)),
-      mosque,
-    );
-
-    final domeRect = Rect.fromCenter(
-      center: Offset(size.width / 2, baseTop + 8),
-      width: size.width * 0.38,
-      height: size.height * 0.18,
-    );
-    canvas.drawArc(
-        domeRect, math.pi, math.pi, false, mosque..style = PaintingStyle.fill);
-
-    final minaretWidth = size.width * 0.035;
-    for (final x in [size.width * 0.17, size.width * 0.83]) {
-      canvas.drawRRect(
-        RRect.fromRectAndRadius(
-          Rect.fromLTWH(x - minaretWidth / 2, size.height * 0.42, minaretWidth,
-              size.height * 0.34),
-          const Radius.circular(10),
-        ),
-        mosque,
-      );
-      final path = Path()
-        ..moveTo(x, size.height * 0.34)
-        ..lineTo(x - minaretWidth, size.height * 0.45)
-        ..lineTo(x + minaretWidth, size.height * 0.45)
-        ..close();
-      canvas.drawPath(path, mosque);
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
 String _formatDateTitle(DateTime date) {

@@ -716,12 +716,23 @@ class _QiblaScreenState extends ConsumerState<QiblaScreen> {
           ),
         ),
         const SizedBox(height: AppDimensions.spacingSM),
-        OutlinedButton.icon(
-          onPressed: _isLocatingMosques
-              ? null
-              : () => _loadNearbyMosques(requestFreshLocation: true),
-          icon: const Icon(Icons.my_location),
-          label: const Text('Konumumu Kullan'),
+        Wrap(
+          spacing: AppDimensions.spacingSM,
+          runSpacing: AppDimensions.spacingSM,
+          children: [
+            OutlinedButton.icon(
+              onPressed: _isLocatingMosques
+                  ? null
+                  : () => _loadNearbyMosques(requestFreshLocation: true),
+              icon: const Icon(Icons.my_location),
+              label: const Text('Konumumu Kullan'),
+            ),
+            TextButton.icon(
+              onPressed: _openNearbyMosquesInMaps,
+              icon: const Icon(Icons.map_outlined),
+              label: const Text('Haritada Ara'),
+            ),
+          ],
         ),
       ],
     );
@@ -802,6 +813,18 @@ class _QiblaScreenState extends ConsumerState<QiblaScreen> {
         'api': '1',
         'query': '${mosque.latitude},${mosque.longitude}',
       },
+    );
+
+    await launchUrl(uri, mode: LaunchMode.externalApplication);
+  }
+
+  Future<void> _openNearbyMosquesInMaps() async {
+    final position = _mosqueQueryPosition ??
+        ref.read(currentPositionProvider) ??
+        _positionForSelectedCity(ref.read(currentCityProvider)) ??
+        _positionFromCoords(defaultLatitude, defaultLongitude);
+    final uri = Uri.parse(
+      'https://www.google.com/maps/search/cami/@${position.latitude},${position.longitude},15z',
     );
 
     await launchUrl(uri, mode: LaunchMode.externalApplication);

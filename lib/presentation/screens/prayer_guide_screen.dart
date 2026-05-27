@@ -441,6 +441,10 @@ class _PrayerGuideScreenState extends State<PrayerGuideScreen> {
           AppDimensions.spacingMD,
         ),
         children: [
+          if (step.letters.isNotEmpty) ...[
+            _buildLetterGrid(step.letters),
+            const SizedBox(height: AppDimensions.spacingMD),
+          ],
           Text(
             step.arabic,
             textAlign: TextAlign.right,
@@ -454,6 +458,10 @@ class _PrayerGuideScreenState extends State<PrayerGuideScreen> {
           _labelBlock('Okunuş', step.transliteration),
           const SizedBox(height: AppDimensions.spacingSM),
           _labelBlock('Türkçe anlatım', step.explanation),
+          if (step.practice.isNotEmpty) ...[
+            const SizedBox(height: AppDimensions.spacingSM),
+            _buildPracticeList(step.practice),
+          ],
           const SizedBox(height: AppDimensions.spacingMD),
           Row(
             children: [
@@ -474,6 +482,101 @@ class _PrayerGuideScreenState extends State<PrayerGuideScreen> {
               ),
             ],
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLetterGrid(List<_LetterItem> letters) {
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: letters.length,
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 4,
+        mainAxisSpacing: AppDimensions.spacingSM,
+        crossAxisSpacing: AppDimensions.spacingSM,
+        childAspectRatio: 0.86,
+      ),
+      itemBuilder: (context, index) {
+        final letter = letters[index];
+        return Container(
+          padding: const EdgeInsets.all(AppDimensions.spacingSM),
+          decoration: BoxDecoration(
+            color: AppColors.surfaceVariant.withValues(alpha: 0.72),
+            borderRadius: BorderRadius.circular(AppDimensions.radiusMedium),
+            border: Border.all(color: AppColors.primary.withValues(alpha: 0.1)),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                letter.arabic,
+                textAlign: TextAlign.center,
+                style: GoogleFonts.amiri(
+                  fontSize: 32,
+                  height: 1,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.primaryDark,
+                ),
+              ),
+              const SizedBox(height: AppDimensions.spacingXS),
+              Text(
+                letter.name,
+                textAlign: TextAlign.center,
+                style: GoogleFonts.notoSans(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w800,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+              Text(
+                letter.sound,
+                textAlign: TextAlign.center,
+                style: GoogleFonts.notoSans(
+                  fontSize: 10,
+                  color: AppColors.textSecondary,
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildPracticeList(List<String> items) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(AppDimensions.spacingMD),
+      decoration: BoxDecoration(
+        color: AppColors.secondary.withValues(alpha: 0.34),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusMedium),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Alıştırma',
+            style: GoogleFonts.notoSans(
+              fontSize: 12,
+              fontWeight: FontWeight.w800,
+              color: AppColors.primary,
+            ),
+          ),
+          const SizedBox(height: AppDimensions.spacingSM),
+          for (final item in items)
+            Padding(
+              padding: const EdgeInsets.only(bottom: AppDimensions.spacingXS),
+              child: Text(
+                item,
+                style: GoogleFonts.notoSans(
+                  fontSize: 13,
+                  height: 1.45,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+            ),
         ],
       ),
     );
@@ -694,84 +797,224 @@ class _PrayerText {
 class _QuranLearningStep {
   final String title;
   final String subtitle;
+  final List<_LetterItem> letters;
   final String arabic;
   final String transliteration;
   final String explanation;
+  final List<String> practice;
   final IconData icon;
 
   const _QuranLearningStep({
     required this.title,
     required this.subtitle,
+    this.letters = const [],
     required this.arabic,
     required this.transliteration,
     required this.explanation,
+    this.practice = const [],
     required this.icon,
   });
 }
 
+class _LetterItem {
+  final String arabic;
+  final String name;
+  final String sound;
+
+  const _LetterItem(this.arabic, this.name, this.sound);
+}
+
 const _quranLearningSteps = [
   _QuranLearningStep(
-    title: '1. Harflerle Başlangıç',
-    subtitle: 'Elif-Ba cüzü mantığıyla ilk harfler',
+    title: '1. Harfler: Elif Grubu',
+    subtitle: 'Elif, Be, Te, Se, Cim, Ha, Hı',
+    letters: [
+      _LetterItem('ا', 'Elif', 'a/e uzatma'),
+      _LetterItem('ب', 'Be', 'b'),
+      _LetterItem('ت', 'Te', 't'),
+      _LetterItem('ث', 'Se', 'peltek s'),
+      _LetterItem('ج', 'Cim', 'c'),
+      _LetterItem('ح', 'Ha', 'boğazdan h'),
+      _LetterItem('خ', 'Hı', 'hırıltılı h'),
+    ],
     arabic: 'ا ب ت ث\nج ح خ',
     transliteration: 'Elif, Be, Te, Se. Cim, Ha, Hı.',
     explanation:
-        'Önce harfin şeklini tanı. Harfler tek başına ve kelime içinde farklı görünebilir. Bu bölümde amaç ezberden çok göz alışkanlığı kazanmaktır.',
+        'Bu ilk grup Elif-Ba cüzünün başlangıcıdır. Harfin adını, şeklini ve yaklaşık sesini birlikte tanı. Harfleri önce tek tek, sonra soldan sağa değil Arapça yönüyle sağdan sola takip et.',
+    practice: [
+      'ا harfi çoğu zaman uzatma görevindedir.',
+      'ب ت ث aynı gövdeye benzer; noktaların yeri harfi değiştirir.',
+      'ج ح خ aynı aile gibidir; nokta ve boğaz sesi farkına dikkat et.',
+    ],
     icon: Icons.abc,
   ),
   _QuranLearningStep(
-    title: '2. Harekeler',
+    title: '2. Harfler: Dal-Sad Grubu',
+    subtitle: 'Dal, Zel, Ra, Ze, Sin, Şın, Sad, Dad',
+    letters: [
+      _LetterItem('د', 'Dal', 'd'),
+      _LetterItem('ذ', 'Zel', 'peltek z'),
+      _LetterItem('ر', 'Ra', 'r'),
+      _LetterItem('ز', 'Ze', 'z'),
+      _LetterItem('س', 'Sin', 's'),
+      _LetterItem('ش', 'Şın', 'ş'),
+      _LetterItem('ص', 'Sad', 'kalın s'),
+      _LetterItem('ض', 'Dad', 'kalın d/z'),
+    ],
+    arabic: 'د ذ ر ز\nس ش ص ض',
+    transliteration: 'Dal, Zel, Ra, Ze. Sin, Şın, Sad, Dad.',
+    explanation:
+        'Bu grupta ince ve kalın sesleri ayırmaya başlıyoruz. Sad ve Dad kalın okunur; Sin ve Şın ise daha tanıdık ince seslerdir.',
+    practice: [
+      'س ile ش farkını noktalardan takip et.',
+      'ص ve ض harflerinde sesi kalınlaştırmaya çalış.',
+      'ر harfi kelime içinde bazen ince, bazen kalın duyulabilir.',
+    ],
+    icon: Icons.grid_view,
+  ),
+  _QuranLearningStep(
+    title: '3. Harfler: Ta-Kef Grubu',
+    subtitle: 'Tı, Zı, Ayn, Ğayn, Fe, Kaf, Kef',
+    letters: [
+      _LetterItem('ط', 'Tı', 'kalın t'),
+      _LetterItem('ظ', 'Zı', 'kalın z'),
+      _LetterItem('ع', 'Ayn', 'boğaz sesi'),
+      _LetterItem('غ', 'Ğayn', 'ğ/gırtlak'),
+      _LetterItem('ف', 'Fe', 'f'),
+      _LetterItem('ق', 'Kaf', 'kalın k'),
+      _LetterItem('ك', 'Kef', 'k'),
+    ],
+    arabic: 'ط ظ ع غ\nف ق ك',
+    transliteration: 'Tı, Zı, Ayn, Ğayn. Fe, Kaf, Kef.',
+    explanation:
+        'Ayn ve Ğayn Türkçede birebir karşılığı olmayan boğaz harfleridir. Kaf daha kalın, Kef daha ince okunur.',
+    practice: [
+      'ق için sesi ağız arkasından çıkar.',
+      'ك için Türkçedeki k sesine yakın oku.',
+      'ع harfinde acele etme; sesi boğazdan başlatmayı dene.',
+    ],
+    icon: Icons.record_voice_over_outlined,
+  ),
+  _QuranLearningStep(
+    title: '4. Harfler: Lam-Ye Grubu',
+    subtitle: 'Lam, Mim, Nun, He, Vav, Ye, Hemze',
+    letters: [
+      _LetterItem('ل', 'Lam', 'l'),
+      _LetterItem('م', 'Mim', 'm'),
+      _LetterItem('ن', 'Nun', 'n'),
+      _LetterItem('ه', 'He', 'h'),
+      _LetterItem('و', 'Vav', 'v/u'),
+      _LetterItem('ي', 'Ye', 'y/i'),
+      _LetterItem('ء', 'Hemze', 'kesik ses'),
+    ],
+    arabic: 'ل م ن ه\nو ي ء',
+    transliteration: 'Lam, Mim, Nun, He. Vav, Ye, Hemze.',
+    explanation:
+        'Bu grupla temel harfleri tamamlıyoruz. Vav ve Ye hem harf hem de uzatma görevinde karşına çıkar.',
+    practice: [
+      'م ve ن burundan gelen seslere hazırlık yapar.',
+      'و bazen “v”, bazen “uu” uzatması verir.',
+      'ي bazen “y”, bazen “ii” uzatması verir.',
+    ],
+    icon: Icons.done_all,
+  ),
+  _QuranLearningStep(
+    title: '5. Harekeler',
     subtitle: 'Üstün, esre ve ötre',
-    arabic: 'بَ بِ بُ\nتَ تِ تُ',
-    transliteration: 'Be, bi, bu. Te, ti, tu.',
+    arabic: 'بَ بِ بُ\nتَ تِ تُ\nجَ جِ جُ',
+    transliteration: 'Be, bi, bu. Te, ti, tu. Ce, ci, cu.',
     explanation:
         'Üstün kısa “e/a”, esre kısa “i”, ötre kısa “u” sesi verir. Harfi hızlıca değil, tane tane okuyarak ilerle.',
+    practice: [
+      'بَ = be, بِ = bi, بُ = bu',
+      'تَ = te, تِ = ti, تُ = tu',
+      'جَ = ce, جِ = ci, جُ = cu',
+    ],
     icon: Icons.tune,
   ),
   _QuranLearningStep(
-    title: '3. Cezm ve Sükun',
+    title: '6. Cezm ve Sükun',
     subtitle: 'Harfi durdurarak okuma',
     arabic: 'اَبْ اَتْ اَحْ\nمِنْ عَنْ قُلْ',
     transliteration: 'Eb, et, eh. Min, an, kul.',
     explanation:
         'Cezmli harf kendinden önceki sesle birleşir ve durdurularak okunur. Bu ders kelimeleri akıcı okumaya geçiştir.',
+    practice: [
+      'اَبْ okurken “e-b” diye kapat.',
+      'مِنْ kelimesinde ن harfinde duruş vardır.',
+      'قُلْ kelimesinde ل cezimlidir.',
+    ],
     icon: Icons.stop_circle_outlined,
   ),
   _QuranLearningStep(
-    title: '4. Şedde',
+    title: '7. Şedde',
     subtitle: 'Harf iki kere okunur gibi tutulur',
     arabic: 'رَبَّنَا\nاِيَّاكَ\nاَللّٰهُ',
     transliteration: 'Rabbena, iyyake, Allah.',
     explanation:
         'Şedde harfi güçlendirir. Önce harfi kısa tut, sonra devamındaki harekeyi oku. “Rab-be-na” gibi parçalara ayırmak öğrenmeyi kolaylaştırır.',
+    practice: [
+      'رَبَّنَا = Rab-be-na',
+      'اِيَّاكَ = iy-ya-ke',
+      'اَللّٰهُ kelimesinde lam şeddelidir.',
+    ],
     icon: Icons.compress,
   ),
   _QuranLearningStep(
-    title: '5. Uzatma Harfleri',
+    title: '8. Uzatma Harfleri',
     subtitle: 'Elif, vav ve ye ile med',
     arabic: 'قَالَ\nنُورٌ\nفِيهِ',
     transliteration: 'Kaa-le, nuur, fii-hi.',
     explanation:
         'Med harfleri sesi uzatır. Elif “aa”, vav “uu”, ye “ii” uzatması verir. Kısa sesle uzun sesi ayırmak kıraat için önemlidir.',
+    practice: [
+      'قَالَ kelimesinde elif sesi uzatır.',
+      'نُورٌ kelimesinde vav “uu” sesi verir.',
+      'فِيهِ kelimesinde ye “ii” sesi verir.',
+    ],
     icon: Icons.keyboard_double_arrow_right,
   ),
   _QuranLearningStep(
-    title: '6. Kısa Sureye Geçiş',
+    title: '9. Tenvin',
+    subtitle: 'İki üstün, iki esre, iki ötre',
+    arabic: 'ـً  ـٍ  ـٌ\nكِتَابًا  نُورٍ  اَحَدٌ',
+    transliteration: 'En, in, ün. Kitaben, nurin, ehadün.',
+    explanation:
+        'Tenvin kelime sonuna n sesi katar. Kısa surelerde çok sık gelir; özellikle durarak okurken hocadan/dinleme kaydından kontrol etmek faydalıdır.',
+    practice: [
+      'ـً genelde “en/an” gibi duyulur.',
+      'ـٍ “in”, ـٌ “ün/un” sesi verir.',
+      'اَحَدٌ kelimesi “ehadün” diye çalışılır.',
+    ],
+    icon: Icons.more_horiz,
+  ),
+  _QuranLearningStep(
+    title: '10. Kısa Sureye Geçiş',
     subtitle: 'İhlas suresiyle okuma pratiği',
     arabic: 'قُلْ هُوَ اللّٰهُ اَحَدٌ\nاَللّٰهُ الصَّمَدُ',
     transliteration: 'Kul hüvellahu ehad. Allahus-samed.',
     explanation:
         'Artık harfleri kelime içinde takip ederek kısa sureye geç. Önce Arapça metne bak, sonra okunuş desteğiyle kontrol et.',
+    practice: [
+      'قُلْ kelimesinde cezm var.',
+      'اللّٰهُ kelimesinde şedde var.',
+      'اَحَدٌ kelimesinde tenvin var.',
+    ],
     icon: Icons.menu_book_outlined,
   ),
   _QuranLearningStep(
-    title: '7. Kur’an Okuma Pratiği',
+    title: '11. Kur’an Okuma Pratiği',
     subtitle: 'Fatiha ile düzenli tekrar',
     arabic:
         'بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيمِ\nاَلْحَمْدُ لِلّٰهِ رَبِّ الْعَالَمِينَ',
     transliteration: 'Bismillahirrahmanirrahim. Elhamdülillahi rabbil alemin.',
     explanation:
         'Bu bölümden sonra Kur’an sekmesinde sureleri ayet ayet takip edebilirsin. Uygulama Kur’an tarafında son okuduğun yeri ayrıca saklar.',
+    practice: [
+      'Önce Fatiha’yı satır satır takip et.',
+      'Takıldığın yerde Sure/Dua bölümünden okunuşa dön.',
+      'Sonra Kur’an sekmesinde kaldığın yerden okumaya devam et.',
+    ],
     icon: Icons.auto_stories_outlined,
   ),
 ];

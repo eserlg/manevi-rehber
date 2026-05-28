@@ -52,6 +52,15 @@ class ManeviRehberApp extends StatelessWidget {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
+      builder: (context, child) {
+        final mediaQuery = MediaQuery.of(context);
+        final textScale =
+            mediaQuery.textScaler.scale(1).clamp(0.9, 1.12).toDouble();
+        return MediaQuery(
+          data: mediaQuery.copyWith(textScaler: TextScaler.linear(textScale)),
+          child: child ?? const SizedBox.shrink(),
+        );
+      },
       home: const AuthGate(),
     );
   }
@@ -230,7 +239,10 @@ class _MainScreenState extends ConsumerState<MainScreen> {
         ),
         child: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+            padding: EdgeInsets.symmetric(
+              horizontal: MediaQuery.sizeOf(context).width < 380 ? 4 : 8,
+              vertical: 6,
+            ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
@@ -330,7 +342,9 @@ class _MainScreenState extends ConsumerState<MainScreen> {
     required bool isSelected,
     required VoidCallback onTap,
   }) {
-    final isCompact = MediaQuery.sizeOf(context).width < 430;
+    final width = MediaQuery.sizeOf(context).width;
+    final isCompact = width < 430;
+    final isVeryCompact = width < 370;
 
     return Expanded(
       child: GestureDetector(
@@ -339,8 +353,8 @@ class _MainScreenState extends ConsumerState<MainScreen> {
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
           padding: EdgeInsets.symmetric(
-            horizontal: isCompact ? 2 : 6,
-            vertical: 7,
+            horizontal: isCompact ? 1 : 6,
+            vertical: isVeryCompact ? 5 : 7,
           ),
           decoration: BoxDecoration(
             color: isSelected
@@ -354,11 +368,11 @@ class _MainScreenState extends ConsumerState<MainScreen> {
               Icon(
                 isSelected ? activeIcon : icon,
                 color: isSelected ? AppColors.primary : AppColors.textSecondary,
-                size: isCompact ? 21 : 23,
+                size: isVeryCompact ? 19 : (isCompact ? 21 : 23),
               ),
-              const SizedBox(height: 3),
+              SizedBox(height: isVeryCompact ? 2 : 3),
               SizedBox(
-                height: 24,
+                height: isVeryCompact ? 22 : 24,
                 child: Center(
                   child: Text(
                     label,
@@ -366,8 +380,8 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                     overflow: TextOverflow.ellipsis,
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      fontSize: isCompact ? 9 : 10,
-                      height: 1.1,
+                      fontSize: isVeryCompact ? 8.2 : (isCompact ? 9 : 10),
+                      height: 1.05,
                       fontWeight:
                           isSelected ? FontWeight.w600 : FontWeight.normal,
                       color: isSelected

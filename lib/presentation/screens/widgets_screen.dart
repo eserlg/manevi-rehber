@@ -666,7 +666,7 @@ class _VersePostCard extends StatelessWidget {
       child: Stack(
         fit: StackFit.expand,
         children: [
-          const _PhotoMosqueBackground(),
+          _WidgetArtBackground(style: palette.artStyle),
           DecoratedBox(
             decoration: BoxDecoration(
               gradient: LinearGradient(
@@ -898,6 +898,258 @@ class _QiblaMiniWidgetPreview extends StatelessWidget {
   }
 }
 
+class _WidgetArtBackground extends StatelessWidget {
+  final int style;
+
+  const _WidgetArtBackground({required this.style});
+
+  @override
+  Widget build(BuildContext context) {
+    if (style == 0) return const _PhotoMosqueBackground();
+
+    return CustomPaint(
+      painter: _WidgetArtPainter(style),
+      child: const SizedBox.expand(),
+    );
+  }
+}
+
+class _WidgetArtPainter extends CustomPainter {
+  final int style;
+
+  const _WidgetArtPainter(this.style);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final rect = Offset.zero & size;
+    final basePalettes = [
+      [const Color(0xFF163B4B), const Color(0xFF427B83)],
+      [const Color(0xFF7A5A2B), const Color(0xFFDEC27A)],
+      [const Color(0xFF0A2C39), const Color(0xFF155D52)],
+      [const Color(0xFF0E4E43), const Color(0xFFB88D38)],
+      [const Color(0xFF314A62), const Color(0xFFE0B86A)],
+    ];
+    final colors = basePalettes[(style - 1) % basePalettes.length];
+    canvas.drawRect(
+      rect,
+      Paint()
+        ..shader = LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: colors,
+        ).createShader(rect),
+    );
+
+    switch (style) {
+      case 1:
+        _paintArchSunrise(canvas, size);
+        break;
+      case 2:
+        _paintKaaba(canvas, size);
+        break;
+      case 3:
+        _paintNightDome(canvas, size);
+        break;
+      case 4:
+        _paintGeometric(canvas, size);
+        break;
+      default:
+        _paintMinaretSky(canvas, size);
+    }
+  }
+
+  void _paintArchSunrise(Canvas canvas, Size size) {
+    canvas.drawCircle(
+      Offset(size.width * 0.76, size.height * 0.24),
+      44,
+      Paint()..color = Colors.white.withOpacity(0.16),
+    );
+    final arch = Path()
+      ..moveTo(size.width * 0.18, size.height)
+      ..lineTo(size.width * 0.18, size.height * 0.50)
+      ..quadraticBezierTo(
+        size.width * 0.50,
+        size.height * 0.08,
+        size.width * 0.82,
+        size.height * 0.50,
+      )
+      ..lineTo(size.width * 0.82, size.height)
+      ..close();
+    canvas.drawPath(arch, Paint()..color = Colors.white.withOpacity(0.18));
+    canvas.drawRect(
+      Rect.fromLTWH(0, size.height * 0.70, size.width, size.height * 0.30),
+      Paint()..color = Colors.black.withOpacity(0.10),
+    );
+  }
+
+  void _paintKaaba(Canvas canvas, Size size) {
+    canvas.drawOval(
+      Rect.fromCenter(
+        center: Offset(size.width * 0.52, size.height * 0.78),
+        width: size.width * 0.62,
+        height: 28,
+      ),
+      Paint()..color = Colors.black.withOpacity(0.16),
+    );
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        Rect.fromLTWH(
+          size.width * 0.32,
+          size.height * 0.42,
+          size.width * 0.40,
+          size.height * 0.34,
+        ),
+        const Radius.circular(8),
+      ),
+      Paint()..color = const Color(0xFF111111),
+    );
+    canvas.drawRect(
+      Rect.fromLTWH(
+        size.width * 0.32,
+        size.height * 0.50,
+        size.width * 0.40,
+        10,
+      ),
+      Paint()..color = const Color(0xFFD6AC45),
+    );
+    final starPaint = Paint()..color = Colors.white.withOpacity(0.42);
+    for (final point in [
+      Offset(size.width * 0.18, size.height * 0.20),
+      Offset(size.width * 0.62, size.height * 0.18),
+      Offset(size.width * 0.80, size.height * 0.32),
+      Offset(size.width * 0.24, size.height * 0.35),
+    ]) {
+      canvas.drawCircle(point, 2.3, starPaint);
+    }
+  }
+
+  void _paintNightDome(Canvas canvas, Size size) {
+    canvas.drawCircle(
+      Offset(size.width * 0.78, size.height * 0.20),
+      22,
+      Paint()..color = const Color(0xFFF8E7A0),
+    );
+    canvas.drawCircle(
+      Offset(size.width * 0.86, size.height * 0.16),
+      22,
+      Paint()..color = const Color(0xFF0A2C39),
+    );
+    final mosquePaint = Paint()..color = Colors.white.withOpacity(0.22);
+    canvas.drawArc(
+      Rect.fromLTWH(
+        size.width * 0.22,
+        size.height * 0.52,
+        size.width * 0.56,
+        size.height * 0.34,
+      ),
+      3.14,
+      3.14,
+      true,
+      mosquePaint,
+    );
+    canvas.drawRect(
+      Rect.fromLTWH(
+        size.width * 0.18,
+        size.height * 0.68,
+        size.width * 0.64,
+        size.height * 0.22,
+      ),
+      mosquePaint,
+    );
+    canvas.drawRect(
+      Rect.fromLTWH(
+        size.width * 0.16,
+        size.height * 0.38,
+        10,
+        size.height * 0.50,
+      ),
+      mosquePaint,
+    );
+    canvas.drawRect(
+      Rect.fromLTWH(
+        size.width * 0.84,
+        size.height * 0.34,
+        10,
+        size.height * 0.54,
+      ),
+      mosquePaint,
+    );
+  }
+
+  void _paintGeometric(Canvas canvas, Size size) {
+    final linePaint = Paint()
+      ..color = Colors.white.withOpacity(0.20)
+      ..strokeWidth = 1.2
+      ..style = PaintingStyle.stroke;
+    for (var x = -size.height; x < size.width; x += 28) {
+      canvas.drawLine(
+          Offset(x, 0), Offset(x + size.height, size.height), linePaint);
+      canvas.drawLine(
+          Offset(x + size.height, 0), Offset(x, size.height), linePaint);
+    }
+    for (var x = 26.0; x < size.width; x += 58) {
+      for (var y = 32.0; y < size.height; y += 58) {
+        canvas.drawCircle(
+            Offset(x, y), 11, Paint()..color = Colors.white.withOpacity(0.10));
+        canvas.drawCircle(
+            Offset(x, y), 4, Paint()..color = Colors.white.withOpacity(0.20));
+      }
+    }
+  }
+
+  void _paintMinaretSky(Canvas canvas, Size size) {
+    canvas.drawCircle(
+      Offset(size.width * 0.72, size.height * 0.28),
+      46,
+      Paint()..color = const Color(0xFFFFD98C).withOpacity(0.74),
+    );
+    final silhouette = Paint()..color = Colors.black.withOpacity(0.20);
+    canvas.drawRect(
+      Rect.fromLTWH(
+        size.width * 0.16,
+        size.height * 0.34,
+        15,
+        size.height * 0.58,
+      ),
+      silhouette,
+    );
+    canvas.drawPath(
+      Path()
+        ..moveTo(size.width * 0.135, size.height * 0.34)
+        ..lineTo(size.width * 0.19, size.height * 0.18)
+        ..lineTo(size.width * 0.245, size.height * 0.34)
+        ..close(),
+      silhouette,
+    );
+    canvas.drawRect(
+      Rect.fromLTWH(
+        size.width * 0.56,
+        size.height * 0.52,
+        size.width * 0.24,
+        size.height * 0.30,
+      ),
+      silhouette,
+    );
+    canvas.drawArc(
+      Rect.fromLTWH(
+        size.width * 0.50,
+        size.height * 0.38,
+        size.width * 0.36,
+        size.height * 0.32,
+      ),
+      3.14,
+      3.14,
+      true,
+      silhouette,
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant _WidgetArtPainter oldDelegate) {
+    return oldDelegate.style != style;
+  }
+}
+
 class _PreviewFrame extends StatelessWidget {
   final String title;
   final Widget child;
@@ -1065,10 +1317,12 @@ class _WidgetVerse {
 class _PostPalette {
   final List<Color> colors;
   final Color actionColor;
+  final int artStyle;
 
   const _PostPalette({
     required this.colors,
     required this.actionColor,
+    required this.artStyle,
   });
 }
 
@@ -1076,14 +1330,32 @@ const _postPalettes = [
   _PostPalette(
     colors: [Color(0xDD073E34), Color(0xAA0E6F59), Color(0x88956F25)],
     actionColor: Color(0xFF0E6F59),
+    artStyle: 0,
   ),
   _PostPalette(
     colors: [Color(0xDD153447), Color(0xAA2B6B73), Color(0x889C7B38)],
     actionColor: Color(0xFF153447),
+    artStyle: 1,
   ),
   _PostPalette(
     colors: [Color(0xDD5A3F20), Color(0xAA98733A), Color(0x881B4D5C)],
     actionColor: Color(0xFF5A3F20),
+    artStyle: 2,
+  ),
+  _PostPalette(
+    colors: [Color(0xDD092B35), Color(0xAA126C55), Color(0x881F5164)],
+    actionColor: Color(0xFF0A2C39),
+    artStyle: 3,
+  ),
+  _PostPalette(
+    colors: [Color(0xDD0B5C4D), Color(0xAA8C742D), Color(0x8813473E)],
+    actionColor: Color(0xFF0E4E43),
+    artStyle: 4,
+  ),
+  _PostPalette(
+    colors: [Color(0xDD253C54), Color(0xAA5D7F88), Color(0x88B88D38)],
+    actionColor: Color(0xFF314A62),
+    artStyle: 5,
   ),
 ];
 

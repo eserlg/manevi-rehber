@@ -79,16 +79,21 @@ class _PrayerTimesScreenState extends ConsumerState<PrayerTimesScreen> {
               color: AppColors.primary.withOpacity(0.1),
               borderRadius: BorderRadius.circular(AppDimensions.radiusMedium),
             ),
-            child: Row(
+            child: Wrap(
+              spacing: AppDimensions.spacingSM,
+              runSpacing: AppDimensions.spacingSM,
+              crossAxisAlignment: WrapCrossAlignment.center,
               children: [
                 Icon(Icons.location_on, color: AppColors.primary),
-                const SizedBox(width: AppDimensions.spacingSM),
-                Expanded(
+                ConstrainedBox(
+                  constraints: const BoxConstraints(minWidth: 140),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         city,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: GoogleFonts.notoSans(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
@@ -97,6 +102,8 @@ class _PrayerTimesScreenState extends ConsumerState<PrayerTimesScreen> {
                       ),
                       Text(
                         prayerTimes.date,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: GoogleFonts.notoSans(
                           fontSize: 12,
                           color: AppColors.textSecondary,
@@ -117,6 +124,8 @@ class _PrayerTimesScreenState extends ConsumerState<PrayerTimesScreen> {
                   ),
                   child: Text(
                     prayerTimes.hijriDate,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: GoogleFonts.notoSans(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
@@ -228,7 +237,7 @@ class _PrayerTimesScreenState extends ConsumerState<PrayerTimesScreen> {
                   crossAxisCount: 2,
                   crossAxisSpacing: AppDimensions.spacingMD,
                   mainAxisSpacing: AppDimensions.spacingMD,
-                  childAspectRatio: compact ? 1.2 : 1.4,
+                  childAspectRatio: compact ? 1.05 : 1.28,
                 ),
                 itemCount: prayers.length,
                 itemBuilder: (context, index) {
@@ -276,44 +285,60 @@ class _PrayerTimesScreenState extends ConsumerState<PrayerTimesScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
+          Wrap(
+            spacing: AppDimensions.spacingMD,
+            runSpacing: AppDimensions.spacingSM,
+            crossAxisAlignment: WrapCrossAlignment.center,
             children: [
-              Container(
-                padding: const EdgeInsets.all(AppDimensions.spacingSM),
-                decoration: BoxDecoration(
-                  color: AppColors.primary.withOpacity(0.1),
-                  borderRadius:
-                      BorderRadius.circular(AppDimensions.radiusSmall),
-                ),
-                child: Icon(Icons.task_alt, color: AppColors.primary),
-              ),
-              const SizedBox(width: AppDimensions.spacingMD),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Bugünkü Namaz Takibi',
-                      style: GoogleFonts.notoSans(
-                        fontSize: 17,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.textPrimary,
-                      ),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(AppDimensions.spacingSM),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withOpacity(0.1),
+                      borderRadius:
+                          BorderRadius.circular(AppDimensions.radiusSmall),
                     ),
-                    Text(
-                      '$completed/5 tamamlandı • Son 7 günde $weeklyFullDays tam gün',
-                      style: GoogleFonts.notoSans(
-                        fontSize: 12,
-                        color: AppColors.textSecondary,
-                      ),
+                    child: Icon(Icons.task_alt, color: AppColors.primary),
+                  ),
+                  const SizedBox(width: AppDimensions.spacingMD),
+                  ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 260),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Bugünkü Namaz Takibi',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.notoSans(
+                            fontSize: 17,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.textPrimary,
+                          ),
+                        ),
+                        Text(
+                          '$completed/5 tamamlandı • Son 7 günde $weeklyFullDays tam gün',
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.notoSans(
+                            fontSize: 12,
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
               TextButton.icon(
                 onPressed: _showQadaSheet,
                 icon: const Icon(Icons.history),
                 label: const Text('Kaza'),
+                style: TextButton.styleFrom(
+                  visualDensity: VisualDensity.compact,
+                ),
               ),
             ],
           ),

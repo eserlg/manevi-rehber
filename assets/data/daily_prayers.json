@@ -334,5 +334,101 @@
     "turkish": "Rabbimiz! Eşlerimizi ve çocuklarımızı bize göz aydınlığı kıl; bizi takva sahiplerine önder eyle.",
     "meaning": "Aile huzuru ve hayırlı nesil için Kur'an duası.",
     "category": "aile"
+  },
+  {
+    "id": "43",
+    "title": "Kadir Gecesi Duası",
+    "arabic": "اللَّهُمَّ إِنَّكَ عَفُوٌّ كَرِيمٌ تُحِبُّ الْعَفْوَ فَاعْفُ عَنِّي",
+    "turkish": "Allah'ım! Sen affedicisin, kerem sahibisin, affetmeyi seversin; beni de affet.",
+    "meaning": "Ramazan'ın son gecelerinde ve özellikle Kadir gecesinde okunması tavsiye edilen duadır.",
+    "category": "ramazan"
+  },
+  {
+    "id": "44",
+    "title": "İftar Duası",
+    "arabic": "اللَّهُمَّ لَكَ صُمْتُ، وَبِكَ آمَنْتُ، وَعَلَيْكَ تَوَكَّلْتُ، وَعَلَى رِزْقِكَ أَفْطَرْتُ",
+    "turkish": "Allah'ım! Senin için oruç tuttum, Sana iman ettim, Sana güvendim ve verdiğin rızıkla orucumu açtım.",
+    "meaning": "Oruç açarken şükür ve teslimiyet niyetiyle okunur.",
+    "category": "ramazan"
+  },
+  {
+    "id": "45",
+    "title": "Telbiye",
+    "arabic": "لَبَّيْكَ اللَّهُمَّ لَبَّيْكَ، لَبَّيْكَ لَا شَرِيكَ لَكَ لَبَّيْكَ، إِنَّ الْحَمْدَ وَالنِّعْمَةَ لَكَ وَالْمُلْكَ، لَا شَرِيكَ لَكَ",
+    "turkish": "Buyur Allah'ım buyur! Buyur, Senin ortağın yoktur. Hamd, nimet ve mülk Sana aittir. Senin ortağın yoktur.",
+    "meaning": "Hac ve umrede ihrama girildikten sonra söylenir.",
+    "category": "hac"
+  },
+  {
+    "id": "46",
+    "title": "Hz. İbrahim'in Namaz Duası",
+    "arabic": "رَبِّ اجْعَلْنِي مُقِيمَ الصَّلَاةِ وَمِنْ ذُرِّيَّتِي، رَبَّنَا وَتَقَبَّلْ دُعَاءِ",
+    "turkish": "Rabbim! Beni ve soyumdan gelecekleri namazı dosdoğru kılanlardan eyle. Rabbimiz! Duamı kabul buyur.",
+    "meaning": "Namazda sebat ve hayırlı nesil için Kur'an duasıdır.",
+    "category": "peygamber"
+  },
+  {
+    "id": "47",
+    "title": "Hz. Süleyman'ın Şükür Duası",
+    "arabic": "رَبِّ أَوْزِعْنِي أَنْ أَشْكُرَ نِعْمَتَكَ الَّتِي أَنْعَمْتَ عَلَيَّ وَعَلَى وَالِدَيَّ، وَأَنْ أَعْمَلَ صَالِحًا تَرْضَاهُ",
+    "turkish": "Rabbim! Bana ve anne babama verdiğin nimete şükretmemi ve razı olacağın salih amel işlememi bana ilham et.",
+    "meaning": "Nimet bilinci, şükür ve salih amel için Kur'an duasıdır.",
+    "category": "peygamber"
+  },
+  {
+    "id": "48",
+    "title": "Sabır ve Sebat Duası",
+    "arabic": "رَبَّنَا أَفْرِغْ عَلَيْنَا صَبْرًا، وَثَبِّتْ أَقْدَامَنَا، وَانْصُرْنَا عَلَى الْقَوْمِ الْكَافِرِينَ",
+    "turkish": "Rabbimiz! Üzerimize sabır yağdır, ayaklarımızı sağlam bastır ve inkârcı topluluğa karşı bize yardım et.",
+    "meaning": "Zor zamanlarda sabır, sebat ve yardım istemek için Kur'an duası.",
+    "category": "gunluk"
+  },
+  {
+    "id": "49",
+    "title": "Borç ve Geçim Duası",
+    "arabic": "اللَّهُمَّ اكْفِنِي بِحَلَالِكَ عَنْ حَرَامِكَ، وَأَغْنِنِي بِفَضْلِكَ عَمَّنْ سِوَاكَ",
+    "turkish": "Allah'ım! Helalinle beni haramdan koru; lütfunla beni Senden başkasına muhtaç etme.",
+    "meaning": "Helal rızık, borç ve geçim sıkıntısı için okunur.",
+    "category": "gunluk"
+  },
+  {
+    "id": "50",
+    "title": "Cenaze İçin Kapsamlı Dua",
+    "arabic": "اللَّهُمَّ اغْفِرْ لِحَيِّنَا وَمَيِّتِنَا، وَشَاهِدِنَا وَغَائِبِنَا، وَصَغِيرِنَا وَكَبِيرِنَا، وَذَكَرِنَا وَأُنْثَانَا",
+    "turkish": "Allah'ım! Dirilerimizi, ölülerimizi, burada bulunanlarımızı, bulunmayanlarımızı, küçüklerimizi, büyüklerimizi, erkeklerimizi ve kadınlarımızı bağışla.",
+    "meaning": "Cenaze namazında ve vefat eden müminler için okunabilecek kapsamlı duadır.",
+    "category": "cenaze"
+  },
+  {
+    "id": "51",
+    "title": "Yağmur ve Bereket Duası",
+    "arabic": "اللَّهُمَّ صَيِّبًا نَافِعًا",
+    "turkish": "Allah'ım! Bize faydalı bir yağmur ihsan eyle.",
+    "meaning": "Yağmur yağarken bereket ve fayda niyetiyle okunur.",
+    "category": "gunluk"
+  },
+  {
+    "id": "52",
+    "title": "Kalp Huzuru Duası",
+    "arabic": "رَبَّنَا لَا تُزِغْ قُلُوبَنَا بَعْدَ إِذْ هَدَيْتَنَا، وَهَبْ لَنَا مِنْ لَدُنْكَ رَحْمَةً",
+    "turkish": "Rabbimiz! Bizi hidayete erdirdikten sonra kalplerimizi eğriltme; katından bize rahmet bağışla.",
+    "meaning": "İman, istikamet ve kalp huzuru için Kur'an duası.",
+    "category": "gunluk"
+  },
+  {
+    "id": "53",
+    "title": "Mescide Giriş Duası",
+    "arabic": "اللَّهُمَّ افْتَحْ لِي أَبْوَابَ رَحْمَتِكَ",
+    "turkish": "Allah'ım! Bana rahmetinin kapılarını aç.",
+    "meaning": "Mescide girerken okunur.",
+    "category": "namaz"
+  },
+  {
+    "id": "54",
+    "title": "Mescidden Çıkış Duası",
+    "arabic": "اللَّهُمَّ إِنِّي أَسْأَلُكَ مِنْ فَضْلِكَ",
+    "turkish": "Allah'ım! Senden lütfunu isterim.",
+    "meaning": "Mescidden çıkarken okunur.",
+    "category": "namaz"
   }
 ]

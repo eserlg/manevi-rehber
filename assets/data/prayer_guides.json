@@ -350,5 +350,92 @@
         ]
       }
     ]
+  },
+  {
+    "id": "kaza",
+    "category": "ozel",
+    "title": "Kaza Namazı",
+    "subtitle": "Vaktinde kılınamayan farz ve vitir namazları",
+    "totalRakat": "Namaza göre değişir",
+    "shortDescription": "Vaktinde kılınamayan farz namazlar ve vitir namazı, uygun vakitte kaza niyetiyle kılınır.",
+    "highlights": ["Farzlar", "Vitir", "Niyet önemli"],
+    "sections": [
+      {
+        "title": "Nasıl niyet edilir?",
+        "body": "Kaza namazında hangi namazın kaza edildiği niyette belirtilir.",
+        "items": [
+          "Örneğin: Niyet ettim Allah rızası için en son kazaya kalan sabah namazının farzını kılmaya",
+          "Öğle, ikindi ve yatsı farzı 4 rekat; akşam farzı 3 rekat; sabah farzı 2 rekattır",
+          "Vitir namazı da 3 rekat olarak kaza edilir"
+        ]
+      },
+      {
+        "title": "Okunacak sure ve dualar",
+        "body": "Kaza namazı, aynı namazın farz düzeniyle kılınır.",
+        "items": [
+          "Her rekatta Fatiha okunur; ilk iki rekatta Fatiha'dan sonra sure okunur",
+          "Oturuluşlarda Ettehiyyatü; son oturuşta Salli-Barik ve Rabbena duaları okunur",
+          "Düzenli takip için Namaz Takibi bölümünde günlük hedef belirlenebilir"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "tahiyyetul_mescid",
+    "category": "nafile",
+    "title": "Tahiyyetü'l-Mescid Namazı",
+    "subtitle": "Mescide girince kılınan selamlama namazı",
+    "totalRakat": "2 rekat",
+    "shortDescription": "Mescide girildiğinde oturmadan önce iki rekat nafile namaz kılmak güzel görülmüştür.",
+    "highlights": ["2 rekat", "Mescid adabı", "Nafile"],
+    "sections": [
+      {
+        "title": "Rekat düzeni",
+        "body": "İki rekat nafile namaz olarak kılınır.",
+        "items": [
+          "Niyet edilir ve iftitah tekbiri alınır",
+          "Her rekatta Fatiha ve kısa sure okunur",
+          "Son oturuşta Ettehiyyatü, Salli-Barik ve Rabbena duaları okunur"
+        ]
+      },
+      {
+        "title": "Kısa not",
+        "body": "Farz namaz başlamak üzereyse cemaate yetişmek önceliklidir.",
+        "items": [
+          "Vakit uygunsa mescide giriş adabı olarak kılınabilir",
+          "Camiye girince Mescide Giriş Duası da okunabilir",
+          "Mekruh vakitlere dikkat edilmelidir"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "evvabin",
+    "category": "nafile",
+    "title": "Evvabin Namazı",
+    "subtitle": "Akşam namazından sonra kılınan nafile",
+    "totalRakat": "2-6 rekat",
+    "shortDescription": "Akşam namazından sonra kılınan nafile namazdır; iki rekatta bir selam verilebilir.",
+    "highlights": ["Akşam sonrası", "2-6 rekat", "Nafile"],
+    "sections": [
+      {
+        "title": "Rekat düzeni",
+        "body": "İki rekat veya daha fazla olarak kılınabilir.",
+        "items": [
+          "Akşam namazının sünnetinden sonra kılınması yaygındır",
+          "2'şer rekat halinde selam verilebilir",
+          "Her rekatta Fatiha ve kısa sure okunur"
+        ]
+      },
+      {
+        "title": "Okunacaklar",
+        "body": "Standart nafile namaz düzeni uygulanır.",
+        "items": [
+          "İlk rekatta Sübhaneke ile başlanır",
+          "Oturuluşlarda Ettehiyyatü okunur",
+          "Namazdan sonra istiğfar, salavat ve dua ile devam edilebilir"
+        ]
+      }
+    ]
   }
 ]

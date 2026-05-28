@@ -107,7 +107,7 @@ class _QiblaScreenState extends ConsumerState<QiblaScreen> {
       _sensorFallbackTimer?.cancel();
       _setLiveHeading(
         heading,
-        'Telefonu yatay tutup ortadaki oku Kıble işaretiyle hizalayın.',
+        'Telefonu elinde tuttuğun şekilde yavaşça çevir; ortadaki oku Kıble işaretiyle hizala.',
       );
     });
 
@@ -141,7 +141,7 @@ class _QiblaScreenState extends ConsumerState<QiblaScreen> {
       setState(() {
         _isLoading = false;
         _compassMessage = started
-            ? 'Pusula verisi bekleniyor; telefonu hafifçe sağa sola çevirin.'
+            ? 'Pusula verisi bekleniyor; telefonu elinde tuttuğun şekilde yavaşça çevir.'
             : 'Bu cihazda pusula sensörü desteklenmiyor.';
       });
       if (started) {
@@ -199,7 +199,7 @@ class _QiblaScreenState extends ConsumerState<QiblaScreen> {
 
     _setLiveHeading(
       heading,
-      'Telefonu yatay tutup ortadaki oku Kıble işaretiyle hizalayın.',
+      'Telefonu elinde tuttuğun şekilde yavaşça çevir; ortadaki oku Kıble işaretiyle hizala.',
     );
   }
 

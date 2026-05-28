@@ -1097,4 +1097,48 @@ const _prayerTexts = [
         'İhlas Allah’ın birliğini bildirir. Felak ve Nas sureleri Allah’a sığınmayı öğretir.',
     icon: Icons.shield_outlined,
   ),
+  _PrayerText(
+    title: 'Kevser Suresi',
+    usage: 'Kısa sure olarak namazda sık okunur',
+    arabic:
+        'إِنَّا أَعْطَيْنَاكَ الْكَوْثَرَ\nفَصَلِّ لِرَبِّكَ وَانْحَرْ\nإِنَّ شَانِئَكَ هُوَ الْأَبْتَرُ',
+    transliteration:
+        'İnnâ a‘taynâkel kevser. Fe salli li-rabbike venhar. İnne şânieke hüvel ebter.',
+    meaning:
+        'Şüphesiz biz sana Kevser’i verdik. Öyleyse Rabbin için namaz kıl ve kurban kes. Asıl sonu kesik olan, sana kin tutandır.',
+    icon: Icons.water_drop_outlined,
+  ),
+  _PrayerText(
+    title: 'Asr Suresi',
+    usage: 'Kısa sure olarak namazda okunabilir',
+    arabic:
+        'وَالْعَصْرِ\nإِنَّ الْإِنْسَانَ لَفِي خُسْرٍ\nإِلَّا الَّذِينَ آمَنُوا وَعَمِلُوا الصَّالِحَاتِ وَتَوَاصَوْا بِالْحَقِّ وَتَوَاصَوْا بِالصَّبْرِ',
+    transliteration:
+        'Vel asr. İnnel insâne lefî husr. İllellezîne âmenû ve amilûs-sâlihâti ve tevâsav bil hakkı ve tevâsav bis-sabr.',
+    meaning:
+        'Asra yemin olsun ki insan ziyandadır. Ancak iman edip salih amel işleyen, hakkı ve sabrı tavsiye edenler başka.',
+    icon: Icons.hourglass_bottom_outlined,
+  ),
+  _PrayerText(
+    title: 'Kafirun Suresi',
+    usage: 'Tevhid bilinci için namazda okunabilir',
+    arabic:
+        'قُلْ يَا أَيُّهَا الْكَافِرُونَ\nلَا أَعْبُدُ مَا تَعْبُدُونَ\nوَلَا أَنْتُمْ عَابِدُونَ مَا أَعْبُدُ\nوَلَا أَنَا عَابِدٌ مَا عَبَدْتُمْ\nوَلَا أَنْتُمْ عَابِدُونَ مَا أَعْبُدُ\nلَكُمْ دِينُكُمْ وَلِيَ دِينِ',
+    transliteration:
+        'Kul yâ eyyühel kâfirûn. Lâ a‘budu mâ ta‘budûn... Leküm dînüküm ve liye dîn.',
+    meaning:
+        'De ki: Ey inkârcılar! Ben sizin kulluk ettiklerinize kulluk etmem. Sizin dininiz size, benim dinim banadır.',
+    icon: Icons.verified_outlined,
+  ),
+  _PrayerText(
+    title: 'Nasr Suresi',
+    usage: 'Kısa sure olarak namazda okunabilir',
+    arabic:
+        'إِذَا جَاءَ نَصْرُ اللَّهِ وَالْفَتْحُ\nوَرَأَيْتَ النَّاسَ يَدْخُلُونَ فِي دِينِ اللَّهِ أَفْوَاجًا\nفَسَبِّحْ بِحَمْدِ رَبِّكَ وَاسْتَغْفِرْهُ إِنَّهُ كَانَ تَوَّابًا',
+    transliteration:
+        'İzâ câe nasrullâhi vel feth. Ve raeytennâse yedhulûne fî dînillâhi efvâcâ. Fe sebbih bi hamdi rabbike vestağfirh.',
+    meaning:
+        'Allah’ın yardımı ve fetih geldiğinde Rabbini hamd ile tesbih et ve O’ndan bağışlanma dile. Şüphesiz O, tövbeleri çok kabul edendir.',
+    icon: Icons.flag_outlined,
+  ),
 ];

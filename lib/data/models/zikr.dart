@@ -84,7 +84,17 @@ class Zikr {
 
   bool get isCompleted => currentCount >= targetCount;
 
-  double get progress => currentCount / targetCount;
+  int get completedCycles {
+    if (targetCount <= 0) return 0;
+    return currentCount ~/ targetCount;
+  }
+
+  double get progress {
+    if (targetCount <= 0 || currentCount <= 0) return 0;
+    final remainder = currentCount % targetCount;
+    if (remainder == 0) return 1;
+    return remainder / targetCount;
+  }
 
   static List<Zikr> get defaultZikirs => [
         Zikr.subhanallah(),

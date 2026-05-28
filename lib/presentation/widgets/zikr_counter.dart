@@ -28,6 +28,7 @@ class ZikrCounter extends StatelessWidget {
       child: LayoutBuilder(
         builder: (context, constraints) {
           final compact = constraints.maxHeight < 470;
+          final completedCycles = zikr.completedCycles;
           final circleSize = compact ? 118.0 : 180.0;
           final strokeWidth = compact ? 9.0 : 12.0;
           final arabicSize = compact ? 38.0 : 48.0;
@@ -97,7 +98,9 @@ class ZikrCounter extends StatelessWidget {
                               ),
                             ),
                             Text(
-                              '/ ${zikr.targetCount}',
+                              completedCycles > 0
+                                  ? '$completedCycles tur'
+                                  : '${zikr.targetCount} hedef',
                               style: GoogleFonts.notoSans(
                                 fontSize: compact ? 13 : 16,
                                 color: AppColors.textSecondary,
@@ -123,7 +126,7 @@ class ZikrCounter extends StatelessWidget {
                           ),
                         ),
                         child: Text(
-                          'Tamamlandı',
+                          '${zikr.targetCount}\'lük tur tamamlandı',
                           style: GoogleFonts.notoSans(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
@@ -133,7 +136,7 @@ class ZikrCounter extends StatelessWidget {
                       )
                     else
                       Text(
-                        'Saymak için tıklayın',
+                        'Saymak için dokunun',
                         style: GoogleFonts.notoSans(
                           fontSize: 14,
                           color: AppColors.textHint,

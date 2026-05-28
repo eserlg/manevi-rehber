@@ -22,6 +22,10 @@ const List<MapEntry<String, String?>> _prayerCategories = [
   MapEntry<String, String?>('Namaz', 'namaz'),
   MapEntry<String, String?>('Aile', 'aile'),
   MapEntry<String, String?>('Yolculuk', 'yolculuk'),
+  MapEntry<String, String?>('Ramazan', 'ramazan'),
+  MapEntry<String, String?>('Hac/Umre', 'hac'),
+  MapEntry<String, String?>('Peygamber', 'peygamber'),
+  MapEntry<String, String?>('Cenaze', 'cenaze'),
 ];
 
 class PrayersScreen extends ConsumerStatefulWidget {
@@ -50,6 +54,10 @@ class _PrayersScreenState extends ConsumerState<PrayersScreen> {
     '35': [QuranAudioReference(17, 24)],
     '36': [QuranAudioReference(20, 114)],
     '42': [QuranAudioReference(25, 74)],
+    '46': [QuranAudioReference(14, 40)],
+    '47': [QuranAudioReference(27, 19)],
+    '48': [QuranAudioReference(2, 250)],
+    '52': [QuranAudioReference(3, 8)],
   };
 
   @override
@@ -561,6 +569,14 @@ class _PrayersScreenState extends ConsumerState<PrayersScreen> {
         return 'Aile';
       case 'yolculuk':
         return 'Yolculuk';
+      case 'ramazan':
+        return 'Ramazan';
+      case 'hac':
+        return 'Hac/Umre';
+      case 'peygamber':
+        return 'Peygamber';
+      case 'cenaze':
+        return 'Cenaze';
       default:
         return category;
     }

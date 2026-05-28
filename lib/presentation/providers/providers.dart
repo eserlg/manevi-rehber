@@ -101,7 +101,7 @@ class ZikrNotifier extends StateNotifier<List<Zikr>> {
 
   void increment(String zikrId) {
     state = state.map((zikr) {
-      if (zikr.id == zikrId && zikr.currentCount < zikr.targetCount) {
+      if (zikr.id == zikrId) {
         final newCount = zikr.currentCount + 1;
         _saveProgress(zikrId, newCount);
         return zikr.copyWith(currentCount: newCount);

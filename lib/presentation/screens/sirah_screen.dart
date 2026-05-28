@@ -130,6 +130,73 @@ class SirahScreen extends StatelessWidget {
         'Onun hayatı güç sahibi bir kulun şükürle nasıl dengede kalacağını öğretir.',
       ],
     },
+    {
+      'title': 'Hz. Davud (a.s.)',
+      'subtitle': 'Hüküm, zikir, adalet ve güzel ses',
+      'facts': [
+        'Hz. Süleyman’ın babasıdır; kendisine Zebur verilmiştir.',
+        'Kur’an’da dağların ve kuşların onunla birlikte Allah’ı tesbih ettiği anlatılır.',
+        'Güçlü bir hükümdar olmasına rağmen kulluk bilincini kaybetmedi.',
+        'Adaletle hükmetme konusunda uyarılar ve ibretler onun kıssasında öne çıkar.',
+        'El emeğiyle geçinme, zanaat ve çalışkanlık yönüyle de anılır.',
+        'Hayatı, güç ve makamın şükürle taşınması gerektiğini hatırlatır.',
+      ],
+    },
+    {
+      'title': 'Hz. Zekeriyya (a.s.)',
+      'subtitle': 'Ümit, dua ve geç yaşta gelen müjde',
+      'facts': [
+        'Mescid hizmeti ve Hz. Meryem’in himayesiyle anılır.',
+        'Yaşlılık döneminde bile Allah’ın rahmetinden ümit kesmedi.',
+        'Rabbinden hayırlı bir nesil istedi; duasına Hz. Yahya ile karşılık verildi.',
+        'Duasında sesini alçaltarak samimi bir yakarışta bulunduğu bildirilir.',
+        'Onun kıssası, gecikmiş görünen duaların da Allah katında karşılıksız kalmadığını öğretir.',
+      ],
+    },
+    {
+      'title': 'Hz. Yahya (a.s.)',
+      'subtitle': 'Takva, iffet ve erken yaşta hikmet',
+      'facts': [
+        'Hz. Zekeriyya’nın oğludur.',
+        'Kur’an’da kendisine çocuk yaşta hikmet verildiği bildirilir.',
+        'Temiz ahlakı, merhameti ve anne babasına iyiliğiyle övülür.',
+        'Dünya tutkularından uzak, takva merkezli bir hayat sürdü.',
+        'Hak sözü söylemekten çekinmeyen örnek bir peygamber olarak anılır.',
+      ],
+    },
+    {
+      'title': 'Hz. Lut (a.s.)',
+      'subtitle': 'Ahlak, aile imtihanı ve toplumsal uyarı',
+      'facts': [
+        'Hz. İbrahim’e iman eden ve onunla hicret eden peygamberlerdendir.',
+        'Kavmini iffete, temizliğe ve Allah’ın sınırlarına davet etti.',
+        'Toplumsal bozulmaya karşı yalnız kalsa da hakkı söylemeye devam etti.',
+        'Aile içinden bile imtihan yaşaması, hidayetin kişisel bir tercih olduğunu gösterir.',
+        'Kıssası, ahlaki çöküşün toplumları nasıl yıprattığını hatırlatır.',
+      ],
+    },
+    {
+      'title': 'Hz. Şuayb (a.s.)',
+      'subtitle': 'Ticaret ahlakı, ölçü ve adalet',
+      'facts': [
+        'Medyen halkına gönderildi.',
+        'Kavmini Allah’a kulluğa ve ticarette dürüstlüğe çağırdı.',
+        'Eksik ölçüp tartma, kul hakkı ve ekonomik haksızlıklar onun tebliğinde öne çıkar.',
+        'Sözlü baskıya rağmen davetini hikmetle sürdürdü.',
+        'Hayatı, ibadetin ticaret ve sosyal hayat ahlakından ayrı düşünülemeyeceğini öğretir.',
+      ],
+    },
+    {
+      'title': 'Hz. Harun (a.s.)',
+      'subtitle': 'Yardımcılık, kardeşlik ve tebliğ desteği',
+      'facts': [
+        'Hz. Musa’nın kardeşidir.',
+        'Musa (a.s.) duasında onu kendisine yardımcı istemiştir.',
+        'Dili açık, iletişimi güçlü bir peygamber olarak Firavun’a tebliğde Musa’ya destek oldu.',
+        'Kavminin zorlu dönemlerinde sabırla onları doğruya çağırdı.',
+        'Kıssası, hayırlı işlerde ekip olmanın ve kardeş desteğinin önemini gösterir.',
+      ],
+    },
   ];
 
   @override

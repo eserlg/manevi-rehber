@@ -6,6 +6,7 @@ import '../../core/constants/colors.dart';
 import '../../core/constants/dimensions.dart';
 import '../../data/models/prayer_times.dart';
 import '../../data/models/quran.dart';
+import '../../data/services/app_share_service.dart';
 import '../providers/providers.dart';
 
 class WidgetsScreen extends ConsumerWidget {
@@ -43,6 +44,14 @@ class WidgetsScreen extends ConsumerWidget {
               _NotificationPreview(verse: verse),
               const SizedBox(height: AppDimensions.spacingLG),
               _HomeWidgetPreview(prayerTimes: prayerTimes, verse: verse),
+              const SizedBox(height: AppDimensions.spacingLG),
+              _PrayerTimesStripPreview(prayerTimes: prayerTimes),
+              const SizedBox(height: AppDimensions.spacingLG),
+              _VersePostGallery(verse: verse),
+              const SizedBox(height: AppDimensions.spacingLG),
+              const _TasbihWidgetPreview(),
+              const SizedBox(height: AppDimensions.spacingLG),
+              const _QiblaMiniWidgetPreview(),
               const SizedBox(height: AppDimensions.spacingLG),
               _buildPlatformCard(context, ref, prayerTimes, verse),
             ],
@@ -475,6 +484,420 @@ class _HomeWidgetPreview extends StatelessWidget {
   }
 }
 
+class _PrayerTimesStripPreview extends StatelessWidget {
+  final PrayerTimes? prayerTimes;
+
+  const _PrayerTimesStripPreview({required this.prayerTimes});
+
+  @override
+  Widget build(BuildContext context) {
+    final nextPrayer = prayerTimes?.getNextPrayer() ?? 'Öğle';
+    final nextTime = prayerTimes?.getNextPrayerTime() ?? '13:07';
+    final prayers = [
+      ('İmsak', prayerTimes?.imsak ?? '03:42'),
+      ('Güneş', prayerTimes?.gunes ?? '05:32'),
+      ('Öğle', prayerTimes?.ogle ?? '13:08'),
+      ('İkindi', prayerTimes?.ikindi ?? '17:03'),
+      ('Akşam', prayerTimes?.aksam ?? '20:30'),
+      ('Yatsı', prayerTimes?.yatsi ?? '22:13'),
+    ];
+
+    return _PreviewFrame(
+      title: 'Vakit Şeridi',
+      child: Container(
+        padding: const EdgeInsets.all(AppDimensions.spacingMD),
+        decoration: BoxDecoration(
+          color: const Color(0xFF0E6F59),
+          borderRadius: BorderRadius.circular(26),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.primary.withOpacity(0.18),
+              blurRadius: 22,
+              offset: const Offset(0, 12),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(AppDimensions.spacingSM),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.14),
+                    borderRadius:
+                        BorderRadius.circular(AppDimensions.radiusSmall),
+                  ),
+                  child: const Icon(Icons.schedule, color: Colors.white),
+                ),
+                const SizedBox(width: AppDimensions.spacingSM),
+                Expanded(
+                  child: Text(
+                    '$nextPrayer $nextTime',
+                    style: GoogleFonts.notoSans(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w900,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+                Text(
+                  _formatDuration(
+                    prayerTimes?.getTimeUntilNextPrayer() ??
+                        const Duration(hours: 2, minutes: 23),
+                  ),
+                  style: GoogleFonts.notoSans(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w800,
+                    color: Colors.white.withOpacity(0.88),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: AppDimensions.spacingMD),
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  for (final prayer in prayers)
+                    Container(
+                      width: 74,
+                      margin: const EdgeInsets.only(
+                        right: AppDimensions.spacingSM,
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppDimensions.spacingSM,
+                        vertical: AppDimensions.spacingSM,
+                      ),
+                      decoration: BoxDecoration(
+                        color: prayer.$1 == nextPrayer
+                            ? Colors.white.withOpacity(0.22)
+                            : Colors.white.withOpacity(0.10),
+                        borderRadius: BorderRadius.circular(18),
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.14),
+                        ),
+                      ),
+                      child: Column(
+                        children: [
+                          Text(
+                            prayer.$1,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: GoogleFonts.notoSans(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w800,
+                              color: Colors.white.withOpacity(0.82),
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            prayer.$2,
+                            style: GoogleFonts.notoSans(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w900,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _VersePostGallery extends StatelessWidget {
+  final Verse? verse;
+
+  const _VersePostGallery({required this.verse});
+
+  @override
+  Widget build(BuildContext context) {
+    final items = [
+      if (verse != null) _verseItemFromDaily(verse),
+      ..._curatedWidgetVerses,
+    ];
+
+    return _PreviewFrame(
+      title: 'Paylaşımlık Ayet Kartları',
+      child: SizedBox(
+        height: 292,
+        child: ListView.separated(
+          scrollDirection: Axis.horizontal,
+          itemCount: items.length,
+          separatorBuilder: (_, __) =>
+              const SizedBox(width: AppDimensions.spacingMD),
+          itemBuilder: (context, index) {
+            final item = items[index];
+            return SizedBox(
+              width: 228,
+              child: _VersePostCard(
+                item: item,
+                palette: _postPalettes[index % _postPalettes.length],
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+
+class _VersePostCard extends StatelessWidget {
+  final _WidgetVerse item;
+  final _PostPalette palette;
+
+  const _VersePostCard({
+    required this.item,
+    required this.palette,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(28),
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          const _PhotoMosqueBackground(),
+          DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: palette.colors,
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(AppDimensions.spacingLG),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  item.reference,
+                  style: GoogleFonts.notoSans(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w900,
+                    color: Colors.white,
+                  ),
+                ),
+                const Spacer(),
+                Text(
+                  item.text,
+                  maxLines: 6,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.notoSans(
+                    fontSize: 17,
+                    height: 1.22,
+                    fontWeight: FontWeight.w900,
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(height: AppDimensions.spacingMD),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        'Manevi Rehber',
+                        style: GoogleFonts.notoSans(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w800,
+                          color: Colors.white.withOpacity(0.82),
+                        ),
+                      ),
+                    ),
+                    IconButton.filledTonal(
+                      tooltip: 'Paylaş',
+                      onPressed: () => _shareWidgetVerse(context, item),
+                      icon: const Icon(Icons.ios_share, size: 18),
+                      style: IconButton.styleFrom(
+                        backgroundColor: Colors.white.withOpacity(0.88),
+                        foregroundColor: palette.actionColor,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _TasbihWidgetPreview extends StatelessWidget {
+  const _TasbihWidgetPreview();
+
+  @override
+  Widget build(BuildContext context) {
+    return _PreviewFrame(
+      title: 'Tesbih Widgetı',
+      child: Container(
+        height: 150,
+        padding: const EdgeInsets.all(AppDimensions.spacingLG),
+        decoration: BoxDecoration(
+          color: const Color(0xFFF8EFE0),
+          borderRadius: BorderRadius.circular(28),
+          border: Border.all(color: const Color(0xFFD8B66B).withOpacity(0.35)),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 74,
+              height: 74,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: const Color(0xFF0E6F59),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFF0E6F59).withOpacity(0.22),
+                    blurRadius: 18,
+                    offset: const Offset(0, 8),
+                  ),
+                ],
+              ),
+              child: const Icon(
+                Icons.auto_awesome,
+                color: Colors.white,
+                size: 30,
+              ),
+            ),
+            const SizedBox(width: AppDimensions.spacingLG),
+            Expanded(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Subhanallah',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.notoSans(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w900,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: AppDimensions.spacingXS),
+                  Text(
+                    '126 zikir • 3 tur',
+                    style: GoogleFonts.notoSans(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w800,
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                  const SizedBox(height: AppDimensions.spacingSM),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(20),
+                    child: const LinearProgressIndicator(
+                      minHeight: 8,
+                      value: 0.82,
+                      backgroundColor: Colors.white,
+                      valueColor:
+                          AlwaysStoppedAnimation<Color>(Color(0xFF0E6F59)),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _QiblaMiniWidgetPreview extends StatelessWidget {
+  const _QiblaMiniWidgetPreview();
+
+  @override
+  Widget build(BuildContext context) {
+    return _PreviewFrame(
+      title: 'Kıble Kısayolu',
+      child: Container(
+        height: 150,
+        padding: const EdgeInsets.all(AppDimensions.spacingLG),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            begin: Alignment.centerLeft,
+            end: Alignment.centerRight,
+            colors: [Color(0xFFE8F3EE), Color(0xFFFFF4D8)],
+          ),
+          borderRadius: BorderRadius.circular(28),
+          border: Border.all(color: AppColors.primary.withOpacity(0.16)),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 82,
+              height: 82,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white,
+                border: Border.all(color: AppColors.primary.withOpacity(0.20)),
+              ),
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  Icon(
+                    Icons.explore,
+                    color: AppColors.primary,
+                    size: 44,
+                  ),
+                  Transform.translate(
+                    offset: const Offset(16, -20),
+                    child: Icon(
+                      Icons.mosque,
+                      color: AppColors.accent,
+                      size: 20,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: AppDimensions.spacingLG),
+            Expanded(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Kıble Bulucu',
+                    style: GoogleFonts.notoSans(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w900,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: AppDimensions.spacingXS),
+                  Text(
+                    '150.8° • Güneydoğu',
+                    style: GoogleFonts.notoSans(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w800,
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class _PreviewFrame extends StatelessWidget {
   final String title;
   final Widget child;
@@ -609,3 +1032,85 @@ String _shortVerse(Verse? verse) {
   }
   return text.replaceAll(RegExp(r'\s+'), ' ');
 }
+
+_WidgetVerse _verseItemFromDaily(Verse? verse) {
+  if (verse == null || (verse.translation ?? '').trim().isEmpty) {
+    return _curatedWidgetVerses.first;
+  }
+
+  return _WidgetVerse(
+    reference: '${verse.surahId}:${verse.verseKey}',
+    text: verse.translation!.trim().replaceAll(RegExp(r'\s+'), ' '),
+  );
+}
+
+Future<void> _shareWidgetVerse(BuildContext context, _WidgetVerse item) {
+  return AppShareService.shareText(
+    context: context,
+    subject: 'Manevi Rehber ayet kartı',
+    text: '${item.reference}\n\n${item.text}\n\nManevi Rehber',
+  );
+}
+
+class _WidgetVerse {
+  final String reference;
+  final String text;
+
+  const _WidgetVerse({
+    required this.reference,
+    required this.text,
+  });
+}
+
+class _PostPalette {
+  final List<Color> colors;
+  final Color actionColor;
+
+  const _PostPalette({
+    required this.colors,
+    required this.actionColor,
+  });
+}
+
+const _postPalettes = [
+  _PostPalette(
+    colors: [Color(0xDD073E34), Color(0xAA0E6F59), Color(0x88956F25)],
+    actionColor: Color(0xFF0E6F59),
+  ),
+  _PostPalette(
+    colors: [Color(0xDD153447), Color(0xAA2B6B73), Color(0x889C7B38)],
+    actionColor: Color(0xFF153447),
+  ),
+  _PostPalette(
+    colors: [Color(0xDD5A3F20), Color(0xAA98733A), Color(0x881B4D5C)],
+    actionColor: Color(0xFF5A3F20),
+  ),
+];
+
+const _curatedWidgetVerses = [
+  _WidgetVerse(
+    reference: 'Bakara 2:152',
+    text:
+        'Öyleyse yalnız beni anın ki ben de sizi anayım. Bana şükredin, sakın nankörlük etmeyin.',
+  ),
+  _WidgetVerse(
+    reference: 'Ra’d 13:28',
+    text: 'Bilesiniz ki kalpler ancak Allah’ı anmakla huzur bulur.',
+  ),
+  _WidgetVerse(
+    reference: 'İnşirah 94:5-6',
+    text: 'Şüphesiz güçlükle beraber bir kolaylık vardır.',
+  ),
+  _WidgetVerse(
+    reference: 'Zümer 39:53',
+    text: 'Allah’ın rahmetinden ümidinizi kesmeyin.',
+  ),
+  _WidgetVerse(
+    reference: 'Duha 93:5',
+    text: 'Rabbin sana verecek ve sen hoşnut olacaksın.',
+  ),
+  _WidgetVerse(
+    reference: 'Talak 65:3',
+    text: 'Kim Allah’a tevekkül ederse Allah ona yeter.',
+  ),
+];

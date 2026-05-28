@@ -107,7 +107,7 @@ class ZikrScreen extends ConsumerWidget {
                               borderRadius: BorderRadius.circular(10),
                             ),
                             child: Text(
-                              '${zikr.currentCount}/${zikr.targetCount}',
+                              '${zikr.currentCount}',
                               style: GoogleFonts.notoSans(
                                 fontSize: 10,
                                 fontWeight: FontWeight.w600,
@@ -155,8 +155,8 @@ class ZikrScreen extends ConsumerWidget {
                           },
                         ),
                       ),
-                      if (selectedZikr.isCompleted)
-                        _buildCompletionActions(context, ref, selectedZikr),
+                      if (selectedZikr.currentCount > 0)
+                        _buildCounterActions(context, ref, selectedZikr),
                     ],
                   )
                 : Center(
@@ -242,7 +242,7 @@ class ZikrScreen extends ConsumerWidget {
     }
   }
 
-  Widget _buildCompletionActions(
+  Widget _buildCounterActions(
     BuildContext context,
     WidgetRef ref,
     Zikr zikr,
@@ -283,14 +283,21 @@ class ZikrScreen extends ConsumerWidget {
       context: context,
       ref: ref,
       initialKey: 'tasbihCount',
-      tasbihAmount: zikr.currentCount,
+      tasbihAmount:
+          zikr.currentCount > 0 ? zikr.currentCount : zikr.targetCount,
       title: 'Bağış Yap',
       note:
-          '${zikr.name} tamamlandı. Dilersen tesbih olarak bağışla; aynı pencereden Yasin veya Hatim bağışı da ekleyebilirsin.',
+          '${zikr.name} sayacındaki mevcut sayıyı tesbih olarak bağışlayabilir; aynı pencereden Yasin veya Hatim bağışı da ekleyebilirsin. Sayaç bağıştan sonra kaldığı yerden devam eder.',
     );
 
-    if (result?.counterKey == 'tasbihCount') {
-      ref.read(zikrListProvider.notifier).reset(zikr.id);
+    if (result != null && context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Sayaç kaldığı yerden devam ediyor.'),
+          backgroundColor: AppColors.primary,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
     }
   }
 
@@ -300,8 +307,21 @@ class ZikrScreen extends ConsumerWidget {
   }
 
   Widget _buildDailyProgress(List<Zikr> zikrList) {
-    final totalCompleted = zikrList.where((z) => z.isCompleted).length;
-    final progress = totalCompleted / zikrList.length;
+    final totalCount = zikrList.fold<int>(
+      0,
+      (total, zikr) => total + zikr.currentCount,
+    );
+    final completedCycles = zikrList.fold<int>(
+      0,
+      (total, zikr) => total + zikr.completedCycles,
+    );
+    final targetTotal = zikrList.fold<int>(
+      0,
+      (total, zikr) => total + zikr.targetCount,
+    );
+    final progress = targetTotal == 0
+        ? 0.0
+        : (totalCount / targetTotal).clamp(0.0, 1.0).toDouble();
 
     return Container(
       padding: const EdgeInsets.all(AppDimensions.spacingLG),
@@ -324,7 +344,7 @@ class ZikrScreen extends ConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Günlük İlerleme',
+                'Zikir İlerlemesi',
                 style: GoogleFonts.notoSans(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
@@ -332,7 +352,7 @@ class ZikrScreen extends ConsumerWidget {
                 ),
               ),
               Text(
-                '$totalCompleted/${zikrList.length} tamamlandı',
+                '$totalCount zikir • $completedCycles tur',
                 style: GoogleFonts.notoSans(
                   fontSize: 12,
                   color: AppColors.textSecondary,

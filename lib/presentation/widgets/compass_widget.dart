@@ -156,7 +156,7 @@ class CompassWidget extends StatelessWidget {
               Expanded(
                 child: Text(
                   isLiveCompass
-                      ? 'Ortadaki oku üstteki Kıble işaretiyle hizalayın.'
+                      ? 'Telefonu elinde tuttuğun yönde yavaşça çevir; ortadaki oku Kıble işaretiyle hizala.'
                       : 'Bu cihazda canlı pusula yok; Kıble işareti kuzeye göre yaklaşık gösteriliyor.',
                   style: GoogleFonts.notoSans(
                     fontSize: 12,

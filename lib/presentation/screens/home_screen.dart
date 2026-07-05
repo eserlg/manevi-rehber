@@ -1185,29 +1185,34 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             height: compact ? AppDimensions.spacingXS : AppDimensions.spacingSM,
           ),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _counterButton(
-                icon: Icons.remove,
-                tooltip: 'Düşür',
-                compact: compact,
-                color: AppColors.error,
-                onTap: onDecrement,
+              Expanded(
+                child: _counterButton(
+                  icon: Icons.remove_circle_outline,
+                  tooltip: 'Düşür',
+                  compact: compact,
+                  color: AppColors.error,
+                  onTap: onDecrement,
+                ),
               ),
-              _counterButton(
-                icon: Icons.edit_outlined,
-                tooltip: 'Manuel gir',
-                compact: compact,
-                color: AppColors.textSecondary,
-                onTap: onManual,
+              Expanded(
+                child: _counterButton(
+                  icon: Icons.edit_outlined,
+                  tooltip: 'Düzenle',
+                  compact: compact,
+                  color: AppColors.textSecondary,
+                  onTap: onManual,
+                ),
               ),
-              _counterButton(
-                icon: Icons.add,
-                tooltip: 'Ekle',
-                compact: compact,
-                color: AppColors.primary,
-                onTap: onIncrement,
+              Expanded(
+                child: _counterButton(
+                  icon: Icons.add_circle_outline,
+                  tooltip: 'Ekle',
+                  compact: compact,
+                  color: AppColors.primary,
+                  onTap: onIncrement,
+                ),
               ),
             ],
           ),
@@ -1223,16 +1228,32 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     required Color color,
     required VoidCallback onTap,
   }) {
-    return IconButton(
-      tooltip: tooltip,
-      onPressed: onTap,
-      icon: Icon(icon, size: compact ? 16 : 18),
-      color: color,
-      visualDensity: VisualDensity.compact,
-      padding: EdgeInsets.zero,
-      constraints: BoxConstraints(
-        minWidth: compact ? 26 : 32,
-        minHeight: compact ? 26 : 32,
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(compact ? 22 : 26),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 4),
+          child: Tooltip(
+            message: tooltip,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(icon, size: compact ? 22 : 26, color: color),
+                SizedBox(height: compact ? 1 : 2),
+                Text(
+                  tooltip,
+                  style: GoogleFonts.notoSans(
+                    fontSize: compact ? 8.5 : 10,
+                    fontWeight: FontWeight.w600,
+                    color: color,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }

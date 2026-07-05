@@ -17,6 +17,7 @@ import '../widgets/memorial_donation_sheet.dart';
 import 'live_stream_screen.dart';
 import 'occasion_messages_screen.dart';
 import 'widgets_screen.dart';
+import 'yasin_screen.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -836,6 +837,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         subtitle: 'Günlük Dua',
         color: AppColors.info,
         onTap: () => ref.read(selectedTabProvider.notifier).state = 3,
+      ),
+      _QuickActionData(
+        icon: Icons.auto_stories,
+        title: 'Yasin',
+        subtitle: 'Yasin-i Şerif oku',
+        color: AppColors.primary,
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const YasinScreen(),
+            ),
+          );
+        },
       ),
       _QuickActionData(
         icon: Icons.celebration_outlined,

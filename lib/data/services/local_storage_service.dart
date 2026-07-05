@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/occasion_message.dart';
 import '../models/prayer.dart';
+import '../models/zikr.dart';
 
 class LocalStorageService {
   static const String _activeUserKey = 'active_user';
@@ -21,6 +22,7 @@ class LocalStorageService {
   static const String _qadaDebtKey = 'qada_debt';
   static const String _appRatingKey = 'app_rating';
   static const String _feedbackKey = 'feedback_messages';
+  static const String _customZikrsKey = 'custom_zikrs';
 
   SharedPreferences? _prefs;
 
@@ -62,7 +64,52 @@ class LocalStorageService {
     return _prefs?.getStringList(_knownUsersKey) ?? [];
   }
 
-  // Zikr Progress
+  // Custom Zikrs
+  Future<void> saveCustomZikrs(List<Zikr> zikrs) async {
+    final prefs = await _ensurePrefs();
+    final encoded =
+        jsonEncode(zikrs.map((zikr) => zikr.toJson()).toList());
+    await prefs.setString(_scopedKey(_customZikrsKey), encoded);
+  }
+
+  List<Zikr> getCustomZikrs() {
+    final data = _prefs?.getString(_scopedKey(_customZikrsKey));
+    if (data == null) return [];
+    try {
+      final decoded = jsonDecode(data);
+      if (decoded is! List) return [];
+      return decoded
+          .whereType<Map>()
+          .map((item) => Zikr.fromJson(Map<String, dynamic>.from(item)))
+          .toList();
+    } catch (_) {
+      return [];
+    }
+  }
+
+  Future<void> addCustomZikr(Zikr zikr) async {
+    final zikrs = getCustomZikrs();
+    final index =
+        zikrs.indexWhere((element) => element.id == zikr.id);
+    if (index >= 0) {
+      zikrs[index] = zikr;
+    } else {
+      zikrs.add(zikr);
+    }
+    await saveCustomZikrs(zikrs);
+  }
+
+  Future<void> deleteCustomZikr(String zikrId) async {
+    final zikrs = getCustomZikrs().where((z) => z.id != zikrId).toList();
+    await saveCustomZikrs(zikrs);
+    final progress = getZikrProgress();
+    if (progress.containsKey(zikrId)) {
+      progress.remove(zikrId);
+      await saveZikrProgress(progress);
+    }
+  }
+
+// Zikr Progress
   Future<void> saveZikrProgress(Map<String, int> progress) async {
     final prefs = await _ensurePrefs();
     await prefs.setString(_scopedKey(_zikrKey), jsonEncode(progress));

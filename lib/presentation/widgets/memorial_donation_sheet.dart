@@ -93,6 +93,8 @@ Future<MemorialDonationResult?> showMemorialDonationSheet({
   var selectedKey =
       allowedKeys.contains(initialKey) ? initialKey : 'tasbihCount';
   var selectedRecordId = records.first['id']?.toString() ?? '';
+  final manualAmountController = TextEditingController();
+  var useManualAmount = false;
 
   final result = await showModalBottomSheet<MemorialDonationResult>(
     context: context,
@@ -112,6 +114,10 @@ Future<MemorialDonationResult?> showMemorialDonationSheet({
             (record) => record['id']?.toString() == selectedRecordId,
             orElse: () => records.first,
           );
+          final manualParsed =
+              int.tryParse(manualAmountController.text.trim()) ?? 0;
+          final effectiveAmount =
+              useManualAmount && manualParsed > 0 ? manualParsed : selectedOption.amount;
 
           return SafeArea(
             child: Padding(
@@ -165,7 +171,10 @@ Future<MemorialDonationResult?> showMemorialDonationSheet({
                       return ChoiceChip(
                         selected: selected,
                         onSelected: (_) {
-                          setSheetState(() => selectedKey = option.key);
+                          setSheetState(() {
+                            selectedKey = option.key;
+                            useManualAmount = false;
+                          });
                         },
                         avatar: Icon(
                           option.icon,
@@ -187,6 +196,42 @@ Future<MemorialDonationResult?> showMemorialDonationSheet({
                         ),
                       );
                     }).toList(),
+                  ),
+                  const SizedBox(height: AppDimensions.spacingMD),
+                  Row(
+                    children: [
+                      Switch(
+                        value: useManualAmount,
+                        activeColor: AppColors.primary,
+                        onChanged: (value) => setSheetState(() {
+                          useManualAmount = value;
+                          if (value) manualAmountController.clear();
+                        }),
+                      ),
+                      Expanded(
+                        child: Text(
+                          'Manuel miktar gir',
+                          style: GoogleFonts.notoSans(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.textPrimary,
+                          ),
+                        ),
+                      ),
+                      if (useManualAmount)
+                        SizedBox(
+                          width: 100,
+                          child: TextField(
+                            controller: manualAmountController,
+                            keyboardType: TextInputType.number,
+                            decoration: const InputDecoration(
+                              isDense: true,
+                              hintText: 'Adet',
+                            ),
+                            onChanged: (_) => setSheetState(() {}),
+                          ),
+                        ),
+                    ],
                   ),
                   const SizedBox(height: AppDimensions.spacingLG),
                   Text(
@@ -220,7 +265,11 @@ Future<MemorialDonationResult?> showMemorialDonationSheet({
                               ),
                             ),
                             subtitle: Text(
-                              _formatDonationPreview(record, selectedOption),
+                              _formatDonationPreview(
+                                record,
+                                selectedOption,
+                                overrideAmount: effectiveAmount,
+                              ),
                               style: GoogleFonts.notoSans(
                                 fontSize: 12,
                                 color: AppColors.textSecondary,
@@ -247,24 +296,28 @@ Future<MemorialDonationResult?> showMemorialDonationSheet({
                       const SizedBox(width: AppDimensions.spacingSM),
                       Expanded(
                         child: ElevatedButton.icon(
-                          onPressed: () {
-                            final name =
-                                selectedRecord['name']?.toString().trim();
-                            Navigator.pop(
-                              sheetContext,
-                              MemorialDonationResult(
-                                recordId: selectedRecordId,
-                                recordName: name == null || name.isEmpty
-                                    ? 'Vefat Hatırası'
-                                    : name,
-                                counterKey: selectedOption.key,
-                                label: selectedOption.title,
-                                amount: selectedOption.amount,
-                              ),
-                            );
-                          },
+                          onPressed: effectiveAmount <= 0
+                              ? null
+                              : () {
+                                  final name =
+                                      selectedRecord['name']?.toString().trim();
+                                  Navigator.pop(
+                                    sheetContext,
+                                    MemorialDonationResult(
+                                      recordId: selectedRecordId,
+                                      recordName: name == null || name.isEmpty
+                                          ? 'Vefat Hatırası'
+                                          : name,
+                                      counterKey: selectedOption.key,
+                                      label: selectedOption.title,
+                                      amount: effectiveAmount,
+                                    ),
+                                  );
+                                },
                           icon: const Icon(Icons.volunteer_activism),
-                          label: const Text('Bağışla'),
+                          label: Text(effectiveAmount > 1
+                              ? '$effectiveAmount Bağışla'
+                              : 'Bağışla'),
                         ),
                       ),
                     ],
@@ -277,6 +330,8 @@ Future<MemorialDonationResult?> showMemorialDonationSheet({
       );
     },
   );
+
+  manualAmountController.dispose();
 
   if (result == null) return null;
 
@@ -297,7 +352,7 @@ Future<MemorialDonationResult?> showMemorialDonationSheet({
   if (context.mounted) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('${result.label} ${result.recordName} için bağışlandı'),
+        content: Text('${result.amount} ${result.label} ${result.recordName} için bağışlandı'),
         backgroundColor: AppColors.primary,
         behavior: SnackBarBehavior.floating,
       ),
@@ -309,10 +364,12 @@ Future<MemorialDonationResult?> showMemorialDonationSheet({
 
 String _formatDonationPreview(
   Map<String, dynamic> record,
-  _DonationOption option,
-) {
+  _DonationOption option, {
+  int? overrideAmount,
+}) {
   final current = _asInt(record[option.key]);
-  return 'Mevcut $current, bağış sonrası ${current + option.amount}';
+  final amount = overrideAmount ?? option.amount;
+  return 'Mevcut $current, bağış sonrası ${current + amount}';
 }
 
 int _asInt(dynamic value) {

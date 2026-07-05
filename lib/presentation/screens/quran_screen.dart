@@ -310,6 +310,7 @@ class SurahDetailScreen extends ConsumerStatefulWidget {
 class _SurahDetailScreenState extends ConsumerState<SurahDetailScreen> {
   final _scrollController = ScrollController();
   bool _didScrollToInitialVerse = false;
+  bool _donationPromptShown = false;
   late final TextToSpeechService _speechService;
   late final QuranAudioService _quranAudioService;
 
@@ -317,13 +318,68 @@ class _SurahDetailScreenState extends ConsumerState<SurahDetailScreen> {
   void initState() {
     super.initState();
     _speechService = ref.read(textToSpeechProvider);
-    _quranAudioService = ref.read(quranAudioProvider);
+    _quranAudioService = ref.read(quranAudioService);
+    _scrollController.addListener(_onScroll);
+  }
+
+  void _onScroll() {
+    if (!_scrollController.hasClients || _donationPromptShown) return;
+    final max = _scrollController.position.maxScrollExtent;
+    final current = _scrollController.offset;
+    if (max - current < 240) {
+      _donationPromptShown = true;
+      _maybePromptDonation();
+    }
+  }
+
+  Future<void> _maybePromptDonation() async {
+    await Future<void>.delayed(const Duration(milliseconds: 400));
+    if (!mounted) return;
+    final surah = widget.surah;
+    final isYasin = surah.id == 36;
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Row(
+          children: [
+            Icon(Icons.volunteer_activism, color: AppColors.primary),
+            const SizedBox(width: AppDimensions.spacingSM),
+            Text(isYasin ? 'Yasin tamamlandı' : '${surah.englishName} tamamlandı'),
+          ],
+        ),
+        content: Text(
+          isYasin
+              ? 'Yasin-i Şerif\'i okudunuz. Bu sevabı vefat hatırası kişilerinden birine bağışlamak ister misiniz?'
+              : '${surah.englishName} suresini okudunuz. Bu sevabı hatim olarak veya vefat hatırasına bağışlamak ister misiniz?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: const Text('Hayır'),
+          ),
+          ElevatedButton.icon(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            icon: const Icon(Icons.volunteer_activism),
+            label: const Text('Bağışla'),
+          ),
+        ],
+      ),
+    );
+    if (confirm != true || !mounted) return;
+    await showMemorialDonationSheet(
+      context: context,
+      ref: ref,
+      initialKey: isYasin ? 'yasinCount' : 'hatimCount',
+      title: isYasin ? 'Yasin Bağışla' : 'Hatim Bağışla',
+      note: 'Okunan ${surah.englishName} sevabı kayıtlı kişilerden birine bağışlanacak.',
+    );
   }
 
   @override
   void dispose() {
     _speechService.stop();
     _quranAudioService.stop();
+    _scrollController.removeListener(_onScroll);
     _scrollController.dispose();
     super.dispose();
   }
@@ -391,8 +447,11 @@ class _SurahDetailScreenState extends ConsumerState<SurahDetailScreen> {
                 return ListView.builder(
                   controller: _scrollController,
                   padding: const EdgeInsets.all(AppDimensions.screenPadding),
-                  itemCount: verses.length,
+                  itemCount: verses.length + 1,
                   itemBuilder: (context, index) {
+                    if (index == verses.length) {
+                      return _buildSurahFooter(verses.length);
+                    }
                     return _buildVerseCard(
                         context, ref, verses[index], index + 1);
                   },
@@ -623,6 +682,39 @@ class _SurahDetailScreenState extends ConsumerState<SurahDetailScreen> {
         'Ayetler yüklenemedi',
         style: GoogleFonts.notoSans(color: AppColors.textSecondary),
       ),
+    );
+  }
+
+  Widget _buildSurahFooter(int verseCount) {
+    final surah = widget.surah;
+    final isYasin = surah.id == 36;
+    return Column(
+      children: [
+        const SizedBox(height: AppDimensions.spacingMD),
+        Icon(Icons.volunteer_activism,
+            color: AppColors.primary, size: 40),
+        const SizedBox(height: AppDimensions.spacingSM),
+        Text(
+          '$verseCount ayet tamamlandı',
+          style: GoogleFonts.notoSans(
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+            color: AppColors.textPrimary,
+          ),
+        ),
+        const SizedBox(height: AppDimensions.spacingSM),
+        ElevatedButton.icon(
+          onPressed: _donationPromptShown
+              ? null
+              : () {
+                  _donationPromptShown = true;
+                  _maybePromptDonation();
+                },
+          icon: const Icon(Icons.volunteer_activism_outlined),
+          label: Text(isYasin ? 'Yasin Bağışla' : 'Hatim Bağışla'),
+        ),
+        const SizedBox(height: AppDimensions.spacingXL),
+      ],
     );
   }
 

@@ -82,21 +82,21 @@ final zikrListProvider = StateNotifierProvider<ZikrNotifier, List<Zikr>>((ref) {
 class ZikrNotifier extends StateNotifier<List<Zikr>> {
   final LocalStorageService _storage;
 
-  ZikrNotifier(this._storage) : super(Zikr.defaultZikirs) {
-    _loadProgress();
+  ZikrNotifier(this._storage) : super(Zikr.defaultZikrs) {
+    _loadAll();
   }
 
-  void _loadProgress() {
+  void _loadAll() {
+    final customZikrs = _storage.getCustomZikrs();
+    final all = [...Zikr.defaultZikrs, ...customZikrs];
     final progress = _storage.getZikrProgress();
-    if (progress.isNotEmpty) {
-      state = state.map((zikr) {
-        final savedCount = progress[zikr.id];
-        if (savedCount != null) {
-          return zikr.copyWith(currentCount: savedCount);
-        }
-        return zikr;
-      }).toList();
-    }
+    state = all.map((zikr) {
+      final savedCount = progress[zikr.id];
+      if (savedCount != null) {
+        return zikr.copyWith(currentCount: savedCount);
+      }
+      return zikr;
+    }).toList();
   }
 
   void increment(String zikrId) {
@@ -118,6 +118,26 @@ class ZikrNotifier extends StateNotifier<List<Zikr>> {
       }
       return zikr;
     }).toList();
+  }
+
+  Future<void> addCustomZikr(Zikr zikr) async {
+    await _storage.addCustomZikr(zikr.copyWith(isCustom: true));
+    _loadAll();
+  }
+
+  Future<void> updateCustomZikr(Zikr zikr) async {
+    final customs = _storage.getCustomZikrs();
+    final index = customs.indexWhere((z) => z.id == zikr.id);
+    if (index >= 0) {
+      customs[index] = zikr.copyWith(isCustom: true);
+      await _storage.saveCustomZikrs(customs);
+      _loadAll();
+    }
+  }
+
+  Future<void> deleteCustomZikr(String zikrId) async {
+    await _storage.deleteCustomZikr(zikrId);
+    state = state.where((zikr) => zikr.id != zikrId).toList();
   }
 
   void _saveProgress(String zikrId, int count) {

@@ -39,6 +39,13 @@ class ZikrScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Zikir'),
+        actions: [
+          IconButton(
+            tooltip: 'Zikir Ekle',
+            icon: const Icon(Icons.add_circle_outline),
+            onPressed: () => _showZikrDialog(context, ref),
+          ),
+        ],
       ),
       body: Column(
         children: [
@@ -62,6 +69,9 @@ class ZikrScreen extends ConsumerWidget {
                     onTap: () {
                       ref.read(selectedZikrProvider.notifier).state = zikr;
                     },
+                    onLongPress: zikr.isCustom
+                        ? () => _showCustomZikrMenu(context, ref, zikr)
+                        : null,
                     child: Container(
                       padding: const EdgeInsets.symmetric(
                         horizontal: AppDimensions.spacingMD,
@@ -396,6 +406,232 @@ class ZikrScreen extends ConsumerWidget {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppDimensions.radiusSmall),
         ),
+      ),
+    );
+  }
+
+  void _showCustomZikrMenu(
+    BuildContext context,
+    WidgetRef ref,
+    Zikr zikr,
+  ) {
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: AppColors.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(AppDimensions.radiusLarge),
+        ),
+      ),
+      builder: (sheetContext) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(AppDimensions.spacingMD),
+              child: Text(
+                zikr.name,
+                style: GoogleFonts.notoSans(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+            ),
+            ListTile(
+              leading: Icon(Icons.edit_outlined, color: AppColors.primary),
+              title: const Text('Düzenle'),
+              onTap: () {
+                Navigator.pop(sheetContext);
+                _showZikrDialog(context, ref, existing: zikr);
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.delete_outline, color: AppColors.error),
+              title: const Text('Sil'),
+              onTap: () async {
+                Navigator.pop(sheetContext);
+                final confirmed = await _confirmDelete(context, zikr.name);
+                if (!confirmed) return;
+                await ref.read(zikrListProvider.notifier).deleteCustomZikr(zikr.id);
+                ref.read(selectedZikrProvider.notifier).state = null;
+                if (!context.mounted) return;
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('${zikr.name} silindi'),
+                    backgroundColor: AppColors.error,
+                    behavior: SnackBarBehavior.floating,
+                  ),
+                );
+              },
+            ),
+            const SizedBox(height: AppDimensions.spacingSM),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<bool> _confirmDelete(BuildContext context, String name) async {
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Zikri Sil'),
+        content: Text('\"$name\" zikrini silmek istediğinize emin misiniz?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: const Text('Vazgeç'),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.error,
+            ),
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: const Text('Sil'),
+          ),
+        ],
+      ),
+    );
+    return result ?? false;
+  }
+
+  Future<void> _showZikrDialog(
+    BuildContext context,
+    WidgetRef ref, {
+    Zikr? existing,
+  }) async {
+    final isEditing = existing != null;
+    final nameController =
+        TextEditingController(text: existing?.name ?? '');
+    final arabicController =
+        TextEditingController(text: existing?.arabic ?? '');
+    final meaningController =
+        TextEditingController(text: existing?.meaning ?? '');
+    var targetCount = existing?.targetCount ?? 33;
+    final categoryController =
+        TextEditingController(text: existing?.category ?? 'custom');
+
+    final result = await showDialog<Zikr>(
+      context: context,
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          scrollable: true,
+          title: Text(isEditing ? 'Zikri Düzenle' : 'Yeni Zikir Ekle'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: nameController,
+                decoration: const InputDecoration(
+                  labelText: 'Zikir adı',
+                  hintText: 'Subhanallah',
+                  prefixIcon: Icon(Icons.text_fields),
+                ),
+              ),
+              const SizedBox(height: AppDimensions.spacingSM),
+              TextField(
+                controller: arabicController,
+                textInputAction: TextInputAction.done,
+                decoration: const InputDecoration(
+                  labelText: 'Arapça (opsiyonel)',
+                  prefixIcon: Icon(Icons.translate),
+                ),
+              ),
+              const SizedBox(height: AppDimensions.spacingSM),
+              TextField(
+                controller: meaningController,
+                decoration: const InputDecoration(
+                  labelText: 'Anlamı / Türkçesi',
+                  prefixIcon: Icon(Icons.lightbulb_outline),
+                ),
+              ),
+              const SizedBox(height: AppDimensions.spacingSM),
+              Row(
+                children: [
+                  const Text('Hedef sayı: '),
+                  Expanded(
+                    child: Slider(
+                      value: targetCount.toDouble(),
+                      min: 1,
+                      max: 200,
+                      divisions: 199,
+                      label: '$targetCount',
+                      activeColor: AppColors.primary,
+                      onChanged: (value) =>
+                          setDialogState(() => targetCount = value.round()),
+                    ),
+                  ),
+                  SizedBox(
+                    width: 60,
+                    child: Text(
+                      '$targetCount',
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.notoSans(
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.primary,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: const Text('Vazgeç'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                final name = nameController.text.trim();
+                if (name.isEmpty) return;
+                final id = existing?.id ??
+                    'custom_${DateTime.now().millisecondsSinceEpoch}';
+                Navigator.pop(
+                  dialogContext,
+                  Zikr(
+                    id: id,
+                    name: name,
+                    arabic: arabicController.text.trim(),
+                    meaning: meaningController.text.trim(),
+                    targetCount: targetCount,
+                    category: categoryController.text.trim().isEmpty
+                        ? 'custom'
+                        : categoryController.text.trim(),
+                    isCustom: true,
+                  ),
+                );
+              },
+              child: Text(isEditing ? 'Kaydet' : 'Ekle'),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    nameController.dispose();
+    arabicController.dispose();
+    meaningController.dispose();
+    categoryController.dispose();
+
+    if (result == null) return;
+
+    if (isEditing) {
+      await ref.read(zikrListProvider.notifier).updateCustomZikr(result);
+    } else {
+      await ref.read(zikrListProvider.notifier).addCustomZikr(result);
+    }
+    ref.read(selectedZikrProvider.notifier).state = result;
+
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(isEditing
+            ? '${result.name} güncellendi'
+            : '${result.name} eklendi'),
+        backgroundColor: AppColors.primary,
+        behavior: SnackBarBehavior.floating,
       ),
     );
   }

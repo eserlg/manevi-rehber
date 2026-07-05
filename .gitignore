@@ -44,3 +44,6 @@ server.err.log
 .env.*
 !.env.example
 .vercel/
+
+# Python venv (icon generation tooling)
+.venv/

@@ -318,7 +318,7 @@ class _SurahDetailScreenState extends ConsumerState<SurahDetailScreen> {
   void initState() {
     super.initState();
     _speechService = ref.read(textToSpeechProvider);
-    _quranAudioService = ref.read(quranAudioService);
+    _quranAudioService = ref.read(quranAudioProvider);
     _scrollController.addListener(_onScroll);
   }
 

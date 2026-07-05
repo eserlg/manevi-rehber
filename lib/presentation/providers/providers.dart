@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
+import '../../core/theme/app_themes.dart';
 import '../../data/models/prayer_times.dart';
 import '../../data/models/prayer.dart';
 import '../../data/models/prayer_tracking.dart';
@@ -307,12 +308,113 @@ final verseOfDayProvider = FutureProvider<Verse?>((ref) async {
   return repository.getVerseOfDay();
 });
 
+// Widget verses — her seferinde farklı verse seç (rotation + shuffle)
+final widgetVersesProvider =
+    StateNotifierProvider<WidgetVersesNotifier, List<WidgetVerse>>((ref) {
+  final verseAsync = ref.watch(verseOfDayProvider).valueOrNull;
+  return WidgetVersesNotifier(verseAsync);
+});
+
+class WidgetVerse {
+  final String reference;
+  final String text;
+  const WidgetVerse({required this.reference, required this.text});
+}
+
+class WidgetVersesNotifier extends StateNotifier<List<WidgetVerse>> {
+  WidgetVersesNotifier(Verse? dailyVerse)
+      : super(_buildInitial(dailyVerse));
+
+  static const _pool = [
+    WidgetVerse(
+      reference: 'Bakara 2:152',
+      text:
+          'Öyleyse yalnız beni anın ki ben de sizi anayım. Bana şükredin, sakın nankörlük etmeyin.',
+    ),
+    WidgetVerse(
+      reference: 'Ra\'d 13:28',
+      text: 'Bilesiniz ki kalpler ancak Allah\'ı anmakla huzur bulur.',
+    ),
+    WidgetVerse(
+      reference: 'İnşirah 94:5-6',
+      text: 'Şüphesiz güçlükle beraber bir kolaylık vardır.',
+    ),
+    WidgetVerse(
+      reference: 'Zümer 39:53',
+      text: 'Allah\'ın rahmetinden ümidinizi kesmeyin.',
+    ),
+    WidgetVerse(
+      reference: 'Duha 93:5',
+      text: 'Rabbin sana verecek ve sen hoşnut olacaksın.',
+    ),
+    WidgetVerse(
+      reference: 'Talak 65:3',
+      text: 'Kim Allah\'a tevekkül ederse Allah ona yeter.',
+    ),
+    WidgetVerse(
+      reference: 'Bakara 2:153',
+      text: 'Ey iman edenler! Sabır ve namazla Allah\'tan yardım isteyin.',
+    ),
+    WidgetVerse(
+      reference: 'Fecr 89:27-28',
+      text: 'Ey huzura kavuşmuş nefis! Rabbine, razı edilmiş ve razı olmuş olarak dön.',
+    ),
+    WidgetVerse(
+      reference: 'Şems 91:9',
+      text: 'Nefsini arındıran kurtuluşa ermiştir.',
+    ),
+    WidgetVerse(
+      reference: 'Ankebut 29:69',
+      text: 'Bizim uğrumuzda cihad edenleri elbette yollarımıza ulaştıracağız.',
+    ),
+    WidgetVerse(
+      reference: 'Hadid 57:3',
+      text: 'O, ilk ve sondur, zahiri ve batındır. O her şeyi bilir.',
+    ),
+    WidgetVerse(
+      reference: 'Nahl 16:97',
+      text:
+          'Erkek olsun kadın olsun, mümin olarak iyi işler yapan kimseye güzel bir hayat yaşatacağız.',
+    ),
+  ];
+
+  static List<WidgetVerse> _buildInitial(Verse? dailyVerse) {
+    final verses = <WidgetVerse>[];
+    if (dailyVerse != null &&
+        (dailyVerse.translation ?? '').trim().isNotEmpty) {
+      verses.add(WidgetVerse(
+        reference: '${dailyVerse.surahId}:${dailyVerse.verseKey}',
+        text: dailyVerse.translation!.trim().replaceAll(RegExp(r'\s+'), ' '),
+      ));
+    }
+    verses.addAll(_pool);
+    verses.shuffle();
+    return verses;
+  }
+
+  void rotate(Verse? dailyVerse) {
+    state = _buildInitial(dailyVerse);
+  }
+}
+
 // Navigation
 final selectedTabProvider = StateProvider<int>((ref) => 0);
 final activeUserProvider = StateProvider<String?>(
   (ref) => ref.read(localStorageProvider).getActiveUser(),
 );
 final memorialRefreshProvider = StateProvider<int>((ref) => 0);
+
+// Theme
+final themeModeProvider = StateProvider<AppThemeMode>((ref) {
+  final stored = ref.read(localStorageProvider).getThemeMode();
+  return AppThemeMode.values.firstWhere(
+    (m) => m.name == stored,
+    orElse: () => AppThemeMode.meadow,
+  );
+});
+
+final themeColorsProvider = Provider<ThemeColors>(
+    (ref) => AppThemes.colors(ref.watch(themeModeProvider)));
 
 // Quran resume
 final lastReadProvider = FutureProvider<Map<String, int>?>((ref) async {

@@ -1092,23 +1092,32 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 _buildMemorialCounter(
                   title: 'Tesbih',
                   value: tasbihCount,
-                  actionLabel: '+33',
                   compact: compact,
-                  onTap: () => _incrementMemorialCount(id, 'tasbihCount', 33),
+                  onIncrement: () =>
+                      _incrementMemorialCount(id, 'tasbihCount', 33),
+                  onDecrement: () =>
+                      _decrementMemorialCount(id, 'tasbihCount', 33),
+                  onManual: () => _manualEditCount(id, 'tasbihCount'),
                 ),
                 _buildMemorialCounter(
                   title: 'Yasin',
                   value: yasinCount,
-                  actionLabel: '+1',
                   compact: compact,
-                  onTap: () => _incrementMemorialCount(id, 'yasinCount', 1),
+                  onIncrement: () =>
+                      _incrementMemorialCount(id, 'yasinCount', 1),
+                  onDecrement: () =>
+                      _decrementMemorialCount(id, 'yasinCount', 1),
+                  onManual: () => _manualEditCount(id, 'yasinCount'),
                 ),
                 _buildMemorialCounter(
                   title: 'Hatim',
                   value: hatimCount,
-                  actionLabel: '+1',
                   compact: compact,
-                  onTap: () => _incrementMemorialCount(id, 'hatimCount', 1),
+                  onIncrement: () =>
+                      _incrementMemorialCount(id, 'hatimCount', 1),
+                  onDecrement: () =>
+                      _decrementMemorialCount(id, 'hatimCount', 1),
+                  onManual: () => _manualEditCount(id, 'hatimCount'),
                 ),
               ];
 
@@ -1139,9 +1148,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget _buildMemorialCounter({
     required String title,
     required int value,
-    required String actionLabel,
     bool compact = false,
-    required VoidCallback onTap,
+    required VoidCallback onIncrement,
+    required VoidCallback onDecrement,
+    required VoidCallback onManual,
   }) {
     return Container(
       padding: EdgeInsets.symmetric(
@@ -1174,20 +1184,55 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           SizedBox(
             height: compact ? AppDimensions.spacingXS : AppDimensions.spacingSM,
           ),
-          TextButton(
-            onPressed: onTap,
-            style: TextButton.styleFrom(
-              minimumSize: Size.zero,
-              padding: EdgeInsets.symmetric(
-                horizontal:
-                    compact ? AppDimensions.spacingXS : AppDimensions.spacingSM,
-                vertical: AppDimensions.spacingXS,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _counterButton(
+                icon: Icons.remove,
+                tooltip: 'Düşür',
+                compact: compact,
+                color: AppColors.error,
+                onTap: onDecrement,
               ),
-              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-            ),
-            child: Text(actionLabel),
+              _counterButton(
+                icon: Icons.edit_outlined,
+                tooltip: 'Manuel gir',
+                compact: compact,
+                color: AppColors.textSecondary,
+                onTap: onManual,
+              ),
+              _counterButton(
+                icon: Icons.add,
+                tooltip: 'Ekle',
+                compact: compact,
+                color: AppColors.primary,
+                onTap: onIncrement,
+              ),
+            ],
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _counterButton({
+    required IconData icon,
+    required String tooltip,
+    required bool compact,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return IconButton(
+      tooltip: tooltip,
+      onPressed: onTap,
+      icon: Icon(icon, size: compact ? 16 : 18),
+      color: color,
+      visualDensity: VisualDensity.compact,
+      padding: EdgeInsets.zero,
+      constraints: BoxConstraints(
+        minWidth: compact ? 26 : 32,
+        minHeight: compact ? 26 : 32,
       ),
     );
   }
@@ -1202,6 +1247,79 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     if (index < 0) return;
 
     records[index][key] = _asInt(records[index][key]) + amount;
+    await _saveMemorialRecords(records);
+  }
+
+  Future<void> _decrementMemorialCount(
+    String recordId,
+    String key,
+    int amount,
+  ) async {
+    final records = _memorialRecords.map(Map<String, dynamic>.from).toList();
+    final index = records.indexWhere((record) => record['id'] == recordId);
+    if (index < 0) return;
+
+    final current = _asInt(records[index][key]);
+    if (current <= 0) return;
+    records[index][key] = (current - amount).clamp(0, current).toInt();
+    await _saveMemorialRecords(records);
+  }
+
+  Future<void> _manualEditCount(
+    String recordId,
+    String key,
+  ) async {
+    final record = _memorialRecords.firstWhere(
+      (r) => r['id'] == recordId,
+      orElse: () => <String, dynamic>{},
+    );
+    final current = _asInt(record[key]);
+    final controller = TextEditingController(text: '$current');
+    final labelMap = {
+      'tasbihCount': 'Tesbih',
+      'yasinCount': 'Yasin',
+      'hatimCount': 'Hatim',
+    };
+    final label = labelMap[key] ?? key;
+
+    final result = await showDialog<int>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text('$label sayacını düzenle'),
+        content: TextField(
+          controller: controller,
+          keyboardType: TextInputType.number,
+          autofocus: true,
+          decoration: InputDecoration(
+            labelText: label,
+            hintText: '$current',
+            prefixIcon: const Icon(Icons.edit_outlined),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('Vazgeç'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              final value = int.tryParse(controller.text.trim());
+              Navigator.pop(dialogContext, value);
+            },
+            child: const Text('Kaydet'),
+          ),
+        ],
+      ),
+    );
+
+    controller.dispose();
+
+    if (result == null) return;
+    final clamped = result.clamp(0, 999999).toInt();
+    final records = _memorialRecords.map(Map<String, dynamic>.from).toList();
+    final index = records.indexWhere((r) => r['id'] == recordId);
+    if (index < 0) return;
+    records[index][key] = clamped;
     await _saveMemorialRecords(records);
   }
 

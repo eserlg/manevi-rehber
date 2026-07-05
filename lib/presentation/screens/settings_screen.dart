@@ -7,6 +7,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../core/constants/colors.dart';
 import '../../core/constants/city_coordinates.dart';
 import '../../core/constants/dimensions.dart';
+import '../../core/theme/app_themes.dart';
 import '../../data/services/app_share_service.dart';
 import '../providers/providers.dart';
 
@@ -89,6 +90,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     activeColor: AppColors.primary,
                   ),
           ),
+          const SizedBox(height: AppDimensions.spacingLG),
+          _buildSectionTitle('Tema'),
+          _buildThemeSection(),
           const SizedBox(height: AppDimensions.spacingLG),
           _buildSectionTitle('Bildirimler'),
           _buildSettingsTile(
@@ -798,6 +802,112 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           color: AppColors.primary,
         ),
       ),
+    );
+  }
+
+  Widget _buildThemeSection() {
+    final currentMode = ref.watch(themeModeProvider);
+
+    return Column(
+      children: AppThemeMode.values.map((mode) {
+        final selected = mode == currentMode;
+        final colors = AppThemes.colors(mode);
+        return Padding(
+          padding: const EdgeInsets.only(bottom: AppDimensions.spacingSM),
+          child: GestureDetector(
+            onTap: () async {
+              ref.read(themeModeProvider.notifier).state = mode;
+              await ref.read(localStorageProvider).setThemeMode(mode.name);
+              if (!mounted) return;
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content:
+                      Text('${AppThemes.label(mode)} teması uygulandı'),
+                  backgroundColor: colors.primary,
+                  behavior: SnackBarBehavior.floating,
+                ),
+              );
+            },
+            child: Container(
+              padding: const EdgeInsets.all(AppDimensions.spacingMD),
+              decoration: BoxDecoration(
+                color: colors.surface,
+                borderRadius:
+                    BorderRadius.circular(AppDimensions.radiusMedium),
+                border: Border.all(
+                  color: selected ? colors.primary : Colors.transparent,
+                  width: 2,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: colors.primaryDark.withOpacity(0.06),
+                    blurRadius: 14,
+                    offset: const Offset(0, 6),
+                  ),
+                ],
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    width: 52,
+                    height: 52,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          colors.gradientStart,
+                          colors.gradientEnd,
+                        ],
+                      ),
+                      borderRadius:
+                          BorderRadius.circular(AppDimensions.radiusMedium),
+                      border: Border.all(
+                        color: colors.primary.withOpacity(0.30),
+                      ),
+                    ),
+                    child: Icon(
+                      AppThemes.icon(mode),
+                      color: colors.primaryDark,
+                    ),
+                  ),
+                  const SizedBox(width: AppDimensions.spacingMD),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          AppThemes.label(mode),
+                          style: GoogleFonts.notoSans(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                            color: colors.textPrimary,
+                          ),
+                        ),
+                        Text(
+                          AppThemes.subtitle(mode),
+                          style: GoogleFonts.notoSans(
+                            fontSize: 12,
+                            color: colors.textSecondary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Icon(
+                    selected
+                        ? Icons.check_circle
+                        : Icons.radio_button_off,
+                    color: selected
+                        ? colors.primary
+                        : AppColors.textHint,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      }).toList(),
     );
   }
 

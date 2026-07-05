@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../core/constants/colors.dart';
 import '../../core/constants/dimensions.dart';
+import '../../core/theme/app_themes.dart';
 import '../../data/models/prayer_times.dart';
 import '../../data/models/quran.dart';
 import '../../data/services/app_share_service.dart';
@@ -16,10 +17,29 @@ class WidgetsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final prayerTimes = ref.watch(prayerTimesProvider).valueOrNull;
     final verse = ref.watch(verseOfDayProvider).valueOrNull;
+    final widgetVerses = ref.watch(widgetVersesProvider);
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Widgetler'),
+        actions: [
+          IconButton(
+            tooltip: 'Ayetleri yenile',
+            icon: const Icon(Icons.refresh),
+            onPressed: () {
+              ref.read(widgetVersesProvider.notifier).rotate(verse);
+              ref.invalidate(verseOfDayProvider);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: const Text('Ayetler yenilendi'),
+                  backgroundColor: AppColors.primary,
+                  behavior: SnackBarBehavior.floating,
+                  duration: const Duration(seconds: 1),
+                ),
+              );
+            },
+          ),
+        ],
       ),
       body: Container(
         decoration: const BoxDecoration(
@@ -34,28 +54,145 @@ class WidgetsScreen extends ConsumerWidget {
           ),
         ),
         child: SafeArea(
-          child: ListView(
-            padding: const EdgeInsets.all(AppDimensions.screenPadding),
-            children: [
-              _buildIntroCard(context),
-              const SizedBox(height: AppDimensions.spacingLG),
-              _LockScreenPreview(prayerTimes: prayerTimes, verse: verse),
-              const SizedBox(height: AppDimensions.spacingLG),
-              _NotificationPreview(verse: verse),
-              const SizedBox(height: AppDimensions.spacingLG),
-              _HomeWidgetPreview(prayerTimes: prayerTimes, verse: verse),
-              const SizedBox(height: AppDimensions.spacingLG),
-              _PrayerTimesStripPreview(prayerTimes: prayerTimes),
-              const SizedBox(height: AppDimensions.spacingLG),
-              _VersePostGallery(verse: verse),
-              const SizedBox(height: AppDimensions.spacingLG),
-              const _TasbihWidgetPreview(),
-              const SizedBox(height: AppDimensions.spacingLG),
-              const _QiblaMiniWidgetPreview(),
-              const SizedBox(height: AppDimensions.spacingLG),
-              _buildPlatformCard(context, ref, prayerTimes, verse),
+          child: RefreshIndicator(
+            onRefresh: () async {
+              ref.invalidate(verseOfDayProvider);
+              ref.read(widgetVersesProvider.notifier).rotate(verse);
+            },
+            child: ListView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: const EdgeInsets.all(AppDimensions.screenPadding),
+              children: [
+                _buildIntroCard(context),
+                const SizedBox(height: AppDimensions.spacingLG),
+                _LockScreenPreview(
+                  prayerTimes: prayerTimes,
+                  verse: widgetVerses.isNotEmpty ? widgetVerses[0] : null,
+                ),
+                const SizedBox(height: AppDimensions.spacingLG),
+                _NotificationPreview(
+                  verse: widgetVerses.length > 1 ? widgetVerses[1] : null,
+                ),
+                const SizedBox(height: AppDimensions.spacingLG),
+                _HomeWidgetPreview(
+                  prayerTimes: prayerTimes,
+                  verse: widgetVerses.length > 2 ? widgetVerses[2] : null,
+                ),
+                const SizedBox(height: AppDimensions.spacingLG),
+                _PrayerTimesStripPreview(prayerTimes: prayerTimes),
+                const SizedBox(height: AppDimensions.spacingLG),
+                _VersePostGallery(verses: widgetVerses),
+                const SizedBox(height: AppDimensions.spacingLG),
+const _TasbihWidgetPreview(),
+                const SizedBox(height: AppDimensions.spacingLG),
+                const _QiblaMiniWidgetPreview(),
+                const SizedBox(height: AppDimensions.spacingLG),
+                _buildThemeGalleryPreview(context, ref),
+                const SizedBox(height: AppDimensions.spacingLG),
+                _buildPlatformCard(context, ref, prayerTimes, verse),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildThemeGalleryPreview(BuildContext context, WidgetRef ref) {
+    final currentMode = ref.watch(themeModeProvider);
+
+    return _PreviewFrame(
+      title: 'Tema Galeri',
+      child: SizedBox(
+        height: 140,
+        child: ListView.separated(
+          scrollDirection: Axis.horizontal,
+          itemCount: AppThemeMode.values.length,
+          separatorBuilder: (_, __) =>
+              const SizedBox(width: AppDimensions.spacingMD),
+          itemBuilder: (context, index) {
+            final mode = AppThemeMode.values[index];
+            final colors = AppThemes.colors(mode);
+            final selected = mode == currentMode;
+            return GestureDetector(
+              onTap: () async {
+                ref.read(themeModeProvider.notifier).state = mode;
+                await ref.read(localStorageProvider).setThemeMode(mode.name);
+                if (!context.mounted) return;
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content:
+                        Text('${AppThemes.label(mode)} teması uygulandı'),
+                    backgroundColor: colors.primary,
+                    behavior: SnackBarBehavior.floating,
+                    duration: const Duration(seconds: 1),
+                  ),
+                );
+              },
+              child: SizedBox(
+                width: 200,
+                child: ClipRRect(
+                  borderRadius:
+                      BorderRadius.circular(AppDimensions.radiusLarge),
+                  child: Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [
+                              colors.gradientStart,
+                              colors.gradientEnd,
+                            ],
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Icon(
+                              AppThemes.icon(mode),
+                              color: colors.primaryDark,
+                              size: 28,
+                            ),
+                            const Spacer(),
+                            Text(
+                              AppThemes.label(mode),
+                              style: GoogleFonts.notoSans(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w800,
+                                color: colors.textPrimary,
+                              ),
+                            ),
+                            Text(
+                              AppThemes.subtitle(mode),
+                              style: GoogleFonts.notoSans(
+                                fontSize: 11,
+                                color: colors.textSecondary,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      if (selected)
+                        Positioned(
+                          top: 12,
+                          right: 12,
+                          child: Icon(
+                            Icons.check_circle,
+                            color: colors.primary,
+                            size: 22,
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
         ),
       ),
     );
@@ -187,7 +324,7 @@ class WidgetsScreen extends ConsumerWidget {
 
 class _LockScreenPreview extends StatelessWidget {
   final PrayerTimes? prayerTimes;
-  final Verse? verse;
+  final WidgetVerse? verse;
 
   const _LockScreenPreview({
     required this.prayerTimes,
@@ -303,7 +440,7 @@ class _LockScreenPreview extends StatelessWidget {
 }
 
 class _NotificationPreview extends StatelessWidget {
-  final Verse? verse;
+  final WidgetVerse? verse;
 
   const _NotificationPreview({required this.verse});
 
@@ -392,7 +529,7 @@ class _NotificationPreview extends StatelessWidget {
 
 class _HomeWidgetPreview extends StatelessWidget {
   final PrayerTimes? prayerTimes;
-  final Verse? verse;
+  final WidgetVerse? verse;
 
   const _HomeWidgetPreview({
     required this.prayerTimes,
@@ -614,16 +751,13 @@ class _PrayerTimesStripPreview extends StatelessWidget {
 }
 
 class _VersePostGallery extends StatelessWidget {
-  final Verse? verse;
+  final List<WidgetVerse> verses;
 
-  const _VersePostGallery({required this.verse});
+  const _VersePostGallery({required this.verses});
 
   @override
   Widget build(BuildContext context) {
-    final items = [
-      if (verse != null) _verseItemFromDaily(verse),
-      ..._curatedWidgetVerses,
-    ];
+    final items = verses.take(8).toList();
 
     return _PreviewFrame(
       title: 'Paylaşımlık Ayet Kartları',
@@ -651,7 +785,7 @@ class _VersePostGallery extends StatelessWidget {
 }
 
 class _VersePostCard extends StatelessWidget {
-  final _WidgetVerse item;
+  final WidgetVerse item;
   final _PostPalette palette;
 
   const _VersePostCard({
@@ -1272,46 +1406,25 @@ String _formatDuration(Duration duration) {
   return '${minutes}dk ${seconds}sn';
 }
 
-String _verseReference(Verse? verse) {
+String _verseReference(WidgetVerse? verse) {
   if (verse == null) return 'Bakara 2:152';
-  return '${verse.surahId}:${verse.verseKey}';
+  return verse.reference;
 }
 
-String _shortVerse(Verse? verse) {
-  final text = verse?.translation?.trim();
+String _shortVerse(WidgetVerse? verse) {
+  final text = verse?.text.trim();
   if (text == null || text.isEmpty) {
     return 'Öyleyse yalnız beni anın ki ben de sizi anayım. Bana şükredin, sakın nankörlük etmeyin.';
   }
-  return text.replaceAll(RegExp(r'\s+'), ' ');
+  return text;
 }
 
-_WidgetVerse _verseItemFromDaily(Verse? verse) {
-  if (verse == null || (verse.translation ?? '').trim().isEmpty) {
-    return _curatedWidgetVerses.first;
-  }
-
-  return _WidgetVerse(
-    reference: '${verse.surahId}:${verse.verseKey}',
-    text: verse.translation!.trim().replaceAll(RegExp(r'\s+'), ' '),
-  );
-}
-
-Future<void> _shareWidgetVerse(BuildContext context, _WidgetVerse item) {
+Future<void> _shareWidgetVerse(BuildContext context, WidgetVerse item) {
   return AppShareService.shareText(
     context: context,
     subject: 'Manevi Rehber ayet kartı',
     text: '${item.reference}\n\n${item.text}\n\nManevi Rehber',
   );
-}
-
-class _WidgetVerse {
-  final String reference;
-  final String text;
-
-  const _WidgetVerse({
-    required this.reference,
-    required this.text,
-  });
 }
 
 class _PostPalette {
@@ -1356,33 +1469,5 @@ const _postPalettes = [
     colors: [Color(0xDD253C54), Color(0xAA5D7F88), Color(0x88B88D38)],
     actionColor: Color(0xFF314A62),
     artStyle: 5,
-  ),
-];
-
-const _curatedWidgetVerses = [
-  _WidgetVerse(
-    reference: 'Bakara 2:152',
-    text:
-        'Öyleyse yalnız beni anın ki ben de sizi anayım. Bana şükredin, sakın nankörlük etmeyin.',
-  ),
-  _WidgetVerse(
-    reference: 'Ra’d 13:28',
-    text: 'Bilesiniz ki kalpler ancak Allah’ı anmakla huzur bulur.',
-  ),
-  _WidgetVerse(
-    reference: 'İnşirah 94:5-6',
-    text: 'Şüphesiz güçlükle beraber bir kolaylık vardır.',
-  ),
-  _WidgetVerse(
-    reference: 'Zümer 39:53',
-    text: 'Allah’ın rahmetinden ümidinizi kesmeyin.',
-  ),
-  _WidgetVerse(
-    reference: 'Duha 93:5',
-    text: 'Rabbin sana verecek ve sen hoşnut olacaksın.',
-  ),
-  _WidgetVerse(
-    reference: 'Talak 65:3',
-    text: 'Kim Allah’a tevekkül ederse Allah ona yeter.',
   ),
 ];

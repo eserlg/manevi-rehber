@@ -23,6 +23,7 @@ class LocalStorageService {
   static const String _appRatingKey = 'app_rating';
   static const String _feedbackKey = 'feedback_messages';
   static const String _customZikrsKey = 'custom_zikrs';
+  static const String _themeModeKey = 'theme_mode';
 
   SharedPreferences? _prefs;
 
@@ -65,6 +66,15 @@ class LocalStorageService {
   }
 
   // Custom Zikrs
+  Future<void> setThemeMode(String mode) async {
+    final prefs = await _ensurePrefs();
+    await prefs.setString(_scopedKey(_themeModeKey), mode);
+  }
+
+  String getThemeMode() {
+    return _prefs?.getString(_scopedKey(_themeModeKey)) ?? 'meadow';
+  }
+
   Future<void> saveCustomZikrs(List<Zikr> zikrs) async {
     final prefs = await _ensurePrefs();
     final encoded =

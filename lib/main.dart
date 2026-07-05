@@ -34,15 +34,16 @@ Future<void> main() async {
   );
 }
 
-class ManeviRehberApp extends StatelessWidget {
+class ManeviRehberApp extends ConsumerWidget {
   const ManeviRehberApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final themeMode = ref.watch(themeModeProvider);
     return MaterialApp(
       title: 'Manevi Rehber',
       debugShowCheckedModeBanner: false,
-      theme: AppTheme.lightTheme,
+      theme: AppTheme.buildTheme(themeMode),
       locale: const Locale('tr', 'TR'),
       supportedLocales: const [
         Locale('tr', 'TR'),

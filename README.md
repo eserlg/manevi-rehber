@@ -27,11 +27,15 @@ Modern, soft pastel tasarımlı İslami günlük asistan. **Flutter** ile geliş
 ### 💚 Vefat Hatırası & Bağışlama
 - Çoklu kişi kaydı (isim + vefat tarihi)
 - Kişi başına: tesbih sayacı, Yasin sayacı, hatim sayacı
+- **Sayaç düşürme** (−1, −33) ve **manuel sayı girme** ile doğru tutma
 - **Manuel miktar girme** ile özelleştirilmiş bağışlanacak miktar
 - Vefatın üzerinden geçen gün sayısı
 - Bağış animasyonlu şerit ile canlı onay
 
 ### 🎨 Tasarım & Platform
+- **3 Huzur Teması**: Gün Doğumu (şeftali/krem), Gece Sükuneti (lacivert/altın), Bahar Nebesi (nane/yağmur)
+  - Ayarlar'dan tema seç → tüm uygulama renkleri anında değişir
+  - Widget ekranında tema galerisi önizleme (yatay scroll)
 - **Soft Pastel Tasarım**: Sage (`#A8D5BA`), krem (`#FDF8F5`), accent rose (`#E8B4B8`), soft blue
 - **Material Design 3** + Google Fonts (Amiri, Noto Sans)
 - **PWA**: Tam PWA desteği, Service Worker bildirimleri, Web Speech API ile TTS, DeviceOrientation API ile pusula
@@ -42,6 +46,9 @@ Modern, soft pastel tasarımlı İslami günlük asistan. **Flutter** ile geliş
 - **Siyer**: Efendimiz'in (s.a.v) hayatı bölümleri
 - **Namaz Rehberi**: Adım adım namaz kılınışı kategoriler halinde
 - **Ana Ekran Widget'ları**: Özelleştirilmiş widget önizleme ekranı
+  - Ayetler her seferinde **rotation + shuffle** ile değişir (12 ayet havuzu)
+  - Pull-to-refresh veya AppBar'daki refresh ile yeni ayet seti
+  - Her widget kartına farklı ayet gösterilir
 - **Çoklu Kullanıcı**: Cihazda birden fazla kullanıcı profili, per-user scoped veri
 - **Geri Bildirim & Puanlama**: Uygulama içi değerlendirme ve mesaj gönderme
 
@@ -189,13 +196,16 @@ tools/
 ## 📋 Roadmap
 
 - [x] Namaz vakitleri (Diyanet + Aladhan fallback)
-- [x] Zikirmatik + custom zikr ekleme
+- [x] Zikirmatik + custom zikr ekleme (8 varsayılan + kullanıcı kendi)
 - [x] Kur'an okuma + Türkçe meal + sesli okuma
 - [x] Yasin-i Şerif özel sayfası + otomatik bağış sorgusu
-- [x] Vefat hatırası + bağışlama (manuel miktar)
+- [x] Vefat hatırası + bağışlama (manuel miktar + sayaç düşürme)
 - [x] Kıble bulucu (native + PWA)
 - [x] Namaz takibi + kaza takibi
 - [x] PWA: Service Worker bildirimleri, compass, TTS
+- [x] Widget verse rotation (ayetler her seferinde değişir)
+- [x] 3 huzur teması (Gün Doğumu, Gece Sükuneti, Bahar Nebesi)
+- [x] App-icon generator (Pillow ile tüm platformlar)
 - [ ] Ana ekran widget'ları (Android home_widget)
 - [ ] Dark mode
 - [ ] Çoklu dil desteği

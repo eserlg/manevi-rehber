@@ -127,10 +127,17 @@ class LocalStorageService {
 
   Map<String, int> getZikrProgress() {
     final data = _prefs?.getString(_scopedKey(_zikrKey));
-    if (data != null) {
-      return Map<String, int>.from(jsonDecode(data));
+    if (data == null) return {};
+    try {
+      final decoded = jsonDecode(data);
+      if (decoded is! Map) return {};
+      return decoded.map((key, value) {
+        final v = _asInt(value);
+        return MapEntry(key.toString(), v);
+      });
+    } catch (_) {
+      return {};
     }
-    return {};
   }
 
   // Favorite Prayers
@@ -154,10 +161,17 @@ class LocalStorageService {
 
   Map<String, int>? getLastRead() {
     final data = _prefs?.getString(_scopedKey(_lastReadKey));
-    if (data != null) {
-      return Map<String, int>.from(jsonDecode(data));
+    if (data == null) return null;
+    try {
+      final decoded = jsonDecode(data);
+      if (decoded is! Map) return null;
+      return decoded.map((key, value) {
+        final v = int.tryParse(value?.toString() ?? '') ?? 0;
+        return MapEntry(key.toString(), v);
+      });
+    } catch (_) {
+      return null;
     }
-    return null;
   }
 
   // Memorial Record

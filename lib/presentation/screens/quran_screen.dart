@@ -393,14 +393,26 @@ class _SurahDetailScreenState extends ConsumerState<SurahDetailScreen> {
       appBar: AppBar(
         title: Text(surah.englishName),
       ),
-      body: Column(
-        children: [
-          // Surah Header
-          Container(
-            padding: const EdgeInsets.all(AppDimensions.screenPadding),
-            decoration: BoxDecoration(
-              gradient: AppColors.primaryGradient,
-            ),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              const Color(0xFFFDFCF7),
+              AppColors.background,
+              AppColors.surfaceVariant.withOpacity(0.6),
+            ],
+          ),
+        ),
+        child: Column(
+          children: [
+            // Surah Header
+            Container(
+              padding: const EdgeInsets.all(AppDimensions.screenPadding),
+              decoration: BoxDecoration(
+                gradient: AppColors.primaryGradient,
+              ),
             child: Column(
               children: [
                 Text(
@@ -463,7 +475,8 @@ class _SurahDetailScreenState extends ConsumerState<SurahDetailScreen> {
           ),
         ],
       ),
-    );
+    ),
+  );
   }
 
   Widget _buildSurahAudioBar(

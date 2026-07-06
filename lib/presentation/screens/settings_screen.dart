@@ -50,10 +50,22 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       appBar: AppBar(
         title: const Text('Ayarlar'),
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(AppDimensions.screenPadding),
-        children: [
-          _buildSectionTitle('Profil'),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              const Color(0xFFFDFCF7),
+              AppColors.background,
+              AppColors.surfaceVariant.withOpacity(0.6),
+            ],
+          ),
+        ),
+        child: ListView(
+          padding: const EdgeInsets.all(AppDimensions.screenPadding),
+          children: [
+            _buildSectionTitle('Profil'),
           _buildSettingsTile(
             icon: Icons.person,
             title: activeUser ?? 'Misafir',
@@ -173,7 +185,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           ),
         ],
       ),
-    );
+    ),
+  );
   }
 
   Future<void> _toggleAutoLocation(bool enabled) async {

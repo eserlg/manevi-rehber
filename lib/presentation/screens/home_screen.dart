@@ -884,7 +884,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       _QuickActionData(
         icon: Icons.live_tv_outlined,
         title: 'Canlı Yayın',
-        subtitle: 'Mekke, Medine ve kıraat',
+        subtitle: 'Mekke & Medine',
         color: AppColors.primaryDark,
         onTap: () {
           Navigator.push(
@@ -898,7 +898,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       _QuickActionData(
         icon: Icons.widgets_outlined,
         title: 'Widgetler',
-        subtitle: 'Ayet ve vakit ekranları',
+        subtitle: 'Ayet & Vakit',
         color: AppColors.primaryLight,
         onTap: () {
           Navigator.push(
@@ -940,7 +940,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             crossAxisCount: 2,
             crossAxisSpacing: AppDimensions.spacingMD,
             mainAxisSpacing: AppDimensions.spacingMD,
-            childAspectRatio: 1.35,
+            childAspectRatio: 1.05,
           ),
           itemBuilder: (context, index) {
             final action = actions[index];
@@ -1578,24 +1578,24 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         onTap: onTap,
         borderRadius: BorderRadius.circular(AppDimensions.radiusLarge),
         child: Container(
-          constraints: const BoxConstraints(minHeight: 130),
-          padding: const EdgeInsets.all(AppDimensions.spacingLG),
+          constraints: const BoxConstraints(minHeight: 110),
+          padding: const EdgeInsets.all(AppDimensions.spacingMD),
           decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
-                color.withOpacity(0.22),
-                AppColors.surface.withOpacity(0.80),
+                color.withOpacity(0.18),
+                AppColors.surface.withOpacity(0.82),
               ],
             ),
             borderRadius: BorderRadius.circular(AppDimensions.radiusLarge),
-            border: Border.all(color: color.withOpacity(0.30)),
+            border: Border.all(color: color.withOpacity(0.28)),
             boxShadow: [
               BoxShadow(
-                color: color.withOpacity(0.12),
-                blurRadius: 20,
-                offset: const Offset(0, 10),
+                color: color.withOpacity(0.10),
+                blurRadius: 16,
+                offset: const Offset(0, 8),
               ),
             ],
           ),
@@ -1604,19 +1604,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
-                padding: const EdgeInsets.all(AppDimensions.spacingMD),
+                padding: const EdgeInsets.all(AppDimensions.spacingSM),
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.16),
+                  color: color.withOpacity(0.14),
                   borderRadius:
                       BorderRadius.circular(AppDimensions.radiusMedium),
                 ),
-                child: Icon(icon, color: color, size: 28),
+                child: Icon(icon, color: color, size: 26),
               ),
-              const SizedBox(height: AppDimensions.spacingMD),
+              const SizedBox(height: AppDimensions.spacingSM),
               Text(
                 title,
                 style: GoogleFonts.notoSans(
-                  fontSize: 16,
+                  fontSize: 15,
                   fontWeight: FontWeight.w700,
                   color: AppColors.textPrimary,
                 ),

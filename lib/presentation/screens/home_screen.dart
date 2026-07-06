@@ -558,23 +558,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       width: double.infinity,
       padding: const EdgeInsets.all(AppDimensions.spacingXL),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
+        gradient: const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            AppColors.primaryDark,
             AppColors.primary,
-            AppColors.primaryLight.withOpacity(0.92),
-            AppColors.accent.withOpacity(0.35),
+            AppColors.primaryLight,
           ],
-          stops: const [0.0, 0.45, 0.8, 1.0],
         ),
         borderRadius: BorderRadius.circular(AppDimensions.radiusLarge + 8),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primaryDark.withOpacity(0.32),
-            blurRadius: 36,
-            offset: const Offset(0, 20),
+            color: AppColors.primary.withOpacity(0.18),
+            blurRadius: 28,
+            offset: const Offset(0, 14),
           ),
         ],
       ),
@@ -1585,17 +1582,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
-                color.withOpacity(0.18),
-                AppColors.surface.withOpacity(0.82),
+                color.withOpacity(0.14),
+                AppColors.surface.withOpacity(0.86),
               ],
             ),
             borderRadius: BorderRadius.circular(AppDimensions.radiusLarge),
-            border: Border.all(color: color.withOpacity(0.28)),
+            border: Border.all(color: color.withOpacity(0.22)),
             boxShadow: [
               BoxShadow(
-                color: color.withOpacity(0.10),
-                blurRadius: 16,
-                offset: const Offset(0, 8),
+                color: color.withOpacity(0.08),
+                blurRadius: 12,
+                offset: const Offset(0, 6),
               ),
             ],
           ),

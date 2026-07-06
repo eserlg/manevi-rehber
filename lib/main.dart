@@ -230,16 +230,17 @@ class _MainScreenState extends ConsumerState<MainScreen> {
         children: screens,
       ),
       bottomNavigationBar: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+        padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
         child: Container(
           decoration: BoxDecoration(
             color: colors.surface,
             borderRadius: BorderRadius.circular(28),
+            border: Border.all(color: colors.primary.withOpacity(0.08)),
             boxShadow: [
               BoxShadow(
-                color: colors.primary.withOpacity(0.12),
-                blurRadius: 24,
-                offset: const Offset(0, 10),
+                color: colors.primary.withOpacity(0.08),
+                blurRadius: 16,
+                offset: const Offset(0, 6),
               ),
             ],
           ),
@@ -376,9 +377,9 @@ class _MainScreenState extends ConsumerState<MainScreen> {
           ),
           decoration: BoxDecoration(
             color: isSelected
-                ? colors.primary.withOpacity(0.12)
+                ? colors.primary.withOpacity(0.08)
                 : Colors.transparent,
-            borderRadius: BorderRadius.circular(18),
+            borderRadius: BorderRadius.circular(14),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -401,7 +402,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                       fontSize: isVeryCompact ? 7.8 : (isCompact ? 8.5 : 9.5),
                       height: 1.05,
                       fontWeight:
-                          isSelected ? FontWeight.w700 : FontWeight.w500,
+                          isSelected ? FontWeight.w600 : FontWeight.w500,
                       color: isSelected
                           ? colors.primary
                           : colors.textSecondary,

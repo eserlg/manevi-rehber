@@ -43,7 +43,8 @@ class AppTheme {
       ),
       cardTheme: CardThemeData(
         color: surface,
-        elevation: AppDimensions.cardElevation,
+        elevation: 1,
+        shadowColor: c.primary.withOpacity(0.08),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppDimensions.radiusLarge),
         ),
@@ -53,8 +54,8 @@ class AppTheme {
           backgroundColor: c.primary,
           foregroundColor: onPrimary,
           minimumSize: const Size(double.infinity, AppDimensions.buttonHeight),
-          elevation: 2,
-          shadowColor: c.primary.withOpacity(0.25),
+          elevation: 1,
+          shadowColor: c.primary.withOpacity(0.12),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppDimensions.buttonRadius),
           ),
@@ -142,7 +143,8 @@ class AppTheme {
           fontWeight: FontWeight.w500,
         ),
         type: BottomNavigationBarType.fixed,
-        elevation: 8,
+        elevation: 4,
+        backgroundColor: surface,
       ),
       textTheme: _buildTextTheme(textPrimary, textSecondary),
       dividerTheme: DividerThemeData(

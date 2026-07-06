@@ -119,9 +119,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              const Color(0xFFFDFCF7),
               AppColors.background,
-              AppColors.surfaceVariant.withOpacity(0.6),
+              AppColors.surface,
+              AppColors.background,
             ],
           ),
         ),
@@ -243,16 +243,16 @@ class _MainScreenState extends ConsumerState<MainScreen> {
         children: screens,
       ),
       bottomNavigationBar: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+        padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
         child: Container(
           decoration: BoxDecoration(
             color: colors.surface,
-            borderRadius: BorderRadius.circular(28),
-            border: Border.all(color: colors.primary.withOpacity(0.08)),
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: colors.primary.withOpacity(0.06)),
             boxShadow: [
               BoxShadow(
-                color: colors.primary.withOpacity(0.08),
-                blurRadius: 16,
+                color: colors.primary.withOpacity(0.10),
+                blurRadius: 20,
                 offset: const Offset(0, 6),
               ),
             ],

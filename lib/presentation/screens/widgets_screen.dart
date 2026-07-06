@@ -47,9 +47,9 @@ class WidgetsScreen extends ConsumerWidget {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              const Color(0xFFFDFCF7),
               AppColors.background,
-              AppColors.surfaceVariant.withOpacity(0.6),
+              AppColors.surface,
+              AppColors.background,
             ],
           ),
         ),

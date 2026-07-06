@@ -36,11 +36,12 @@ class AppTheme {
         scrolledUnderElevation: 0.5,
         surfaceTintColor: Colors.transparent,
         shadowColor: c.primary.withOpacity(0.04),
-        centerTitle: true,
+        centerTitle: false,
         titleTextStyle: GoogleFonts.notoSans(
-          fontSize: 18,
+          fontSize: 20,
           fontWeight: FontWeight.w700,
           color: textPrimary,
+          letterSpacing: -0.3,
         ),
       ),
       cardTheme: CardThemeData(
@@ -49,23 +50,26 @@ class AppTheme {
         shadowColor: Colors.transparent,
         surfaceTintColor: Colors.transparent,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(18),
         ),
+        margin: EdgeInsets.zero,
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: c.primary,
           foregroundColor: onPrimary,
-          minimumSize: const Size(double.infinity, AppDimensions.buttonHeight),
+          minimumSize: const Size(double.infinity, 52),
           elevation: 0,
           shadowColor: Colors.transparent,
           surfaceTintColor: Colors.transparent,
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(14),
           ),
           textStyle: GoogleFonts.notoSans(
             fontSize: 15,
             fontWeight: FontWeight.w700,
+            letterSpacing: 0.1,
           ),
         ),
       ),
@@ -73,18 +77,19 @@ class AppTheme {
         style: TextButton.styleFrom(
           foregroundColor: c.primary,
           textStyle: GoogleFonts.notoSans(
-            fontSize: 16,
-            fontWeight: FontWeight.w500,
+            fontSize: 15,
+            fontWeight: FontWeight.w600,
           ),
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           foregroundColor: c.primary,
-          side: BorderSide(color: c.primary.withOpacity(0.4)),
+          side: BorderSide(color: c.primary.withOpacity(0.35)),
           surfaceTintColor: Colors.transparent,
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(14),
           ),
           textStyle: GoogleFonts.notoSans(
             fontSize: 14,
@@ -94,7 +99,7 @@ class AppTheme {
       ),
       chipTheme: ChipThemeData(
         backgroundColor: c.surfaceVariant,
-        selectedColor: c.primary.withOpacity(0.16),
+        selectedColor: c.primary.withOpacity(0.12),
         checkmarkColor: c.primary,
         labelStyle: GoogleFonts.notoSans(
           fontSize: 13,
@@ -104,31 +109,31 @@ class AppTheme {
         secondaryLabelStyle: GoogleFonts.notoSans(
           fontSize: 13,
           fontWeight: FontWeight.w700,
-          color: c.primaryDark,
+          color: c.primary,
         ),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppDimensions.radiusCircle),
-          side: BorderSide(color: c.primary.withOpacity(0.10)),
+          borderRadius: BorderRadius.circular(20),
+          side: BorderSide(color: c.primary.withOpacity(0.08)),
         ),
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: c.surfaceVariant,
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(14),
           borderSide: BorderSide.none,
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(color: c.primary.withOpacity(0.08)),
+          borderRadius: BorderRadius.circular(14),
+          borderSide: BorderSide(color: c.primary.withOpacity(0.06)),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(14),
           borderSide: BorderSide(color: c.primary, width: 1.5),
         ),
         contentPadding: const EdgeInsets.symmetric(
-          horizontal: AppDimensions.spacingMD,
-          vertical: AppDimensions.spacingMD,
+          horizontal: 18,
+          vertical: 16,
         ),
         hintStyle: GoogleFonts.notoSans(
           color: c.textHint,
@@ -150,58 +155,96 @@ class AppTheme {
         type: BottomNavigationBarType.fixed,
         elevation: 4,
       ),
-      textTheme: _buildTextTheme(textPrimary, textSecondary),
       dividerTheme: DividerThemeData(
         color: c.surfaceVariant,
         thickness: 1,
+        space: 0,
       ),
       bottomSheetTheme: BottomSheetThemeData(
         backgroundColor: surface,
         modalBackgroundColor: surface,
         surfaceTintColor: Colors.transparent,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        ),
       ),
       dialogTheme: DialogThemeData(
         backgroundColor: surface,
         surfaceTintColor: Colors.transparent,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppDimensions.radiusLarge),
+          borderRadius: BorderRadius.circular(24),
         ),
       ),
+      textTheme: _buildTextTheme(textPrimary, textSecondary),
     );
   }
 
   static TextTheme _buildTextTheme(Color textP, Color textS) {
     return TextTheme(
       displayLarge: GoogleFonts.amiri(
-        fontSize: 32, fontWeight: FontWeight.bold, color: textP),
+          fontSize: 32,
+          fontWeight: FontWeight.bold,
+          color: textP,
+          letterSpacing: -0.5),
       displayMedium: GoogleFonts.amiri(
-        fontSize: 28, fontWeight: FontWeight.bold, color: textP),
+          fontSize: 28,
+          fontWeight: FontWeight.bold,
+          color: textP,
+          letterSpacing: -0.5),
       displaySmall: GoogleFonts.amiri(
-        fontSize: 24, fontWeight: FontWeight.bold, color: textP),
+          fontSize: 24,
+          fontWeight: FontWeight.bold,
+          color: textP,
+          letterSpacing: -0.3),
       headlineLarge: GoogleFonts.notoSans(
-        fontSize: 24, fontWeight: FontWeight.w600, color: textP),
+          fontSize: 22,
+          fontWeight: FontWeight.w700,
+          color: textP,
+          letterSpacing: -0.3),
       headlineMedium: GoogleFonts.notoSans(
-        fontSize: 20, fontWeight: FontWeight.w600, color: textP),
+          fontSize: 18,
+          fontWeight: FontWeight.w600,
+          color: textP),
       headlineSmall: GoogleFonts.notoSans(
-        fontSize: 18, fontWeight: FontWeight.w500, color: textP),
+          fontSize: 16,
+          fontWeight: FontWeight.w600,
+          color: textP),
       titleLarge: GoogleFonts.notoSans(
-        fontSize: 18, fontWeight: FontWeight.w500, color: textP),
+          fontSize: 18,
+          fontWeight: FontWeight.w600,
+          color: textP),
       titleMedium: GoogleFonts.notoSans(
-        fontSize: 16, fontWeight: FontWeight.w500, color: textP),
+          fontSize: 16,
+          fontWeight: FontWeight.w500,
+          color: textP),
       titleSmall: GoogleFonts.notoSans(
-        fontSize: 14, fontWeight: FontWeight.w500, color: textP),
+          fontSize: 14,
+          fontWeight: FontWeight.w500,
+          color: textP),
       bodyLarge: GoogleFonts.notoSans(
-        fontSize: 16, fontWeight: FontWeight.normal, color: textP),
+          fontSize: 16,
+          fontWeight: FontWeight.normal,
+          color: textP),
       bodyMedium: GoogleFonts.notoSans(
-        fontSize: 14, fontWeight: FontWeight.normal, color: textP),
+          fontSize: 14,
+          fontWeight: FontWeight.normal,
+          color: textP),
       bodySmall: GoogleFonts.notoSans(
-        fontSize: 12, fontWeight: FontWeight.normal, color: textS),
+          fontSize: 12,
+          fontWeight: FontWeight.normal,
+          color: textS),
       labelLarge: GoogleFonts.notoSans(
-        fontSize: 14, fontWeight: FontWeight.w500, color: textP),
+          fontSize: 14,
+          fontWeight: FontWeight.w600,
+          color: textP),
       labelMedium: GoogleFonts.notoSans(
-        fontSize: 12, fontWeight: FontWeight.w500, color: textS),
+          fontSize: 12,
+          fontWeight: FontWeight.w500,
+          color: textS),
       labelSmall: GoogleFonts.notoSans(
-        fontSize: 10, fontWeight: FontWeight.w500, color: textS),
+          fontSize: 10,
+          fontWeight: FontWeight.w500,
+          color: textS),
     );
   }
 }

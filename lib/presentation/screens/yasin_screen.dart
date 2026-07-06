@@ -151,6 +151,7 @@ class _YasinScreenState extends ConsumerState<YasinScreen> {
       ),
     ),
   );
+  }
 
   Widget _buildYasinContent(Surah yasin) {
     final versesAsync = ref.watch(versesProvider(_yasinSurahId));

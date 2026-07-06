@@ -133,6 +133,7 @@ class _PrayerGuideScreenState extends State<PrayerGuideScreen> {
       ),
     ),
   );
+  }
 
   Widget _buildHeader() {
     return Container(

@@ -388,8 +388,7 @@ class WidgetVersesNotifier extends StateNotifier<List<WidgetVerse>> {
       ));
     }
     verses.addAll(_pool);
-    verses.shuffle();
-    return verses;
+    return List<WidgetVerse>.from(verses)..shuffle();
   }
 
   void rotate(Verse? dailyVerse) {

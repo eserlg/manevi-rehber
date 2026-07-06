@@ -5,9 +5,9 @@ class AppColors {
   AppColors._();
 
   // Primary Colors
-  static const Color primary = Color(0xFF126C55);
-  static const Color primaryLight = Color(0xFF41A47F);
-  static const Color primaryDark = Color(0xFF0A4537);
+  static const Color primary = Color(0xFF1E6B53);
+  static const Color primaryLight = Color(0xFF4FA382);
+  static const Color primaryDark = Color(0xFF14513E);
 
   // Secondary Colors
   static const Color secondary = Color(0xFFF3DFA2);
@@ -15,19 +15,19 @@ class AppColors {
   static const Color secondaryDark = Color(0xFFC9A345);
 
   // Accent Colors
-  static const Color accent = Color(0xFFB98B2E);
+  static const Color accent = Color(0xFFC9A227);
   static const Color accentLight = Color(0xFFE2C46D);
   static const Color accentDark = Color(0xFF7C5A18);
 
   // Background Colors
-  static const Color background = Color(0xFFF4F7F1);
+  static const Color background = Color(0xFFF5FAF7);
   static const Color surface = Color(0xFFFFFFFF);
-  static const Color surfaceVariant = Color(0xFFE6F0EA);
+  static const Color surfaceVariant = Color(0xFFE0F0E6);
 
   // Text Colors
-  static const Color textPrimary = Color(0xFF24352F);
-  static const Color textSecondary = Color(0xFF6D7A72);
-  static const Color textHint = Color(0xFF9AA89F);
+  static const Color textPrimary = Color(0xFF1A2E24);
+  static const Color textSecondary = Color(0xFF5A7669);
+  static const Color textHint = Color(0xFF94A89D);
   static const Color textOnPrimary = Color(0xFFFFFFFF);
 
   // Semantic Colors

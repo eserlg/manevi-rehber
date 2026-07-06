@@ -5,6 +5,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'core/constants/city_coordinates.dart';
 import 'core/theme/app_theme.dart';
+import 'core/theme/app_themes.dart';
 import 'presentation/screens/home_screen.dart';
 import 'presentation/screens/prayer_times_screen.dart';
 import 'presentation/screens/zikr_screen.dart';
@@ -210,6 +211,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
   @override
   Widget build(BuildContext context) {
     final selectedTab = ref.watch(selectedTabProvider);
+    final colors = ref.watch(themeColorsProvider);
 
     final screens = [
       const HomeScreen(),
@@ -227,83 +229,96 @@ class _MainScreenState extends ConsumerState<MainScreen> {
         index: selectedTab,
         children: screens,
       ),
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          color: AppColors.surface,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
-              blurRadius: 10,
-              offset: const Offset(0, -5),
-            ),
-          ],
-        ),
-        child: SafeArea(
-          child: Padding(
-            padding: EdgeInsets.symmetric(
-              horizontal: MediaQuery.sizeOf(context).width < 380 ? 4 : 8,
-              vertical: 6,
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                _buildNavItem(
-                  icon: Icons.home_outlined,
-                  activeIcon: Icons.home,
-                  label: 'Ana Sayfa',
-                  isSelected: selectedTab == 0,
-                  onTap: () => ref.read(selectedTabProvider.notifier).state = 0,
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+        child: Container(
+          decoration: BoxDecoration(
+            color: colors.surface,
+            borderRadius: BorderRadius.circular(28),
+            boxShadow: [
+              BoxShadow(
+                color: colors.primary.withOpacity(0.12),
+                blurRadius: 24,
+                offset: const Offset(0, 10),
+              ),
+            ],
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(28),
+            child: SafeArea(
+              top: false,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    _buildNavItem(
+                      icon: Icons.home_outlined,
+                      activeIcon: Icons.home,
+                      label: 'Ana Sayfa',
+                      isSelected: selectedTab == 0,
+                      colors: colors,
+                      onTap: () => ref.read(selectedTabProvider.notifier).state = 0,
+                    ),
+                    _buildNavItem(
+                      icon: Icons.schedule_outlined,
+                      activeIcon: Icons.schedule,
+                      label: 'Vakitler',
+                      isSelected: selectedTab == 1,
+                      colors: colors,
+                      onTap: () => ref.read(selectedTabProvider.notifier).state = 1,
+                    ),
+                    _buildNavItem(
+                      icon: Icons.auto_awesome_outlined,
+                      activeIcon: Icons.auto_awesome,
+                      label: 'Zikir',
+                      isSelected: selectedTab == 2,
+                      colors: colors,
+                      onTap: () => ref.read(selectedTabProvider.notifier).state = 2,
+                    ),
+                    _buildNavItem(
+                      icon: Icons.menu_book_outlined,
+                      activeIcon: Icons.menu_book,
+                      label: 'Dualar',
+                      isSelected: selectedTab == 3,
+                      colors: colors,
+                      onTap: () => ref.read(selectedTabProvider.notifier).state = 3,
+                    ),
+                    _buildNavItem(
+                      icon: Icons.auto_stories_outlined,
+                      activeIcon: Icons.auto_stories,
+                      label: 'Kur\'an',
+                      isSelected: selectedTab == 4,
+                      colors: colors,
+                      onTap: () => ref.read(selectedTabProvider.notifier).state = 4,
+                    ),
+                    _buildNavItem(
+                      icon: Icons.explore_outlined,
+                      activeIcon: Icons.explore,
+                      label: 'Kıble',
+                      isSelected: selectedTab == 5,
+                      colors: colors,
+                      onTap: () => ref.read(selectedTabProvider.notifier).state = 5,
+                    ),
+                    _buildNavItem(
+                      icon: Icons.history_edu_outlined,
+                      activeIcon: Icons.history_edu,
+                      label: 'Siyer',
+                      isSelected: selectedTab == 6,
+                      colors: colors,
+                      onTap: () => ref.read(selectedTabProvider.notifier).state = 6,
+                    ),
+                    _buildNavItem(
+                      icon: Icons.mosque_outlined,
+                      activeIcon: Icons.mosque,
+                      label: 'Namaz',
+                      isSelected: selectedTab == 7,
+                      colors: colors,
+                      onTap: () => ref.read(selectedTabProvider.notifier).state = 7,
+                    ),
+                  ],
                 ),
-                _buildNavItem(
-                  icon: Icons.schedule_outlined,
-                  activeIcon: Icons.schedule,
-                  label: 'Vakitler',
-                  isSelected: selectedTab == 1,
-                  onTap: () => ref.read(selectedTabProvider.notifier).state = 1,
-                ),
-                _buildNavItem(
-                  icon: Icons.auto_awesome_outlined,
-                  activeIcon: Icons.auto_awesome,
-                  label: 'Zikir',
-                  isSelected: selectedTab == 2,
-                  onTap: () => ref.read(selectedTabProvider.notifier).state = 2,
-                ),
-                _buildNavItem(
-                  icon: Icons.menu_book_outlined,
-                  activeIcon: Icons.menu_book,
-                  label: 'Dualar',
-                  isSelected: selectedTab == 3,
-                  onTap: () => ref.read(selectedTabProvider.notifier).state = 3,
-                ),
-                _buildNavItem(
-                  icon: Icons.auto_stories_outlined,
-                  activeIcon: Icons.auto_stories,
-                  label: 'Kur\'an',
-                  isSelected: selectedTab == 4,
-                  onTap: () => ref.read(selectedTabProvider.notifier).state = 4,
-                ),
-                _buildNavItem(
-                  icon: Icons.explore_outlined,
-                  activeIcon: Icons.explore,
-                  label: 'Kıble',
-                  isSelected: selectedTab == 5,
-                  onTap: () => ref.read(selectedTabProvider.notifier).state = 5,
-                ),
-                _buildNavItem(
-                  icon: Icons.history_edu_outlined,
-                  activeIcon: Icons.history_edu,
-                  label: 'Siyer',
-                  isSelected: selectedTab == 6,
-                  onTap: () => ref.read(selectedTabProvider.notifier).state = 6,
-                ),
-                _buildNavItem(
-                  icon: Icons.mosque_outlined,
-                  activeIcon: Icons.mosque,
-                  label: 'Namaz',
-                  isSelected: selectedTab == 7,
-                  onTap: () => ref.read(selectedTabProvider.notifier).state = 7,
-                ),
-              ],
+              ),
             ),
           ),
         ),
@@ -315,7 +330,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
             MaterialPageRoute(builder: (context) => const SettingsScreen()),
           );
         },
-        backgroundColor: AppColors.primary,
+        backgroundColor: colors.primary,
         child: const Icon(Icons.settings, color: Colors.white),
       ),
     );
@@ -341,6 +356,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
     required IconData activeIcon,
     required String label,
     required bool isSelected,
+    required ThemeColors colors,
     required VoidCallback onTap,
   }) {
     final width = MediaQuery.sizeOf(context).width;
@@ -353,27 +369,28 @@ class _MainScreenState extends ConsumerState<MainScreen> {
         behavior: HitTestBehavior.opaque,
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
+          curve: Curves.easeOut,
           padding: EdgeInsets.symmetric(
-            horizontal: isCompact ? 1 : 6,
-            vertical: isVeryCompact ? 5 : 7,
+            horizontal: isCompact ? 2 : 6,
+            vertical: isVeryCompact ? 4 : 6,
           ),
           decoration: BoxDecoration(
             color: isSelected
-                ? AppColors.primary.withValues(alpha: 0.1)
+                ? colors.primary.withOpacity(0.12)
                 : Colors.transparent,
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(18),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Icon(
                 isSelected ? activeIcon : icon,
-                color: isSelected ? AppColors.primary : AppColors.textSecondary,
-                size: isVeryCompact ? 19 : (isCompact ? 21 : 23),
+                color: isSelected ? colors.primary : colors.textSecondary,
+                size: isVeryCompact ? 18 : (isCompact ? 20 : 22),
               ),
-              SizedBox(height: isVeryCompact ? 2 : 3),
+              SizedBox(height: isVeryCompact ? 1 : 2),
               SizedBox(
-                height: isVeryCompact ? 22 : 24,
+                height: isVeryCompact ? 20 : 22,
                 child: Center(
                   child: Text(
                     label,
@@ -381,13 +398,13 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                     overflow: TextOverflow.ellipsis,
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      fontSize: isVeryCompact ? 8.2 : (isCompact ? 9 : 10),
+                      fontSize: isVeryCompact ? 7.8 : (isCompact ? 8.5 : 9.5),
                       height: 1.05,
                       fontWeight:
-                          isSelected ? FontWeight.w600 : FontWeight.normal,
+                          isSelected ? FontWeight.w700 : FontWeight.w500,
                       color: isSelected
-                          ? AppColors.primary
-                          : AppColors.textSecondary,
+                          ? colors.primary
+                          : colors.textSecondary,
                     ),
                   ),
                 ),

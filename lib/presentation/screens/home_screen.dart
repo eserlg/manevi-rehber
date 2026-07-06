@@ -144,14 +144,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              Color(0xFFF9FAF4),
+              const Color(0xFFFDFCF7),
               AppColors.background,
-              Color(0xFFEAF3ED),
+              AppColors.surfaceVariant.withOpacity(0.6),
             ],
           ),
         ),
@@ -556,23 +556,25 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(AppDimensions.spacingLG),
+      padding: const EdgeInsets.all(AppDimensions.spacingXL),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
+        gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
             AppColors.primaryDark,
             AppColors.primary,
-            AppColors.primaryLight,
+            AppColors.primaryLight.withOpacity(0.92),
+            AppColors.accent.withOpacity(0.35),
           ],
+          stops: const [0.0, 0.45, 0.8, 1.0],
         ),
-        borderRadius: BorderRadius.circular(AppDimensions.radiusLarge),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusLarge + 8),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primaryDark.withOpacity(0.26),
-            blurRadius: 28,
-            offset: const Offset(0, 16),
+            color: AppColors.primaryDark.withOpacity(0.32),
+            blurRadius: 36,
+            offset: const Offset(0, 20),
           ),
         ],
       ),
@@ -590,17 +592,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   vertical: AppDimensions.spacingXS,
                 ),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.14),
+                  color: Colors.white.withOpacity(0.18),
                   borderRadius:
                       BorderRadius.circular(AppDimensions.radiusCircle),
-                  border: Border.all(color: Colors.white.withOpacity(0.18)),
+                  border: Border.all(color: Colors.white.withOpacity(0.28)),
                 ),
                 child: Text(
                   'Sonraki Namaz',
                   style: GoogleFonts.notoSans(
                     fontSize: 13,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.white.withOpacity(0.92),
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 0.4,
+                    color: Colors.white.withOpacity(0.95),
                   ),
                 ),
               ),
@@ -608,15 +611,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               Text(
                 nextPrayer,
                 style: GoogleFonts.amiri(
-                  fontSize: wide ? 44 : 36,
+                  fontSize: wide ? 52 : 42,
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
+                  height: 1.1,
                 ),
               ),
               Text(
                 nextPrayerTime,
                 style: GoogleFonts.amiri(
-                  fontSize: wide ? 32 : 28,
+                  fontSize: wide ? 34 : 30,
                   color: Colors.white.withOpacity(0.92),
                 ),
               ),
@@ -624,11 +628,21 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           );
 
           final countdown = Container(
-            padding: const EdgeInsets.all(AppDimensions.spacingMD),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppDimensions.spacingLG,
+              vertical: AppDimensions.spacingMD,
+            ),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.16),
-              borderRadius: BorderRadius.circular(AppDimensions.radiusLarge),
-              border: Border.all(color: Colors.white.withOpacity(0.16)),
+              color: Colors.white.withOpacity(0.18),
+              borderRadius: BorderRadius.circular(AppDimensions.radiusLarge + 8),
+              border: Border.all(color: Colors.white.withOpacity(0.22)),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.primaryDark.withOpacity(0.15),
+                  blurRadius: 16,
+                  offset: const Offset(0, 8),
+                ),
+              ],
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -643,8 +657,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     Text(
                       _formatDuration(timeUntil),
                       style: GoogleFonts.notoSans(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w700,
+                        fontSize: 22,
+                        fontWeight: FontWeight.w800,
                         color: Colors.white,
                       ),
                     ),
@@ -654,8 +668,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 Text(
                   prayerTimes.hijriDate,
                   style: GoogleFonts.notoSans(
-                    fontSize: 12,
-                    color: Colors.white.withOpacity(0.82),
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white.withOpacity(0.86),
                   ),
                 ),
               ],
@@ -1232,24 +1247,29 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(compact ? 22 : 26),
+        borderRadius: BorderRadius.circular(compact ? 20 : 26),
         child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 4),
+          padding: EdgeInsets.symmetric(
+            vertical: compact ? 4 : 6,
+            horizontal: compact ? 2 : 4,
+          ),
           child: Tooltip(
             message: tooltip,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(icon, size: compact ? 22 : 26, color: color),
-                SizedBox(height: compact ? 1 : 2),
-                Text(
-                  tooltip,
-                  style: GoogleFonts.notoSans(
-                    fontSize: compact ? 8.5 : 10,
-                    fontWeight: FontWeight.w600,
-                    color: color,
+                Icon(icon, size: compact ? 20 : 26, color: color),
+                if (!compact) ...[
+                  const SizedBox(height: 2),
+                  Text(
+                    tooltip,
+                    style: GoogleFonts.notoSans(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w600,
+                      color: color,
+                    ),
                   ),
-                ),
+                ],
               ],
             ),
           ),
@@ -1556,47 +1576,48 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(AppDimensions.radiusMedium),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusLarge),
         child: Container(
-          constraints: const BoxConstraints(minHeight: 122),
-          padding: const EdgeInsets.all(AppDimensions.spacingMD),
+          constraints: const BoxConstraints(minHeight: 130),
+          padding: const EdgeInsets.all(AppDimensions.spacingLG),
           decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
-                color.withOpacity(0.20),
-                AppColors.surface.withOpacity(0.76),
+                color.withOpacity(0.22),
+                AppColors.surface.withOpacity(0.80),
               ],
             ),
-            borderRadius: BorderRadius.circular(AppDimensions.radiusMedium),
-            border: Border.all(color: color.withOpacity(0.34)),
+            borderRadius: BorderRadius.circular(AppDimensions.radiusLarge),
+            border: Border.all(color: color.withOpacity(0.30)),
             boxShadow: [
               BoxShadow(
-                color: color.withOpacity(0.10),
-                blurRadius: 18,
+                color: color.withOpacity(0.12),
+                blurRadius: 20,
                 offset: const Offset(0, 10),
               ),
             ],
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
-                padding: const EdgeInsets.all(AppDimensions.spacingSM),
+                padding: const EdgeInsets.all(AppDimensions.spacingMD),
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.2),
+                  color: color.withOpacity(0.16),
                   borderRadius:
-                      BorderRadius.circular(AppDimensions.radiusSmall),
+                      BorderRadius.circular(AppDimensions.radiusMedium),
                 ),
-                child: Icon(icon, color: color, size: 24),
+                child: Icon(icon, color: color, size: 28),
               ),
-              const SizedBox(height: AppDimensions.spacingSM),
+              const SizedBox(height: AppDimensions.spacingMD),
               Text(
                 title,
                 style: GoogleFonts.notoSans(
                   fontSize: 16,
-                  fontWeight: FontWeight.w600,
+                  fontWeight: FontWeight.w700,
                   color: AppColors.textPrimary,
                 ),
               ),
@@ -1604,6 +1625,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 subtitle,
                 style: GoogleFonts.notoSans(
                   fontSize: 12,
+                  fontWeight: FontWeight.w500,
                   color: AppColors.textSecondary,
                 ),
               ),

@@ -56,11 +56,11 @@ class AppThemes {
   static String subtitle(AppThemeMode mode) {
     switch (mode) {
       case AppThemeMode.dawn:
-        return 'Şeftali, krem, gün ışığı';
+        return 'Terracotta, krem, gün ışığı';
       case AppThemeMode.serenity:
         return 'Lacivert, gümüş, altın hilal';
       case AppThemeMode.meadow:
-        return 'Nane, yağmur, ferahlık';
+        return 'Zümrüt, altın, ferahlık';
     }
   }
 
@@ -79,62 +79,62 @@ class AppThemes {
     switch (mode) {
       case AppThemeMode.dawn:
         return const ThemeColors(
-          primary: Color(0xFFE8915C),
-          primaryLight: Color(0xFFF5B98C),
-          primaryDark: Color(0xFFB26A3C),
-          background: Color(0xFFFFFBF5),
+          primary: Color(0xFFD9784A),
+          primaryLight: Color(0xFFE8A67E),
+          primaryDark: Color(0xFFA85A32),
+          background: Color(0xFFFFFBF7),
           surface: Color(0xFFFFFFFF),
-          surfaceVariant: Color(0xFFF8E8DB),
-          textPrimary: Color(0xFF402E22),
-          textSecondary: Color(0xFF7A6357),
-          textHint: Color(0xFFA8978A),
-          accent: Color(0xFFC56A3F),
-          gradientStart: Color(0xFFFFF6E6),
+          surfaceVariant: Color(0xFFF5E6D8),
+          textPrimary: Color(0xFF3D2B1F),
+          textSecondary: Color(0xFF8A6E5D),
+          textHint: Color(0xFFB8A396),
+          accent: Color(0xFFC96A3A),
+          gradientStart: Color(0xFFFFF4E6),
           gradientEnd: Color(0xFFFCE3D0),
           primaryGradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [Color(0xFFE8915C), Color(0xFFF5B98C)],
+            colors: [Color(0xFFD9784A), Color(0xFFE8A67E)],
           ),
         );
       case AppThemeMode.serenity:
         return const ThemeColors(
-          primary: Color(0xFF4055A8),
-          primaryLight: Color(0xFF637BC4),
-          primaryDark: Color(0xFF23357A),
-          background: Color(0xFFF2F4FA),
+          primary: Color(0xFF3B4C9C),
+          primaryLight: Color(0xFF6B7FC4),
+          primaryDark: Color(0xFF253474),
+          background: Color(0xFFF0F2F9),
           surface: Color(0xFFFFFFFF),
-          surfaceVariant: Color(0xFFE4E8F2),
-          textPrimary: Color(0xFF1E2638),
-          textSecondary: Color(0xFF57617A),
-          textHint: Color(0xFF8A93AD),
-          accent: Color(0xFFD4AF37),
-          gradientStart: Color(0xFFEAEEF8),
-          gradientEnd: Color(0xFFD8DFED),
+          surfaceVariant: Color(0xFFE1E6F2),
+          textPrimary: Color(0xFF1A1F35),
+          textSecondary: Color(0xFF5A6480),
+          textHint: Color(0xFF99A3BD),
+          accent: Color(0xFFC9A227),
+          gradientStart: Color(0xFFE8EDF8),
+          gradientEnd: Color(0xFFD6DDF0),
           primaryGradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [Color(0xFF4055A8), Color(0xFF637BC4)],
+            colors: [Color(0xFF3B4C9C), Color(0xFF6B7FC4)],
           ),
         );
       case AppThemeMode.meadow:
         return const ThemeColors(
-          primary: Color(0xFF4FA67A),
-          primaryLight: Color(0xFF7CC09E),
-          primaryDark: Color(0xFF2F7355),
-          background: Color(0xFFF5FBF6),
+          primary: Color(0xFF1E6B53),
+          primaryLight: Color(0xFF4FA382),
+          primaryDark: Color(0xFF14513E),
+          background: Color(0xFFF5FAF7),
           surface: Color(0xFFFFFFFF),
-          surfaceVariant: Color(0xFFE0F0E4),
-          textPrimary: Color(0xFF1F3D2C),
-          textSecondary: Color(0xFF577567),
-          textHint: Color(0xFF8FA89C),
-          accent: Color(0xFF5BA8C4),
-          gradientStart: Color(0xFFEFFAF2),
-          gradientEnd: Color(0xFFDDEFE2),
+          surfaceVariant: Color(0xFFE0F0E6),
+          textPrimary: Color(0xFF1A2E24),
+          textSecondary: Color(0xFF5A7669),
+          textHint: Color(0xFF94A89D),
+          accent: Color(0xFFC9A227),
+          gradientStart: Color(0xFFE8F5EC),
+          gradientEnd: Color(0xFFD4EBDC),
           primaryGradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [Color(0xFF4FA67A), Color(0xFF7CC09E)],
+            colors: [Color(0xFF1E6B53), Color(0xFF4FA382)],
           ),
         );
     }

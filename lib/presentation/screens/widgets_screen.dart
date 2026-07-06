@@ -350,17 +350,19 @@ class _LockScreenPreview extends StatelessWidget {
           child: Stack(
             fit: StackFit.expand,
             children: [
-              const _PhotoMosqueBackground(),
+              const _WidgetPhotoBackground(
+                assetPath: 'assets/images/widget_blue_mosque.jpg',
+              ),
               Container(color: Colors.black.withOpacity(0.18)),
-              const DecoratedBox(
+              DecoratedBox(
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
                     colors: [
-                      Color(0x66112D3B),
-                      Color(0x11112D3B),
-                      Color(0xAA102D3B),
+                      const Color(0x80112D3B),
+                      const Color(0x20112D3B),
+                      const Color(0xB3102D3B),
                     ],
                   ),
                 ),
@@ -481,7 +483,9 @@ class _NotificationPreview extends StatelessWidget {
                 child: const Stack(
                   fit: StackFit.expand,
                   children: [
-                    _PhotoMosqueBackground(),
+                    const _WidgetPhotoBackground(
+                      assetPath: 'assets/images/widget_quran.jpg',
+                    ),
                     DecoratedBox(
                       decoration: BoxDecoration(color: Color(0x77126C55)),
                     ),
@@ -554,17 +558,19 @@ class _HomeWidgetPreview extends StatelessWidget {
           child: Stack(
             fit: StackFit.expand,
             children: [
-              const _PhotoMosqueBackground(),
+              const _WidgetPhotoBackground(
+                assetPath: 'assets/images/widget_kaaba.jpg',
+              ),
               Container(color: Colors.black.withOpacity(0.30)),
-              const DecoratedBox(
+              DecoratedBox(
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.centerLeft,
                     end: Alignment.centerRight,
                     colors: [
-                      Color(0xDD0A4537),
-                      Color(0x99126C55),
-                      Color(0x66B98B2E),
+                      const Color(0xEE0A4537),
+                      const Color(0xAA126C55),
+                      const Color(0x77B98B2E),
                     ],
                   ),
                 ),
@@ -760,6 +766,37 @@ class _VersePostGallery extends StatelessWidget {
   Widget build(BuildContext context) {
     final items = verses.take(8).toList();
 
+    if (items.isEmpty) {
+      return _PreviewFrame(
+        title: 'Paylaşımlık Ayet Kartları',
+        child: Container(
+          height: 292,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: AppColors.surface.withOpacity(0.94),
+            borderRadius: BorderRadius.circular(AppDimensions.radiusLarge),
+            border: Border.all(color: AppColors.primary.withOpacity(0.14)),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.image_not_supported_outlined,
+                  color: AppColors.textSecondary, size: 40),
+              const SizedBox(height: AppDimensions.spacingSM),
+              Text(
+                'Ayet kartları yüklenemedi',
+                style: GoogleFonts.notoSans(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w800,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
     return _PreviewFrame(
       title: 'Paylaşımlık Ayet Kartları',
       child: SizedBox(
@@ -801,13 +838,30 @@ class _VersePostCard extends StatelessWidget {
       child: Stack(
         fit: StackFit.expand,
         children: [
-          _WidgetArtBackground(style: palette.artStyle),
+          _WidgetArtBackground(
+            assetPath: palette.assetPath,
+            fallbackStyle: palette.fallbackStyle,
+          ),
           DecoratedBox(
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: palette.colors,
+              ),
+            ),
+          ),
+          Positioned.fill(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.black.withOpacity(0.06),
+                    Colors.black.withOpacity(0.38),
+                  ],
+                ),
               ),
             ),
           ),
@@ -1034,16 +1088,22 @@ class _QiblaMiniWidgetPreview extends StatelessWidget {
 }
 
 class _WidgetArtBackground extends StatelessWidget {
-  final int style;
+  final String? assetPath;
+  final int fallbackStyle;
 
-  const _WidgetArtBackground({required this.style});
+  const _WidgetArtBackground({
+    this.assetPath,
+    this.fallbackStyle = 1,
+  });
 
   @override
   Widget build(BuildContext context) {
-    if (style == 0) return const _PhotoMosqueBackground();
+    if (assetPath != null && assetPath!.isNotEmpty) {
+      return _WidgetPhotoBackground(assetPath: assetPath!);
+    }
 
     return CustomPaint(
-      painter: _WidgetArtPainter(style),
+      painter: _WidgetArtPainter(fallbackStyle),
       child: const SizedBox.expand(),
     );
   }
@@ -1359,15 +1419,34 @@ class _StatusLine extends StatelessWidget {
   }
 }
 
-class _PhotoMosqueBackground extends StatelessWidget {
-  const _PhotoMosqueBackground();
+class _WidgetPhotoBackground extends StatelessWidget {
+  final String assetPath;
+
+  const _WidgetPhotoBackground({required this.assetPath});
 
   @override
   Widget build(BuildContext context) {
     return Image.asset(
-      'assets/images/mosque_widget_background.jpg',
+      assetPath,
       fit: BoxFit.cover,
       alignment: Alignment.center,
+      errorBuilder: (context, error, stackTrace) => _fallbackGradient(),
+      frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
+        if (wasSynchronouslyLoaded || frame != null) return child;
+        return _fallbackGradient();
+      },
+    );
+  }
+
+  Widget _fallbackGradient() {
+    return Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFF163B4B), Color(0xFF427B83)],
+        ),
+      ),
     );
   }
 }
@@ -1431,44 +1510,46 @@ Future<void> _shareWidgetVerse(BuildContext context, WidgetVerse item) {
 class _PostPalette {
   final List<Color> colors;
   final Color actionColor;
-  final int artStyle;
+  final String? assetPath;
+  final int fallbackStyle;
 
   const _PostPalette({
     required this.colors,
     required this.actionColor,
-    required this.artStyle,
+    this.assetPath,
+    this.fallbackStyle = 1,
   });
 }
 
 const _postPalettes = [
   _PostPalette(
-    colors: [Color(0xDD073E34), Color(0xAA0E6F59), Color(0x88956F25)],
+    colors: [Color(0xEE052A23), Color(0xCC0A4A3B), Color(0xAA7A5A1E)],
     actionColor: Color(0xFF0E6F59),
-    artStyle: 0,
+    assetPath: 'assets/images/widget_mosque_snow.jpg',
   ),
   _PostPalette(
-    colors: [Color(0xDD153447), Color(0xAA2B6B73), Color(0x889C7B38)],
+    colors: [Color(0xEE0F2636), Color(0xCC1F5360), Color(0xAA7D672E)],
     actionColor: Color(0xFF153447),
-    artStyle: 1,
+    assetPath: 'assets/images/widget_blue_mosque.jpg',
   ),
   _PostPalette(
-    colors: [Color(0xDD5A3F20), Color(0xAA98733A), Color(0x881B4D5C)],
+    colors: [Color(0xEE3D2A14), Color(0xCC7A5C2E), Color(0xAA153542)],
     actionColor: Color(0xFF5A3F20),
-    artStyle: 2,
+    assetPath: 'assets/images/widget_kaaba.jpg',
   ),
   _PostPalette(
-    colors: [Color(0xDD092B35), Color(0xAA126C55), Color(0x881F5164)],
+    colors: [Color(0xEE06232C), Color(0xCC0E5645), Color(0xAA173E50)],
     actionColor: Color(0xFF0A2C39),
-    artStyle: 3,
+    assetPath: 'assets/images/widget_sheikh_zayed.jpg',
   ),
   _PostPalette(
-    colors: [Color(0xDD0B5C4D), Color(0xAA8C742D), Color(0x8813473E)],
+    colors: [Color(0xEE094538), Color(0xCC705C22), Color(0xAA0E362D)],
     actionColor: Color(0xFF0E4E43),
-    artStyle: 4,
+    assetPath: 'assets/images/widget_quran.jpg',
   ),
   _PostPalette(
-    colors: [Color(0xDD253C54), Color(0xAA5D7F88), Color(0x88B88D38)],
+    colors: [Color(0xEE1C2E40), Color(0xCC4A6670), Color(0xAA906C27)],
     actionColor: Color(0xFF314A62),
-    artStyle: 5,
+    assetPath: 'assets/images/widget_sultan_qaboos.jpg',
   ),
 ];

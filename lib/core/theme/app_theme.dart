@@ -33,10 +33,11 @@ class AppTheme {
         backgroundColor: c.background,
         foregroundColor: textPrimary,
         elevation: 0,
+        scrolledUnderElevation: 0,
         centerTitle: true,
         titleTextStyle: GoogleFonts.notoSans(
           fontSize: 20,
-          fontWeight: FontWeight.w600,
+          fontWeight: FontWeight.w700,
           color: textPrimary,
         ),
       ),
@@ -44,7 +45,7 @@ class AppTheme {
         color: surface,
         elevation: AppDimensions.cardElevation,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppDimensions.radiusMedium),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusLarge),
         ),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
@@ -52,6 +53,8 @@ class AppTheme {
           backgroundColor: c.primary,
           foregroundColor: onPrimary,
           minimumSize: const Size(double.infinity, AppDimensions.buttonHeight),
+          elevation: 2,
+          shadowColor: c.primary.withOpacity(0.25),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppDimensions.buttonRadius),
           ),
@@ -109,6 +112,14 @@ class AppTheme {
           borderRadius: BorderRadius.circular(AppDimensions.radiusMedium),
           borderSide: BorderSide.none,
         ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(AppDimensions.radiusMedium),
+          borderSide: BorderSide(color: c.primary.withOpacity(0.08)),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(AppDimensions.radiusMedium),
+          borderSide: BorderSide(color: c.primary, width: 1.5),
+        ),
         contentPadding: const EdgeInsets.symmetric(
           horizontal: AppDimensions.spacingMD,
           vertical: AppDimensions.spacingMD,
@@ -122,6 +133,14 @@ class AppTheme {
         backgroundColor: surface,
         selectedItemColor: c.primary,
         unselectedItemColor: textSecondary,
+        selectedLabelStyle: GoogleFonts.notoSans(
+          fontSize: 12,
+          fontWeight: FontWeight.w700,
+        ),
+        unselectedLabelStyle: GoogleFonts.notoSans(
+          fontSize: 12,
+          fontWeight: FontWeight.w500,
+        ),
         type: BottomNavigationBarType.fixed,
         elevation: 8,
       ),

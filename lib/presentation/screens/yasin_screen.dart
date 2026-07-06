@@ -117,7 +117,19 @@ class _YasinScreenState extends ConsumerState<YasinScreen> {
           ),
         ],
       ),
-      body: surahsAsync.when(
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              const Color(0xFFFDFCF7),
+              AppColors.background,
+              AppColors.surfaceVariant.withOpacity(0.6),
+            ],
+          ),
+        ),
+        child: surahsAsync.when(
         data: (surahs) {
           final yasin = surahs.firstWhere(
             (s) => s.id == _yasinSurahId,
@@ -137,8 +149,8 @@ class _YasinScreenState extends ConsumerState<YasinScreen> {
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (_, __) => _buildError(),
       ),
-    );
-  }
+    ),
+  );
 
   Widget _buildYasinContent(Surah yasin) {
     final versesAsync = ref.watch(versesProvider(_yasinSurahId));

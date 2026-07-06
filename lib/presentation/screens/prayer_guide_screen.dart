@@ -76,7 +76,19 @@ class _PrayerGuideScreenState extends State<PrayerGuideScreen> {
       appBar: AppBar(
         title: const Text('Namaz Rehberi'),
       ),
-      body: FutureBuilder<List<PrayerGuide>>(
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              const Color(0xFFFDFCF7),
+              AppColors.background,
+              AppColors.surfaceVariant.withOpacity(0.6),
+            ],
+          ),
+        ),
+        child: FutureBuilder<List<PrayerGuide>>(
         future: _guidesFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -119,8 +131,8 @@ class _PrayerGuideScreenState extends State<PrayerGuideScreen> {
           );
         },
       ),
-    );
-  }
+    ),
+  );
 
   Widget _buildHeader() {
     return Container(

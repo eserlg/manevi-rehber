@@ -205,9 +205,21 @@ class SirahScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Siyer'),
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(AppDimensions.screenPadding),
-        children: [
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              const Color(0xFFFDFCF7),
+              AppColors.background,
+              AppColors.surfaceVariant.withOpacity(0.6),
+            ],
+          ),
+        ),
+        child: ListView(
+          padding: const EdgeInsets.all(AppDimensions.screenPadding),
+          children: [
           Container(
             padding: const EdgeInsets.all(AppDimensions.spacingLG),
             decoration: BoxDecoration(
@@ -240,6 +252,7 @@ class SirahScreen extends StatelessWidget {
           for (final story in _stories) _buildStoryCard(story),
         ],
       ),
+    ),
     );
   }
 

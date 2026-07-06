@@ -113,8 +113,20 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final knownUsers = ref.read(localStorageProvider).getKnownUsers();
 
     return Scaffold(
-      body: SafeArea(
-        child: Center(
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              const Color(0xFFFDFCF7),
+              AppColors.background,
+              AppColors.surfaceVariant.withOpacity(0.6),
+            ],
+          ),
+        ),
+        child: SafeArea(
+          child: Center(
           child: SingleChildScrollView(
             padding: const EdgeInsets.all(28),
             child: ConstrainedBox(
@@ -178,7 +190,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           ),
         ),
       ),
-    );
+    ),
+  );
   }
 }
 

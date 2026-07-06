@@ -42,7 +42,19 @@ class _OccasionMessagesScreenState
       appBar: AppBar(
         title: const Text('Mesajlar'),
       ),
-      body: Column(
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              const Color(0xFFFDFCF7),
+              AppColors.background,
+              AppColors.surfaceVariant.withOpacity(0.6),
+            ],
+          ),
+        ),
+        child: Column(
         children: [
           Padding(
             padding: const EdgeInsets.all(AppDimensions.screenPadding),
@@ -106,7 +118,8 @@ class _OccasionMessagesScreenState
           ),
         ],
       ),
-    );
+    ),
+  );
   }
 
   List<OccasionMessage> _filterMessages(List<OccasionMessage> messages) {

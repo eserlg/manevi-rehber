@@ -23,14 +23,14 @@ class LiveStreamScreen extends StatelessWidget {
         title: const Text('Canlı Yayın'),
       ),
       body: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              Color(0xFFF9FAF4),
+              const Color(0xFFFDFCF7),
               AppColors.background,
-              Color(0xFFEAF3ED),
+              AppColors.surfaceVariant.withOpacity(0.6),
             ],
           ),
         ),

@@ -144,7 +144,6 @@ class AppTheme {
         ),
         type: BottomNavigationBarType.fixed,
         elevation: 4,
-        backgroundColor: surface,
       ),
       textTheme: _buildTextTheme(textPrimary, textSecondary),
       dividerTheme: DividerThemeData(

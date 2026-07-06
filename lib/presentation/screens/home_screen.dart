@@ -870,7 +870,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       _QuickActionData(
         icon: Icons.celebration_outlined,
         title: 'Mesajlar',
-        subtitle: 'Bayram, Kandil ve Cuma',
+        subtitle: 'Bayram & Kandil',
         color: AppColors.primary,
         onTap: () {
           Navigator.push(
@@ -940,7 +940,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             crossAxisCount: 2,
             crossAxisSpacing: AppDimensions.spacingMD,
             mainAxisSpacing: AppDimensions.spacingMD,
-            childAspectRatio: 1.05,
+            childAspectRatio: 0.92,
           ),
           itemBuilder: (context, index) {
             final action = actions[index];

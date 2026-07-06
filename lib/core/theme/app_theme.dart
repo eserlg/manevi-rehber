@@ -30,23 +30,26 @@ class AppTheme {
         onSurface: textPrimary,
       ),
       appBarTheme: AppBarTheme(
-        backgroundColor: c.background,
+        backgroundColor: Colors.transparent,
         foregroundColor: textPrimary,
         elevation: 0,
-        scrolledUnderElevation: 0,
+        scrolledUnderElevation: 0.5,
+        surfaceTintColor: Colors.transparent,
+        shadowColor: c.primary.withOpacity(0.04),
         centerTitle: true,
         titleTextStyle: GoogleFonts.notoSans(
-          fontSize: 20,
+          fontSize: 18,
           fontWeight: FontWeight.w700,
           color: textPrimary,
         ),
       ),
       cardTheme: CardThemeData(
         color: surface,
-        elevation: 1,
-        shadowColor: c.primary.withOpacity(0.08),
+        elevation: 0,
+        shadowColor: Colors.transparent,
+        surfaceTintColor: Colors.transparent,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppDimensions.radiusLarge),
+          borderRadius: BorderRadius.circular(20),
         ),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
@@ -54,14 +57,15 @@ class AppTheme {
           backgroundColor: c.primary,
           foregroundColor: onPrimary,
           minimumSize: const Size(double.infinity, AppDimensions.buttonHeight),
-          elevation: 1,
-          shadowColor: c.primary.withOpacity(0.12),
+          elevation: 0,
+          shadowColor: Colors.transparent,
+          surfaceTintColor: Colors.transparent,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppDimensions.buttonRadius),
+            borderRadius: BorderRadius.circular(16),
           ),
           textStyle: GoogleFonts.notoSans(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
+            fontSize: 15,
+            fontWeight: FontWeight.w700,
           ),
         ),
       ),
@@ -77,9 +81,10 @@ class AppTheme {
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           foregroundColor: c.primary,
-          side: BorderSide(color: c.primary),
+          side: BorderSide(color: c.primary.withOpacity(0.4)),
+          surfaceTintColor: Colors.transparent,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppDimensions.buttonRadius),
+            borderRadius: BorderRadius.circular(16),
           ),
           textStyle: GoogleFonts.notoSans(
             fontSize: 14,
@@ -110,15 +115,15 @@ class AppTheme {
         filled: true,
         fillColor: c.surfaceVariant,
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppDimensions.radiusMedium),
+          borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide.none,
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppDimensions.radiusMedium),
+          borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide(color: c.primary.withOpacity(0.08)),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppDimensions.radiusMedium),
+          borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide(color: c.primary, width: 1.5),
         ),
         contentPadding: const EdgeInsets.symmetric(
@@ -127,7 +132,7 @@ class AppTheme {
         ),
         hintStyle: GoogleFonts.notoSans(
           color: c.textHint,
-          fontSize: 16,
+          fontSize: 15,
         ),
       ),
       bottomNavigationBarTheme: BottomNavigationBarThemeData(

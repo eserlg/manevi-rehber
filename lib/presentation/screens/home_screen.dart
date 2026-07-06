@@ -556,142 +556,130 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(AppDimensions.spacingXL),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            AppColors.primary,
-            AppColors.primaryLight,
-          ],
-        ),
-        borderRadius: BorderRadius.circular(AppDimensions.radiusLarge + 8),
+        color: AppColors.primary,
+        borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primary.withOpacity(0.18),
-            blurRadius: 28,
+            color: AppColors.primary.withOpacity(0.22),
+            blurRadius: 32,
             offset: const Offset(0, 14),
           ),
         ],
       ),
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          final wide = constraints.maxWidth >= 520;
-
-          final prayerInfo = Column(
-            crossAxisAlignment:
-                wide ? CrossAxisAlignment.start : CrossAxisAlignment.center,
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppDimensions.spacingMD,
-                  vertical: AppDimensions.spacingXS,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.18),
-                  borderRadius:
-                      BorderRadius.circular(AppDimensions.radiusCircle),
-                  border: Border.all(color: Colors.white.withOpacity(0.28)),
-                ),
-                child: Text(
-                  'Sonraki Namaz',
-                  style: GoogleFonts.notoSans(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 0.4,
-                    color: Colors.white.withOpacity(0.95),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(
+              AppDimensions.spacingXL,
+              AppDimensions.spacingXL,
+              AppDimensions.spacingXL,
+              AppDimensions.spacingSM,
+            ),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.16),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    'Sonraki Namaz',
+                    style: GoogleFonts.notoSans(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 0.5,
+                      color: Colors.white.withOpacity(0.9),
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(height: AppDimensions.spacingSM),
-              Text(
-                nextPrayer,
-                style: GoogleFonts.amiri(
-                  fontSize: wide ? 52 : 42,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                  height: 1.1,
-                ),
-              ),
-              Text(
-                nextPrayerTime,
-                style: GoogleFonts.amiri(
-                  fontSize: wide ? 34 : 30,
-                  color: Colors.white.withOpacity(0.92),
-                ),
-              ),
-            ],
-          );
-
-          final countdown = Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppDimensions.spacingLG,
-              vertical: AppDimensions.spacingMD,
-            ),
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.18),
-              borderRadius: BorderRadius.circular(AppDimensions.radiusLarge + 8),
-              border: Border.all(color: Colors.white.withOpacity(0.22)),
-              boxShadow: [
-                BoxShadow(
-                  color: AppColors.primaryDark.withOpacity(0.15),
-                  blurRadius: 16,
-                  offset: const Offset(0, 8),
-                ),
-              ],
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment:
-                  wide ? CrossAxisAlignment.end : CrossAxisAlignment.center,
-              children: [
+                const Spacer(),
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.timer, color: Colors.white, size: 20),
-                    const SizedBox(width: AppDimensions.spacingSM),
+                    const Icon(Icons.timer, color: Colors.white70, size: 16),
+                    const SizedBox(width: 4),
                     Text(
                       _formatDuration(timeUntil),
                       style: GoogleFonts.notoSans(
-                        fontSize: 22,
-                        fontWeight: FontWeight.w800,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
                         color: Colors.white,
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: AppDimensions.spacingSM),
-                Text(
-                  prayerTimes.hijriDate,
-                  style: GoogleFonts.notoSans(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white.withOpacity(0.86),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppDimensions.spacingXL,
+            ),
+            child: Text(
+              nextPrayer,
+              style: GoogleFonts.amiri(
+                fontSize: 48,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+                height: 1.1,
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(
+              AppDimensions.spacingXL,
+              4,
+              AppDimensions.spacingXL,
+              8,
+            ),
+            child: Text(
+              nextPrayerTime,
+              style: GoogleFonts.amiri(
+                fontSize: 32,
+                color: Colors.white.withOpacity(0.88),
+              ),
+            ),
+          ),
+          Container(
+            margin: const EdgeInsets.fromLTRB(
+              AppDimensions.spacingMD,
+              0,
+              AppDimensions.spacingMD,
+              AppDimensions.spacingMD,
+            ),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppDimensions.spacingMD,
+              vertical: AppDimensions.spacingSM + 2,
+            ),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.10),
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.calendar_today,
+                    color: Colors.white70, size: 14),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Text(
+                    prayerTimes.hijriDate ?? '',
+                    style: GoogleFonts.notoSans(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white.withOpacity(0.82),
+                    ),
                   ),
                 ),
               ],
             ),
-          );
-
-          if (wide) {
-            return Row(
-              children: [
-                Expanded(child: prayerInfo),
-                const SizedBox(width: AppDimensions.spacingLG),
-                countdown,
-              ],
-            );
-          }
-
-          return Column(
-            children: [
-              prayerInfo,
-              const SizedBox(height: AppDimensions.spacingMD),
-              countdown,
-            ],
-          );
-        },
+          ),
+        ],
       ),
     );
   }
@@ -750,18 +738,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       color: Colors.transparent,
       child: InkWell(
         onTap: () => ref.read(selectedTabProvider.notifier).state = 1,
-        borderRadius: BorderRadius.circular(AppDimensions.radiusLarge),
+        borderRadius: BorderRadius.circular(20),
         child: Container(
-          padding: const EdgeInsets.all(AppDimensions.spacingLG),
+          padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: AppColors.surface.withOpacity(0.88),
-            borderRadius: BorderRadius.circular(AppDimensions.radiusLarge),
-            border: Border.all(color: AppColors.primary.withOpacity(0.14)),
+            color: AppColors.surface,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: AppColors.surfaceVariant),
             boxShadow: [
               BoxShadow(
-                color: AppColors.primaryDark.withOpacity(0.06),
-                blurRadius: 22,
-                offset: const Offset(0, 12),
+                color: Colors.black.withOpacity(0.04),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
               ),
             ],
           ),
@@ -771,11 +759,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 alignment: Alignment.center,
                 children: [
                   SizedBox(
-                    width: 58,
-                    height: 58,
+                    width: 52,
+                    height: 52,
                     child: CircularProgressIndicator(
                       value: progress,
-                      strokeWidth: 7,
+                      strokeWidth: 5,
                       backgroundColor: AppColors.surfaceVariant,
                       color: AppColors.primary,
                     ),
@@ -790,7 +778,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   ),
                 ],
               ),
-              const SizedBox(width: AppDimensions.spacingMD),
+              const SizedBox(width: 16),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -798,17 +786,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     Text(
                       'Namaz Takibi',
                       style: GoogleFonts.notoSans(
-                        fontSize: 17,
+                        fontSize: 15,
                         fontWeight: FontWeight.w700,
                         color: AppColors.textPrimary,
                       ),
                     ),
-                    const SizedBox(height: AppDimensions.spacingXS),
+                    const SizedBox(height: 2),
                     Text(
-                      'Bugün $completed vakit işaretlendi. Son 7 günde $weeklyFullDays gün tam.',
+                      'Bugün $completed vakit • Son 7 günde $weeklyFullDays tam gün',
                       style: GoogleFonts.notoSans(
                         fontSize: 12,
-                        height: 1.35,
                         color: AppColors.textSecondary,
                       ),
                     ),
@@ -937,7 +924,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             crossAxisCount: 2,
             crossAxisSpacing: AppDimensions.spacingMD,
             mainAxisSpacing: AppDimensions.spacingMD,
-            childAspectRatio: 0.92,
+            childAspectRatio: 1.02,
           ),
           itemBuilder: (context, index) {
             final action = actions[index];
@@ -1573,26 +1560,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(AppDimensions.radiusLarge),
+        borderRadius: BorderRadius.circular(20),
         child: Container(
           constraints: const BoxConstraints(minHeight: 110),
-          padding: const EdgeInsets.all(AppDimensions.spacingMD),
+          padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                color.withOpacity(0.14),
-                AppColors.surface.withOpacity(0.86),
-              ],
-            ),
-            borderRadius: BorderRadius.circular(AppDimensions.radiusLarge),
-            border: Border.all(color: color.withOpacity(0.22)),
+            color: AppColors.surface,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: AppColors.surfaceVariant),
             boxShadow: [
               BoxShadow(
-                color: color.withOpacity(0.08),
+                color: Colors.black.withOpacity(0.04),
                 blurRadius: 12,
-                offset: const Offset(0, 6),
+                offset: const Offset(0, 4),
               ),
             ],
           ),
@@ -1601,27 +1581,28 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
-                padding: const EdgeInsets.all(AppDimensions.spacingSM),
+                width: 42,
+                height: 42,
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.14),
-                  borderRadius:
-                      BorderRadius.circular(AppDimensions.radiusMedium),
+                  color: color.withOpacity(0.12),
+                  borderRadius: BorderRadius.circular(14),
                 ),
-                child: Icon(icon, color: color, size: 26),
+                child: Icon(icon, color: color, size: 22),
               ),
-              const SizedBox(height: AppDimensions.spacingSM),
+              const SizedBox(height: 12),
               Text(
                 title,
                 style: GoogleFonts.notoSans(
-                  fontSize: 15,
+                  fontSize: 14,
                   fontWeight: FontWeight.w700,
                   color: AppColors.textPrimary,
                 ),
               ),
+              const SizedBox(height: 2),
               Text(
                 subtitle,
                 style: GoogleFonts.notoSans(
-                  fontSize: 12,
+                  fontSize: 11,
                   fontWeight: FontWeight.w500,
                   color: AppColors.textSecondary,
                 ),

@@ -83,11 +83,23 @@ class _PrayersScreenState extends ConsumerState<PrayersScreen> {
       appBar: AppBar(
         title: const Text('Dualar'),
       ),
-      body: Column(
-        children: [
-          // Search Bar
-          Padding(
-            padding: const EdgeInsets.all(AppDimensions.screenPadding),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              const Color(0xFFFDFCF7),
+              AppColors.background,
+              AppColors.surfaceVariant.withOpacity(0.6),
+            ],
+          ),
+        ),
+        child: Column(
+          children: [
+            // Search Bar
+            Padding(
+              padding: const EdgeInsets.all(AppDimensions.screenPadding),
             child: TextField(
               controller: _searchController,
               onChanged: (value) {
@@ -153,7 +165,8 @@ class _PrayersScreenState extends ConsumerState<PrayersScreen> {
           ),
         ],
       ),
-    );
+    ),
+  );
   }
 
   Widget _buildCategoryChip(String label, String? category, String? selected) {
@@ -255,7 +268,7 @@ class _PrayersScreenState extends ConsumerState<PrayersScreen> {
                       vertical: AppDimensions.spacingXS,
                     ),
                     decoration: BoxDecoration(
-                      color: AppColors.secondary.withOpacity(0.5),
+                      color: AppColors.surfaceVariant,
                       borderRadius:
                           BorderRadius.circular(AppDimensions.radiusSmall),
                     ),

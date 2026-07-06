@@ -65,13 +65,25 @@ class _PrayerTimesScreenState extends ConsumerState<PrayerTimesScreen> {
     final nextPrayer = prayerTimes.getNextPrayer();
     final timeUntilNextPrayer = prayerTimes.getTimeUntilNextPrayer();
 
-    return RefreshIndicator(
-      onRefresh: () async {
-        ref.invalidate(prayerTimesProvider);
-      },
-      child: ListView(
-        padding: const EdgeInsets.all(AppDimensions.screenPadding),
-        children: [
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            const Color(0xFFFDFCF7),
+            AppColors.background,
+            AppColors.surfaceVariant.withOpacity(0.6),
+          ],
+        ),
+      ),
+      child: RefreshIndicator(
+        onRefresh: () async {
+          ref.invalidate(prayerTimesProvider);
+        },
+        child: ListView(
+          padding: const EdgeInsets.all(AppDimensions.screenPadding),
+          children: [
           // Location Card
           Container(
             padding: const EdgeInsets.all(AppDimensions.spacingMD),
@@ -258,6 +270,7 @@ class _PrayerTimesScreenState extends ConsumerState<PrayerTimesScreen> {
           ),
         ],
       ),
+    ),
     );
   }
 
@@ -273,12 +286,12 @@ class _PrayerTimesScreenState extends ConsumerState<PrayerTimesScreen> {
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(AppDimensions.radiusLarge),
-        border: Border.all(color: AppColors.primary.withOpacity(0.14)),
+        border: Border.all(color: AppColors.primary.withOpacity(0.10)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 18,
-            offset: const Offset(0, 10),
+            color: Colors.black.withOpacity(0.03),
+            blurRadius: 12,
+            offset: const Offset(0, 8),
           ),
         ],
       ),

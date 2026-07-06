@@ -47,14 +47,26 @@ class ZikrScreen extends ConsumerWidget {
           ),
         ],
       ),
-      body: Column(
-        children: [
-          // Zikr Selection Tabs
-          Container(
-            height: 60,
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppDimensions.screenPadding,
-            ),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              const Color(0xFFFDFCF7),
+              AppColors.background,
+              AppColors.surfaceVariant.withOpacity(0.6),
+            ],
+          ),
+        ),
+        child: Column(
+          children: [
+            // Zikr Selection Tabs
+            Container(
+              height: 60,
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppDimensions.screenPadding,
+              ),
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
               itemCount: zikrList.length,
@@ -183,7 +195,8 @@ class ZikrScreen extends ConsumerWidget {
           _buildDailyProgress(zikrList),
         ],
       ),
-    );
+    ),
+  );
   }
 
   Widget _buildAudioActions(BuildContext context, WidgetRef ref, Zikr zikr) {

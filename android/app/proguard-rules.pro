@@ -21,6 +21,10 @@
 # url_launcher
 -keep class io.flutter.plugins.urllauncher.** { *; }
 
+# Flutter deferred components (not used, but Flutter engine references them)
+-dontwarn com.google.android.play.core.**
+-keep class com.google.android.play.core.** { *; }
+
 # General Android
 -keepattributes *Annotation*
 -keepattributes SourceFile,LineNumberTable

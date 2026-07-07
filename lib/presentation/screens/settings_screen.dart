@@ -12,7 +12,7 @@ import '../../data/services/app_share_service.dart';
 import '../providers/providers.dart';
 
 const String _playStoreUrl =
-    'https://play.google.com/store/apps/details?id=com.example.ruh_huzur';
+    'https://play.google.com/store/apps/details?id=com.eseru.manevirehber';
 const String _appStoreUrl =
     'https://apps.apple.com/tr/search?term=Manevi%20Rehber';
 

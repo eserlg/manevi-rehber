@@ -1,11 +1,11 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "bash build_web.sh",
+  "buildCommand": "bash build_web.sh && cp web/privacy.html build/web/privacy.html",
   "outputDirectory": "build/web",
   "cleanUrls": true,
   "rewrites": [
     {
-      "source": "/(.*)",
+      "source": "/((?!privacy\\.html).*)",
       "destination": "/index.html"
     }
   ]

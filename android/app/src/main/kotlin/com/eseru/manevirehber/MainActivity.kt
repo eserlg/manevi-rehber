@@ -1,4 +1,4 @@
-package com.example.ruh_huzur
+package com.eseru.manevirehber
 
 import io.flutter.embedding.android.FlutterActivity
 

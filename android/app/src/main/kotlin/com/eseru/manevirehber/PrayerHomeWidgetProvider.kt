@@ -1,4 +1,4 @@
-package com.example.ruh_huzur
+package com.eseru.manevirehber
 
 import android.app.PendingIntent
 import android.appwidget.AppWidgetManager

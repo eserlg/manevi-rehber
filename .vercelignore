@@ -1,0 +1,13 @@
+build/
+android/
+ios/
+test/
+tools/
+.venv/
+.dart_tool/
+.gradle/
+.vercel/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
